@@ -34,15 +34,15 @@ If you have questions concerning this license or the applicable additional terms
 #undef strncmp
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../libs/stb/stb_image.h"
+#include "vendor/stb/stb_image.h"
 
 //#define STB_IMAGE_WRITE_IMPLEMENTATION
-//#include "../libs/stb/stb_image_write.h"
+//#include "vendor/stb/stb_image_write.h"
 
 #define TINYEXR_IMPLEMENTATION
-#include "../libs/tinyexr/tinyexr.h"
+#include "vendor/tinyexr/tinyexr.h"
 
-#include "../libs/mesa/format_r11g11b10f.h"
+#include "vendor/mesa/format_r11g11b10f.h"
 
 #include "RenderCommon.h"
 

@@ -2266,7 +2266,7 @@ IMGUI RENDERING
 */
 #if !IMGUI_BFGUI
 
-	#include "libs/imgui/imgui.h"
+	#include "vendor/imgui/imgui.h"
 
 	int          g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
 	int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;

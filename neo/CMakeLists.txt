@@ -68,6 +68,9 @@ option(USE_SYSTEM_RAPIDJSON
 
 set(CPU_TYPE "" CACHE STRING "When set, passes this string as CPU-ID which will be embedded into the binary.")
 
+# Make sure to include repo root for vendor.
+include_directories("../")
+
 # SRS - Turn on optimization when cross-compiling from Apple arm64 to x86_64
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)" OR CMAKE_OSX_ARCHITECTURES MATCHES "x86_64")
 	set(CPU_OPTIMIZATION "-mmmx -msse -msse2" CACHE STRING "Which CPU specific optimitations should be used beside the compiler's default?")
@@ -161,7 +164,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 		add_definitions(-D__MSVCRT_VERSION__=0x0700)
 		
 		find_package(DirectX REQUIRED)
-		include_directories(libs/mingw-hacks)
+		include_directories(../vendor/mingw-hacks)
 		include_directories(${DirectX_INCLUDE_DIR})
 		add_definitions(-DUSE_XINPUT)
 	endif()	
@@ -320,7 +323,7 @@ if (ZLIB_FOUND)
     include_directories(${ZLIB_INCLUDE_DIRS})
     set(ZLIB_LIBRARY ${ZLIB_LIBRARIES})
 else (ZLIB_FOUND)
-    include_directories("libs/zlib")
+    include_directories("../vendor/zlib")
     set(ZLIB_LIBRARY "" )
 endif (ZLIB_FOUND)
 
@@ -332,7 +335,7 @@ if (PNG_FOUND)
     include_directories(${PNG_INCLUDE_DIRS})
     set(PNG_LIBRARY ${PNG_LIBRARIES})
 else (PNG_FOUND)
-    include_directories("libs/png")
+    include_directories("../vendor/png")
     set(PNG_LIBRARY "" )
 endif (PNG_FOUND)
 
@@ -345,7 +348,7 @@ if (JPEG_FOUND)
     set(JPEG_LIBRARY ${JPEG_LIBRARIES})
     add_definitions(-DUSE_NEWER_JPEG)
 else (JPEG_FOUND)
-    include_directories("libs/jpeg-6")
+    include_directories("../vendor/jpeg-6")
     set(JPEG_LIBRARY "" )
 endif (JPEG_FOUND)
 
@@ -448,17 +451,17 @@ else()
 		include_directories(${GLEW_INCLUDE_DIRS})
 		set(GLEW_LIBRARY ${GLEW_LIBRARIES})
 	else()
-		include_directories("libs/glew/include")
+		include_directories("../vendor/glew/include")
 		set(GLEW_LIBRARY "" )
 		add_definitions(-DGLEW_STATIC)
 		
-		set(GLEW_INCLUDES libs/glew/include/GL/glew.h)
-		set(GLEW_SOURCES libs/glew/src/glew.c)
+		set(GLEW_INCLUDES ../vendor/glew/include/GL/glew.h)
+		set(GLEW_SOURCES ../vendor/glew/src/glew.c)
 
 		if(WIN32)
-			set(GLEW_INCLUDES ${GLEW_INCLUDES} libs/glew/include/GL/wglew.h)
+			set(GLEW_INCLUDES ${GLEW_INCLUDES} ../vendor/glew/include/GL/wglew.h)
 		else()
-			set(GLEW_INCLUDES ${GLEW_INCLUDES} libs/glew/include/GL/glxew.h)
+			set(GLEW_INCLUDES ${GLEW_INCLUDES} ../vendor/glew/include/GL/glxew.h)
 		endif()
 		
 	endif()
@@ -472,7 +475,7 @@ if (RAPIDJSON_FOUND)
 	include_directories("${RAPIDJSON_INCLUDE_DIRS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RAPIDJSON_CXX_FLAGS}")
 else (RAPIDJSON_FOUND)
-	include_directories("libs/rapidjson/include")
+	include_directories("../vendor/rapidjson/include")
 endif (RAPIDJSON_FOUND)
 
 
@@ -526,149 +529,149 @@ file(GLOB SHADERS_BUILTIN_SSGI ../base/renderprogs/builtin/SSGI/*.hlsl )
 file(GLOB SHADERS_BUILTIN_VIDEO ../base/renderprogs/builtin/video/*.hlsl )
 file(GLOB SHADERS_BUILTIN_VR ../base/renderprogs/builtin/VR/*.hlsl )
 
-file(GLOB IRRXML_INCLUDES libs/irrxml/src/*.h)
-file(GLOB IRRXML_SOURCES libs/irrxml/src/*.cpp)
+file(GLOB IRRXML_INCLUDES ../vendor/irrxml/src/*.h)
+file(GLOB IRRXML_SOURCES ../vendor/irrxml/src/*.cpp)
 
-file(GLOB IMGUI_INCLUDES libs/imgui/*.h)
-file(GLOB IMGUI_SOURCES libs/imgui/*.cpp)
+file(GLOB IMGUI_INCLUDES ../vendor/imgui/*.h)
+file(GLOB IMGUI_SOURCES ../vendor/imgui/*.cpp)
 
-file(GLOB STB_INCLUDES libs/stb/*.h)
+file(GLOB STB_INCLUDES ../vendor/stb/*.h)
 
-file(GLOB MESA_INCLUDES libs/mesa/*.h)
+file(GLOB MESA_INCLUDES ../vendor/mesa/*.h)
 
-file(GLOB TINYEXR_INCLUDES libs/tinyexr/*.h)
+file(GLOB TINYEXR_INCLUDES ../vendor/tinyexr/*.h)
 
-file(GLOB MIKKTSPACE_INCLUDES libs/mikktspace/*.h)
-file(GLOB MIKKTSPACE_SOURCES libs/mikktspace/*.c)
+file(GLOB MIKKTSPACE_INCLUDES ../vendor/mikktspace/*.h)
+file(GLOB MIKKTSPACE_SOURCES ../vendor/mikktspace/*.c)
 
 if (NOT JPEG_FOUND)
     set(JPEG_INCLUDES
-        libs/jpeg-6/jchuff.h
-        libs/jpeg-6/jconfig.h
-        libs/jpeg-6/jdct.h
-        libs/jpeg-6/jdhuff.h
-        libs/jpeg-6/jerror.h
-        libs/jpeg-6/jinclude.h
-        libs/jpeg-6/jmemsys.h
-        libs/jpeg-6/jmorecfg.h
-        libs/jpeg-6/jpegint.h
-        libs/jpeg-6/jpeglib.h
-        libs/jpeg-6/jversion.h)
+        ../vendor/jpeg-6/jchuff.h
+        ../vendor/jpeg-6/jconfig.h
+        ../vendor/jpeg-6/jdct.h
+        ../vendor/jpeg-6/jdhuff.h
+        ../vendor/jpeg-6/jerror.h
+        ../vendor/jpeg-6/jinclude.h
+        ../vendor/jpeg-6/jmemsys.h
+        ../vendor/jpeg-6/jmorecfg.h
+        ../vendor/jpeg-6/jpegint.h
+        ../vendor/jpeg-6/jpeglib.h
+        ../vendor/jpeg-6/jversion.h)
 
     set(JPEG_SOURCES
-        libs/jpeg-6/jcapimin.cpp
-        libs/jpeg-6/jcapistd.cpp
-        libs/jpeg-6/jccoefct.cpp
-        libs/jpeg-6/jccolor.cpp
-        libs/jpeg-6/jcdctmgr.cpp
-        libs/jpeg-6/jchuff.cpp
-        libs/jpeg-6/jcinit.cpp
-        libs/jpeg-6/jcmainct.cpp
-        libs/jpeg-6/jcmarker.cpp
-        libs/jpeg-6/jcmaster.cpp
-        libs/jpeg-6/jcomapi.cpp
-        libs/jpeg-6/jcparam.cpp
-        libs/jpeg-6/jcphuff.cpp
-        libs/jpeg-6/jcprepct.cpp
-        libs/jpeg-6/jcsample.cpp
-        libs/jpeg-6/jctrans.cpp
-        libs/jpeg-6/jdapimin.cpp
-        libs/jpeg-6/jdapistd.cpp
-        libs/jpeg-6/jdatadst.cpp
-        libs/jpeg-6/jdatasrc.cpp
-        libs/jpeg-6/jdcoefct.cpp
-        libs/jpeg-6/jdcolor.cpp
-        libs/jpeg-6/jddctmgr.cpp
-        libs/jpeg-6/jdhuff.cpp
-        libs/jpeg-6/jdinput.cpp
-        libs/jpeg-6/jdmainct.cpp
-        libs/jpeg-6/jdmarker.cpp
-        libs/jpeg-6/jdmaster.cpp
-        libs/jpeg-6/jdmerge.cpp
-        libs/jpeg-6/jdphuff.cpp
-        libs/jpeg-6/jdpostct.cpp
-        libs/jpeg-6/jdsample.cpp
-        libs/jpeg-6/jdtrans.cpp
-        libs/jpeg-6/jerror.cpp
-        libs/jpeg-6/jfdctflt.cpp
-        libs/jpeg-6/jfdctfst.cpp
-        libs/jpeg-6/jfdctint.cpp
-        libs/jpeg-6/jidctflt.cpp
-        libs/jpeg-6/jidctfst.cpp
-        libs/jpeg-6/jidctint.cpp
-        libs/jpeg-6/jidctred.cpp
-        #libs/jpeg-6/jload.cpp
-        libs/jpeg-6/jmemmgr.cpp
-        libs/jpeg-6/jmemnobs.cpp
-        #libs/jpeg-6/jpegtran.cpp
-        libs/jpeg-6/jquant1.cpp
-        libs/jpeg-6/jquant2.cpp
-        libs/jpeg-6/jutils.cpp)
+        ../vendor/jpeg-6/jcapimin.cpp
+        ../vendor/jpeg-6/jcapistd.cpp
+        ../vendor/jpeg-6/jccoefct.cpp
+        ../vendor/jpeg-6/jccolor.cpp
+        ../vendor/jpeg-6/jcdctmgr.cpp
+        ../vendor/jpeg-6/jchuff.cpp
+        ../vendor/jpeg-6/jcinit.cpp
+        ../vendor/jpeg-6/jcmainct.cpp
+        ../vendor/jpeg-6/jcmarker.cpp
+        ../vendor/jpeg-6/jcmaster.cpp
+        ../vendor/jpeg-6/jcomapi.cpp
+        ../vendor/jpeg-6/jcparam.cpp
+        ../vendor/jpeg-6/jcphuff.cpp
+        ../vendor/jpeg-6/jcprepct.cpp
+        ../vendor/jpeg-6/jcsample.cpp
+        ../vendor/jpeg-6/jctrans.cpp
+        ../vendor/jpeg-6/jdapimin.cpp
+        ../vendor/jpeg-6/jdapistd.cpp
+        ../vendor/jpeg-6/jdatadst.cpp
+        ../vendor/jpeg-6/jdatasrc.cpp
+        ../vendor/jpeg-6/jdcoefct.cpp
+        ../vendor/jpeg-6/jdcolor.cpp
+        ../vendor/jpeg-6/jddctmgr.cpp
+        ../vendor/jpeg-6/jdhuff.cpp
+        ../vendor/jpeg-6/jdinput.cpp
+        ../vendor/jpeg-6/jdmainct.cpp
+        ../vendor/jpeg-6/jdmarker.cpp
+        ../vendor/jpeg-6/jdmaster.cpp
+        ../vendor/jpeg-6/jdmerge.cpp
+        ../vendor/jpeg-6/jdphuff.cpp
+        ../vendor/jpeg-6/jdpostct.cpp
+        ../vendor/jpeg-6/jdsample.cpp
+        ../vendor/jpeg-6/jdtrans.cpp
+        ../vendor/jpeg-6/jerror.cpp
+        ../vendor/jpeg-6/jfdctflt.cpp
+        ../vendor/jpeg-6/jfdctfst.cpp
+        ../vendor/jpeg-6/jfdctint.cpp
+        ../vendor/jpeg-6/jidctflt.cpp
+        ../vendor/jpeg-6/jidctfst.cpp
+        ../vendor/jpeg-6/jidctint.cpp
+        ../vendor/jpeg-6/jidctred.cpp
+        #../vendor/jpeg-6/jload.cpp
+        ../vendor/jpeg-6/jmemmgr.cpp
+        ../vendor/jpeg-6/jmemnobs.cpp
+        #../vendor/jpeg-6/jpegtran.cpp
+        ../vendor/jpeg-6/jquant1.cpp
+        ../vendor/jpeg-6/jquant2.cpp
+        ../vendor/jpeg-6/jutils.cpp)
 else (NOT JPEG_FOUND)
    set(JPEG_INCLUDES "")
    set(JPEG_SOURCES "")
 endif (NOT JPEG_FOUND)
 
 if (NOT PNG_FOUND)
-    file(GLOB PNG_INCLUDES libs/png/*.h)
-    file(GLOB PNG_SOURCES libs/png/*.c)
+    file(GLOB PNG_INCLUDES ../vendor/png/*.h)
+    file(GLOB PNG_SOURCES ../vendor/png/*.c)
 else (NOT PNG_FOUND)
     set(PNG_INCLUDES "")
     set(PNG_SOURCES "")
 endif (NOT PNG_FOUND)
 
 if (NOT ZLIB_FOUND)
-file(GLOB ZLIB_INCLUDES libs/zlib/*.h)
-file(GLOB ZLIB_SOURCES libs/zlib/*.c)
+file(GLOB ZLIB_INCLUDES ../vendor/zlib/*.h)
+file(GLOB ZLIB_SOURCES ../vendor/zlib/*.c)
 else (NOT ZLIB_FOUND)
   set(ZLIB_INCLUDES "")
   set(ZLIB_SOURCES "")
 endif (NOT ZLIB_FOUND)
 
 if(BINKDEC)
-	file(GLOB BINKDEC_INCLUDES libs/libbinkdec/include/*.h)
-	file(GLOB BINKDEC_SOURCES libs/libbinkdec/src/*.c libs/libbinkdec/src/*.cpp)
+	file(GLOB BINKDEC_INCLUDES ../vendor/libbinkdec/include/*.h)
+	file(GLOB BINKDEC_SOURCES ../vendor/libbinkdec/src/*.c ../vendor/libbinkdec/src/*.cpp)
 	add_definitions(-DUSE_BINKDEC)
-	include_directories("libs/libbinkdec/include")
+	include_directories("../vendor/libbinkdec/include")
 endif()
 
-file(GLOB MINIZIP_INCLUDES libs/zlib/minizip/*.h)
-file(GLOB MINIZIP_SOURCES libs/zlib/minizip/*.c libs/zlib/minizip/*.cpp)
+file(GLOB MINIZIP_INCLUDES ../vendor/zlib/minizip/*.h)
+file(GLOB MINIZIP_SOURCES ../vendor/zlib/minizip/*.c ../vendor/zlib/minizip/*.cpp)
 
 set(FREETYPE_SOURCES
-	libs/freetype/src/autofit/autofit.c
-	libs/freetype/src/bdf/bdf.c
-	libs/freetype/src/cff/cff.c
-	libs/freetype/src/base/ftbase.c
-	libs/freetype/src/base/ftbitmap.c
-	libs/freetype/src/cache/ftcache.c
-	libs/freetype/src/base/ftdebug.c
-	libs/freetype/src/base/ftgasp.c
-	libs/freetype/src/base/ftglyph.c
-	libs/freetype/src/gzip/ftgzip.c
-	libs/freetype/src/base/ftinit.c
-	libs/freetype/src/lzw/ftlzw.c
-	libs/freetype/src/base/ftstroke.c
-	libs/freetype/src/base/ftsystem.c
-	libs/freetype/src/smooth/smooth.c
-	libs/freetype/src/base/ftbbox.c
-	libs/freetype/src/base/ftmm.c
-	libs/freetype/src/base/ftpfr.c
-	libs/freetype/src/base/ftsynth.c
-	libs/freetype/src/base/fttype1.c
-	libs/freetype/src/base/ftwinfnt.c
-	libs/freetype/src/pcf/pcf.c
-	libs/freetype/src/pfr/pfr.c
-	libs/freetype/src/psaux/psaux.c
-	libs/freetype/src/pshinter/pshinter.c
-	libs/freetype/src/psnames/psmodule.c
-	libs/freetype/src/raster/raster.c
-	libs/freetype/src/sfnt/sfnt.c
-	libs/freetype/src/truetype/truetype.c
-	libs/freetype/src/type1/type1.c
-	libs/freetype/src/cid/type1cid.c
-	libs/freetype/src/type42/type42.c
-	libs/freetype/src/winfonts/winfnt.c)
+	../vendor/freetype/src/autofit/autofit.c
+	../vendor/freetype/src/bdf/bdf.c
+	../vendor/freetype/src/cff/cff.c
+	../vendor/freetype/src/base/ftbase.c
+	../vendor/freetype/src/base/ftbitmap.c
+	../vendor/freetype/src/cache/ftcache.c
+	../vendor/freetype/src/base/ftdebug.c
+	../vendor/freetype/src/base/ftgasp.c
+	../vendor/freetype/src/base/ftglyph.c
+	../vendor/freetype/src/gzip/ftgzip.c
+	../vendor/freetype/src/base/ftinit.c
+	../vendor/freetype/src/lzw/ftlzw.c
+	../vendor/freetype/src/base/ftstroke.c
+	../vendor/freetype/src/base/ftsystem.c
+	../vendor/freetype/src/smooth/smooth.c
+	../vendor/freetype/src/base/ftbbox.c
+	../vendor/freetype/src/base/ftmm.c
+	../vendor/freetype/src/base/ftpfr.c
+	../vendor/freetype/src/base/ftsynth.c
+	../vendor/freetype/src/base/fttype1.c
+	../vendor/freetype/src/base/ftwinfnt.c
+	../vendor/freetype/src/pcf/pcf.c
+	../vendor/freetype/src/pfr/pfr.c
+	../vendor/freetype/src/psaux/psaux.c
+	../vendor/freetype/src/pshinter/pshinter.c
+	../vendor/freetype/src/psnames/psmodule.c
+	../vendor/freetype/src/raster/raster.c
+	../vendor/freetype/src/sfnt/sfnt.c
+	../vendor/freetype/src/truetype/truetype.c
+	../vendor/freetype/src/type1/type1.c
+	../vendor/freetype/src/cid/type1cid.c
+	../vendor/freetype/src/type42/type42.c
+	../vendor/freetype/src/winfonts/winfnt.c)
 	
 	
 set(SOUND_INCLUDES
@@ -717,36 +720,36 @@ set(STUBAUDIO_SOURCES
 	sound/stub/SoundSample.cpp)
 	
 set(OGGVORBIS_INCLUDES
-	libs/oggvorbis/ogg/ogg.h
-	libs/oggvorbis/ogg/os_types.h)
+	../vendor/oggvorbis/ogg/ogg.h
+	../vendor/oggvorbis/ogg/os_types.h)
 	
 set(OGGVORBIS_SOURCES
-	libs/oggvorbis/oggsrc/bitwise.c
-	libs/oggvorbis/oggsrc/framing.c
+	../vendor/oggvorbis/oggsrc/bitwise.c
+	../vendor/oggvorbis/oggsrc/framing.c
 	
-	libs/oggvorbis/vorbissrc/mdct.c
-	libs/oggvorbis/vorbissrc/smallft.c
-	libs/oggvorbis/vorbissrc/block.c
-	libs/oggvorbis/vorbissrc/envelope.c
-	libs/oggvorbis/vorbissrc/windowvb.c
-	libs/oggvorbis/vorbissrc/lsp.c
-	libs/oggvorbis/vorbissrc/lpc.c
-	libs/oggvorbis/vorbissrc/analysis.c
-	libs/oggvorbis/vorbissrc/synthesis.c
-	libs/oggvorbis/vorbissrc/psy.c
-	libs/oggvorbis/vorbissrc/info.c
-	libs/oggvorbis/vorbissrc/floor1.c
-	libs/oggvorbis/vorbissrc/floor0.c
-	libs/oggvorbis/vorbissrc/res0.c
-	libs/oggvorbis/vorbissrc/mapping0.c
-	libs/oggvorbis/vorbissrc/registry.c
-	libs/oggvorbis/vorbissrc/codebook.c
-	libs/oggvorbis/vorbissrc/sharedbook.c
-	libs/oggvorbis/vorbissrc/lookup.c
-	libs/oggvorbis/vorbissrc/bitrate.c
-	libs/oggvorbis/vorbissrc/vorbisfile.c)
+	../vendor/oggvorbis/vorbissrc/mdct.c
+	../vendor/oggvorbis/vorbissrc/smallft.c
+	../vendor/oggvorbis/vorbissrc/block.c
+	../vendor/oggvorbis/vorbissrc/envelope.c
+	../vendor/oggvorbis/vorbissrc/windowvb.c
+	../vendor/oggvorbis/vorbissrc/lsp.c
+	../vendor/oggvorbis/vorbissrc/lpc.c
+	../vendor/oggvorbis/vorbissrc/analysis.c
+	../vendor/oggvorbis/vorbissrc/synthesis.c
+	../vendor/oggvorbis/vorbissrc/psy.c
+	../vendor/oggvorbis/vorbissrc/info.c
+	../vendor/oggvorbis/vorbissrc/floor1.c
+	../vendor/oggvorbis/vorbissrc/floor0.c
+	../vendor/oggvorbis/vorbissrc/res0.c
+	../vendor/oggvorbis/vorbissrc/mapping0.c
+	../vendor/oggvorbis/vorbissrc/registry.c
+	../vendor/oggvorbis/vorbissrc/codebook.c
+	../vendor/oggvorbis/vorbissrc/sharedbook.c
+	../vendor/oggvorbis/vorbissrc/lookup.c
+	../vendor/oggvorbis/vorbissrc/bitrate.c
+	../vendor/oggvorbis/vorbissrc/vorbisfile.c)
 
-file(GLOB RAPIDJSON_INCLUDES libs/rapidjson/include/rapidjson/*.h)
+file(GLOB RAPIDJSON_INCLUDES ../vendor/rapidjson/include/rapidjson/*.h)
 	
 file(GLOB SYS_INCLUDES sys/*.h)
 file(GLOB SYS_SOURCES sys/*.cpp)
@@ -1136,42 +1139,42 @@ source_group("renderer\\Shaders\\builtin\\SSGI" FILES ${SHADERS_BUILTIN_SSGI})
 source_group("renderer\\Shaders\\builtin\\video" FILES ${SHADERS_BUILTIN_VIDEO})
 source_group("renderer\\Shaders\\builtin\\VR" FILES ${SHADERS_BUILTIN_VR})
 
-source_group("libs\\irrxml" FILES ${IRRXML_INCLUDES})
-source_group("libs\\irrxml" FILES ${IRRXML_SOURCES})
+source_group("vendor\\irrxml" FILES ${IRRXML_INCLUDES})
+source_group("vendor\\irrxml" FILES ${IRRXML_SOURCES})
 
-source_group("libs\\imgui" FILES ${IMGUI_INCLUDES})
-source_group("libs\\imgui" FILES ${IMGUI_SOURCES})
+source_group("vendor\\imgui" FILES ${IMGUI_INCLUDES})
+source_group("vendor\\imgui" FILES ${IMGUI_SOURCES})
 
-source_group("libs\\stb" FILES ${STB_INCLUDES})
+source_group("vendor\\stb" FILES ${STB_INCLUDES})
 
-source_group("libs\\mesa" FILES ${MESA_INCLUDES})
+source_group("vendor\\mesa" FILES ${MESA_INCLUDES})
 
-source_group("libs\\tinyexr" FILES ${TINYEXR_INCLUDES})
+source_group("vendor\\tinyexr" FILES ${TINYEXR_INCLUDES})
 
-source_group("libs\\mikktspace" FILES ${MIKKTSPACE_INCLUDES})
-source_group("libs\\mikktspace" FILES ${MIKKTSPACE_SOURCES})
+source_group("vendor\\mikktspace" FILES ${MIKKTSPACE_INCLUDES})
+source_group("vendor\\mikktspace" FILES ${MIKKTSPACE_SOURCES})
 
-source_group("libs\\jpeg-6" FILES ${JPEG_INCLUDES})
-source_group("libs\\jpeg-6" FILES ${JPEG_SOURCES})
+source_group("vendor\\jpeg-6" FILES ${JPEG_INCLUDES})
+source_group("vendor\\jpeg-6" FILES ${JPEG_SOURCES})
 
-source_group("libs\\libbinkdec" FILES ${BINKDEC_INCLUDES})
-source_group("libs\\libbinkdec" FILES ${BINKDEC_SOURCES})
+source_group("vendor\\libbinkdec" FILES ${BINKDEC_INCLUDES})
+source_group("vendor\\libbinkdec" FILES ${BINKDEC_SOURCES})
 
-source_group("libs\\png" FILES ${PNG_INCLUDES})
-source_group("libs\\png" FILES ${PNG_SOURCES})
+source_group("vendor\\png" FILES ${PNG_INCLUDES})
+source_group("vendor\\png" FILES ${PNG_SOURCES})
 
-source_group("libs\\zlib" FILES ${ZLIB_INCLUDES})
-source_group("libs\\zlib" FILES ${ZLIB_SOURCES})
+source_group("vendor\\zlib" FILES ${ZLIB_INCLUDES})
+source_group("vendor\\zlib" FILES ${ZLIB_SOURCES})
 
-source_group("libs\\zlib\\minizip" FILES ${MINIZIP_INCLUDES})
-source_group("libs\\zlib\\minizip" FILES ${MINIZIP_SOURCES})
+source_group("vendor\\zlib\\minizip" FILES ${MINIZIP_INCLUDES})
+source_group("vendor\\zlib\\minizip" FILES ${MINIZIP_SOURCES})
 
-source_group("libs\\glew" FILES ${GLEW_INCLUDES})
-source_group("libs\\glew" FILES ${GLEW_SOURCES})
+source_group("vendor\\glew" FILES ${GLEW_INCLUDES})
+source_group("vendor\\glew" FILES ${GLEW_SOURCES})
 
-source_group("libs\\rapidjson" FILES ${RAPIDJSON_INCLUDES})
+source_group("vendor\\rapidjson" FILES ${RAPIDJSON_INCLUDES})
 
-source_group("libs\\freetype" FILES ${FREETYPE_SOURCES})
+source_group("vendor\\freetype" FILES ${FREETYPE_SOURCES})
 
 source_group("sound" FILES ${SOUND_INCLUDES})
 source_group("sound" FILES ${SOUND_SOURCES})
@@ -1185,8 +1188,8 @@ source_group("sound\\OpenAL" FILES ${OPENAL_SOURCES})
 source_group("sound\\stub" FILES ${STUBAUDIO_INCLUDES})
 source_group("sound\\stub" FILES ${STUBAUDIO_SOURCES})
 
-source_group("libs\\oggvorbis" FILES ${OGGVORBIS_INCLUDES})
-source_group("libs\\oggvorbis" FILES ${OGGVORBIS_SOURCES})
+source_group("vendor\\oggvorbis" FILES ${OGGVORBIS_INCLUDES})
+source_group("vendor\\oggvorbis" FILES ${OGGVORBIS_SOURCES})
 
 source_group("ui" FILES ${UI_INCLUDES})
 source_group("ui" FILES ${UI_SOURCES})
@@ -1458,12 +1461,12 @@ if(MSVC)
 	if(OPENAL)
 		add_definitions(-DUSE_OPENAL)
 	
-		include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/openal-soft/include)
+		include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/include)
 		
 		if(CMAKE_CL_64)
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/openal-soft/lib/win64)
+			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/lib/win64)
 		else()
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/openal-soft/lib/win32)
+			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/lib/win32)
 		endif()
 		
 		list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
@@ -1473,10 +1476,10 @@ if(MSVC)
 			OpenAL32)
 			
 		if(CMAKE_CL_64)
-			install(FILES libs/openal-soft/lib/bin/win64/OpenAL32.dll DESTINATION .)
+			install(FILES ../vendor/openal-soft/lib/bin/win64/OpenAL32.dll DESTINATION .)
 		else()
-			install(FILES libs/openal-soft/lib/bin/win32/OpenAL32.dll DESTINATION .)
-			install(FILES libs/openal-soft/lib/bin/win32/OpenAL32.pdb DESTINATION .)
+			install(FILES ../vendor/openal-soft/lib/bin/win32/OpenAL32.dll DESTINATION .)
+			install(FILES ../vendor/openal-soft/lib/bin/win32/OpenAL32.pdb DESTINATION .)
 		endif()
 	else()
 		list(APPEND RBDOOM3_INCLUDES ${XAUDIO2_INCLUDES})
@@ -1487,23 +1490,23 @@ if(MSVC)
 		add_definitions(-DUSE_FFMPEG)
 	
 		if(CMAKE_CL_64)
-			include_directories(libs/ffmpeg-win64/include)
-			include_directories(libs/ffmpeg-win64/include/libswscale)
-			include_directories(libs/ffmpeg-win64/include/libavformat)
-			include_directories(libs/ffmpeg-win64/include/libavdevice)
-			include_directories(libs/ffmpeg-win64/include/libavcodec)
-			include_directories(libs/ffmpeg-win64/include/libswresample)
+			include_directories(../vendor/ffmpeg-win64/include)
+			include_directories(../vendor/ffmpeg-win64/include/libswscale)
+			include_directories(../vendor/ffmpeg-win64/include/libavformat)
+			include_directories(../vendor/ffmpeg-win64/include/libavdevice)
+			include_directories(../vendor/ffmpeg-win64/include/libavcodec)
+			include_directories(../vendor/ffmpeg-win64/include/libswresample)
 			
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/ffmpeg-win64/lib)
+			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/ffmpeg-win64/lib)
 		else()
-			include_directories(libs/ffmpeg-win32/include)
-			include_directories(libs/ffmpeg-win32/include/libswscale)
-			include_directories(libs/ffmpeg-win32/include/libavformat)
-			include_directories(libs/ffmpeg-win32/include/libavdevice)
-			include_directories(libs/ffmpeg-win32/include/libavcodec)
-			include_directories(libs/ffmpeg-win32/include/libswresample)
+			include_directories(../vendor/ffmpeg-win32/include)
+			include_directories(../vendor/ffmpeg-win32/include/libswscale)
+			include_directories(../vendor/ffmpeg-win32/include/libavformat)
+			include_directories(../vendor/ffmpeg-win32/include/libavdevice)
+			include_directories(../vendor/ffmpeg-win32/include/libavcodec)
+			include_directories(../vendor/ffmpeg-win32/include/libswresample)
 			
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/ffmpeg-win32/lib)
+			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/ffmpeg-win32/lib)
 		endif()
 		
 		set(FFmpeg_LIBRARIES
@@ -1517,11 +1520,11 @@ if(MSVC)
 	
 	if(USE_MFC_TOOLS)
 		
-		include_directories(libs/atlmfc/include)
+		include_directories(../vendor/atlmfc/include)
 		if(CMAKE_CL_64)
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/atlmfc/lib/amd64)
+			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/atlmfc/lib/amd64)
 		else()
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/atlmfc/lib)
+			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/atlmfc/lib)
 		endif()
 		
 		add_definitions(-DUSE_MFC_TOOLS)
@@ -1555,8 +1558,8 @@ if(MSVC)
 	
 	if(USE_PRECOMPILED_HEADERS) 
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${TIMIDITY_SOURCES} ${JPEG_SOURCES} ${PNG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libs/zlib/minizip/ioapi.c)
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${PNG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/zlib/minizip/ioapi.c)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder_SSE2.cpp)
@@ -1720,8 +1723,8 @@ else()
 	
 	if(USE_PRECOMPILED_HEADERS) 	
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${TIMIDITY_SOURCES} ${JPEG_SOURCES} ${PNG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libs/zlib/minizip/ioapi.c)
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${PNG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/zlib/minizip/ioapi.c)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder_SSE2.cpp)

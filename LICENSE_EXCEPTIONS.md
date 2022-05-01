@@ -7,7 +7,7 @@ You are solely responsible for obtaining from the copyright holder a license for
 
 JPEG library
 -----------------------------------------------------------------------------
-neo/libs/jpeg-6/*
+vendor/jpeg-6/*
 
 Copyright (C) 1991-1995, Thomas G. Lane
 
@@ -37,7 +37,7 @@ better release of the library.
 
 zlib library
 ---------------------------------------------------------------------------
-neo/libs/zlib/*
+vendor/zlib/*
 
 Copyright (C) 1995-2012 Jean-loup Gailly and Mark Adler
 
@@ -92,7 +92,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 IO for (un)compress .zip files using zlib
 ---------------------------------------------------------------------------
-neo/libs/zlib/minizip/*
+vendor/zlib/minizip/*
 
 Copyright (C) 1998-2010 Gilles Vollant (minizip) ( http://www.winimage.com/zLibDll/minizip.html )
 
@@ -230,23 +230,10 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
 
-Timidity
----------------------------------------------------------------------------
-neo/libs/timidity/*
-
-Copyright (c) 1995 Tuukka Toivonen 
-
-From http://www.cgs.fi/~tt/discontinued.html :
-
-If you'd like to continue hacking on TiMidity, feel free. I'm
-hereby extending the TiMidity license agreement: you can now 
-select the most convenient license for your needs from (1) the
-GNU GPL, (2) the GNU LGPL, or (3) the Perl Artistic License.  
-
 
 libbinkdec
 ---------------------------------------------------------------------------
-neo/libs/libbinkdec/*
+vendor/libbinkdec/*
 
 Copyright (C) 2011 Barry Duncan
 
@@ -276,7 +263,7 @@ libbinkdec and (the used parts of) FFmpeg are released under LGPL v2.1:
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 (You can find the whole license text on https://www.gnu.org/licenses/lgpl-2.1.html
- or in neo/libs/libbinkdec/COPYING)
+ or in vendor/libbinkdec/COPYING)
 
 ImGui
 ---------------------------------------------------------------------------
@@ -305,7 +292,7 @@ SOFTWARE.
 
 RapidJSON
 ---------------------------------------------------------------------------
-neo/libs/rapidjson/*
+vendor/rapidjson/*
 
 Tencent is pleased to support the open source community by making RapidJSON available. 
  
@@ -369,7 +356,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Irrlicht XML Parser
 ---------------------------------------------------------------------------
-neo/libs/irrxml/*
+vendor/irrxml/*
 
 The irrXML license is based on the zlib license. Basicly, this means you can do with
 irrXML whatever you want:
@@ -398,7 +385,7 @@ freely, subject to the following restrictions:
 
 TinyEXR
 ---------------------------------------------------------------------------
-neo/libs/tinyexr/*
+vendor/tinyexr/*
 
 Copyright (c) 2014 - 2020, Syoyo Fujita and many contributors.
 All rights reserved.
@@ -463,7 +450,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PNG library
 -----------------------------------------------------------------------------
-neo/libs/png/*
+vendor/png/*
 
 This copy of the libpng notices is provided for your convenience.  In case of
 any discrepancy between this copy and the notices in the file png.h that is
@@ -580,7 +567,7 @@ March 29, 2012
 
 Mesa R11G11B10 utility functions
 -----------------------------------------------------------------------------
-neo/libs/mesa/format_r11g11b10f.h
+vendor/mesa/format_r11g11b10f.h
 
 /*
  * Copyright (C) 2011 Marek Olšák <maraeo@gmail.com>
@@ -614,7 +601,7 @@ neo/libs/mesa/format_r11g11b10f.h
 
 Mikkelsen Tangent Space library
 -----------------------------------------------------------------------------
-neo/libs/mikktspace/*
+vendor/mikktspace/*
 
 Copyright (C) 2011 by Morten S. Mikkelsen
 
@@ -637,7 +624,7 @@ freely, subject to the following restrictions:
 
 STB single header libraries
 -----------------------------------------------------------------------------
-neo/libs/stb/*
+vendor/stb/*
 
 These libraries are in the public domain. You can do anything you want with them.
 You have no legal obligation to do anything else, although I appreciate attribution.
@@ -648,7 +635,7 @@ Every source file includes an explicit dual-license for you to choose from.
 
  BinPack2D is a 2 dimensional, multi-bin, bin-packer.
 -----------------------------------------------------------------------------
-neo/libs/binpack2d/*
+vendor/binpack2d/*
 
 Copyright (c) 2013, Christopher Stones < chris.stones@zoho.com >
 All rights reserved.

@@ -30,7 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 #include "precompiled.h"
 
-//#include "../../libs/mesa/format_r11g11b10f.h"
+//#include "../../vendor/mesa/format_r11g11b10f.h"
 
 /*
 ================================================================================================

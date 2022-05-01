@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "RenderCommon.h"
 
-#include "libs/mikktspace/mikktspace.h"
+#include "vendor/mikktspace/mikktspace.h"
 
 /*
 ==============================================================================
