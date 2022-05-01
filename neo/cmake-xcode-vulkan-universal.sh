@@ -5,8 +5,6 @@ rm -rf xcode-vulkan-universal
 mkdir xcode-vulkan-universal
 cd xcode-vulkan-universal
 
-export MOLTENVK_SDK=$(find /usr/local/Cellar/molten-vk/* | head -n 1)
-
 # remove or set -DCMAKE_SUPPRESS_REGENERATION=OFF to reenable ZERO_CHECK target which checks for CMakeLists.txt changes and re-runs CMake before builds
 # however, if ZERO_CHECK is reenabled **must** add VULKAN_SDK location to Xcode Custom Paths (under Prefs/Locations) otherwise build failures may occur
 # note: universal openal-soft library and include paths assume MacPorts install locations

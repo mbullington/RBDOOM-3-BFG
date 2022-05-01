@@ -17,6 +17,13 @@ For discussions join the id Tech 4 Discord: https://discord.gg/Q3E9rUFnnP , #rbd
 
 <img src="https://i.imgur.com/nSWBSUB.png">
 
+# Notes
+
+MacOS: add to profile
+
+```
+export MOLTENVK_SDK=$(find /usr/local/Cellar/molten-vk/* | head -n 1)
+```
 
 # Table of Contents
 
