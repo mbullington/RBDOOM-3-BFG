@@ -2790,14 +2790,14 @@ idFileSystemLocal::SetupGameDirectories
 ================
 */
 void idFileSystemLocal::SetupGameDirectories(const char* gameName) {
+  // setup devpath for additional resources
+#if !defined(ID_RETAIL)
+  AddGameDirectory(Sys_DefaultDevPath(), gameName);
+#endif
   // setup basepath
   if (fs_basepath.GetString()[0]) {
     AddGameDirectory(fs_basepath.GetString(), gameName);
   }
-// setup devpath for additional resources
-#if !defined(ID_RETAIL)
-  AddGameDirectory(Sys_DefaultDevPath(), gameName);
-#endif
   // setup savepath
   if (fs_savepath.GetString()[0]) {
     AddGameDirectory(fs_savepath.GetString(), gameName);
