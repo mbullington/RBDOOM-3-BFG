@@ -40,7 +40,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #pragma hdrstop
 
 #include "RenderCommon.h"
-#include "RenderProgs_embedded.h"
 
 idCVar r_skipStripDeadCode("r_skipStripDeadCode", "0", CVAR_BOOL,
                            "Skip stripping dead code");
@@ -285,125 +284,6 @@ const char* idRenderProgManager::GLSLMacroNames[MAX_SHADER_MACRO_NAMES] = {
     "HDR_DEBUG",        "USE_SRGB",    "USE_PBR"};
 // RB end
 
-// RB: added embedded Cg shader resources
-const char* idRenderProgManager::FindEmbeddedSourceShader(const char* name) {
-  const char* embeddedSource = NULL;
-  for (int i = 0; cg_renderprogs[i].name; i++) {
-    if (!idStr::Icmp(cg_renderprogs[i].name, name)) {
-      embeddedSource = cg_renderprogs[i].shaderText;
-      break;
-    }
-  }
-
-  return embeddedSource;
-}
-
-class idParser_EmbeddedGLSL : public idParser {
- public:
-  idParser_EmbeddedGLSL(int flags) : idParser(flags) {}
-
- private:
-  int Directive_include(idToken* token, bool supressWarning) {
-    if (idParser::Directive_include(token, true)) {
-      // RB: try local shaders in base/renderprogs/ first
-      return true;
-    }
-
-    idLexer* script;
-
-    idStr path;
-
-    /*
-    token was already parsed
-    if( !idParser::ReadSourceToken( &token ) )
-    {
-            idParser::Error( "#include without file name" );
-            return false;
-    }
-    */
-
-    if (token->linesCrossed > 0) {
-      idParser::Error("#include without file name");
-      return false;
-    }
-
-    if (token->type == TT_STRING) {
-      script = new idLexer;
-
-      // try relative to the current file
-      path = scriptstack->GetFileName();
-      path.StripFilename();
-      path += "/";
-      path += *token;
-
-      // if( !script->LoadFile( path, OSPath ) )
-      const char* embeddedSource =
-          idRenderProgManager::FindEmbeddedSourceShader(path);
-      if (embeddedSource == NULL) {
-        // try absolute path
-        path = *token;
-        embeddedSource = idRenderProgManager::FindEmbeddedSourceShader(path);
-        if (embeddedSource == NULL) {
-          // try from the include path
-          path = includepath + *token;
-          embeddedSource = idRenderProgManager::FindEmbeddedSourceShader(path);
-        }
-      }
-
-      if (embeddedSource == NULL ||
-          !script->LoadMemory(embeddedSource, strlen(embeddedSource), path)) {
-        delete script;
-        script = NULL;
-      }
-    } else if (token->type == TT_PUNCTUATION && *token == "<") {
-      path = idParser::includepath;
-      while (idParser::ReadSourceToken(token)) {
-        if (token->linesCrossed > 0) {
-          idParser::UnreadSourceToken(token);
-          break;
-        }
-        if (token->type == TT_PUNCTUATION && *token == ">") {
-          break;
-        }
-        path += *token;
-      }
-      if (*token != ">") {
-        idParser::Warning("#include missing trailing >");
-      }
-      if (!path.Length()) {
-        idParser::Error("#include without file name between < >");
-        return false;
-      }
-      if (idParser::flags & LEXFL_NOBASEINCLUDES) {
-        return true;
-      }
-      script = new idLexer;
-
-      const char* embeddedSource =
-          idRenderProgManager::FindEmbeddedSourceShader(includepath + path);
-
-      if (embeddedSource == NULL ||
-          !script->LoadMemory(embeddedSource, strlen(embeddedSource), path)) {
-        delete script;
-        script = NULL;
-      }
-    } else {
-      idParser::Error("#include without file name");
-      return false;
-    }
-
-    if (!script) {
-      idParser::Error("file '%s' not found", path.c_str());
-      return false;
-    }
-    script->SetFlags(idParser::flags);
-    script->SetPunctuations(idParser::punctuations);
-    idParser::PushScript(script);
-    return true;
-  }
-};
-// RB end
-
 /*
 ========================
 StripDeadCode
@@ -417,7 +297,7 @@ idStr idRenderProgManager::StripDeadCode(const idStr& in, const char* name,
   }
 
   // idLexer src( LEXFL_NOFATALERRORS );
-  idParser_EmbeddedGLSL src(LEXFL_NOFATALERRORS);
+  idParser src(LEXFL_NOFATALERRORS);
   src.LoadMemory(in.c_str(), in.Length(), name);
 
   idStrStatic<256> sourceName = "filename ";
@@ -678,7 +558,7 @@ const char* vertexInsert = {
     //"vec3 saturate( vec3 v ) { return clamp( v, 0.0, 1.0 ); }\n"
     //"vec4 saturate( vec4 v ) { return clamp( v, 0.0, 1.0 ); }\n"
     //"vec4 tex2Dlod( sampler2D sampler, vec4 texcoord ) { return textureLod(
-    //sampler, texcoord.xy, texcoord.w ); }\n"
+    // sampler, texcoord.xy, texcoord.w ); }\n"
     //"\n"
 };
 
@@ -708,39 +588,40 @@ const char* fragmentInsert = {
     "vec4 saturate( vec4 v ) { return clamp( v, 0.0, 1.0 ); }\n"
     "\n"
     //"vec4 tex2D( sampler2D sampler, vec2 texcoord ) { return texture( sampler,
-    //texcoord.xy ); }\n" "vec4 tex2D( sampler2DShadow sampler, vec3 texcoord )
+    // texcoord.xy ); }\n" "vec4 tex2D( sampler2DShadow sampler, vec3 texcoord )
     //{ return vec4( texture( sampler, texcoord.xyz ) ); }\n"
     //"\n"
     //"vec4 tex2D( sampler2D sampler, vec2 texcoord, vec2 dx, vec2 dy ) { return
-    //textureGrad( sampler, texcoord.xy, dx, dy ); }\n" "vec4 tex2D(
-    //sampler2DShadow sampler, vec3 texcoord, vec2 dx, vec2 dy ) { return vec4(
-    //textureGrad( sampler, texcoord.xyz, dx, dy ) ); }\n"
+    // textureGrad( sampler, texcoord.xy, dx, dy ); }\n" "vec4 tex2D(
+    // sampler2DShadow sampler, vec3 texcoord, vec2 dx, vec2 dy ) { return vec4(
+    // textureGrad( sampler, texcoord.xyz, dx, dy ) ); }\n"
     //"\n"
     //"vec4 texCUBE( samplerCube sampler, vec3 texcoord ) { return texture(
-    //sampler, texcoord.xyz ); }\n" "vec4 texCUBE( samplerCubeShadow sampler,
-    //vec4 texcoord ) { return vec4( texture( sampler, texcoord.xyzw ) ); }\n"
+    // sampler, texcoord.xyz ); }\n" "vec4 texCUBE( samplerCubeShadow sampler,
+    // vec4 texcoord ) { return vec4( texture( sampler, texcoord.xyzw ) ); }\n"
     //"\n"
     //"vec4 tex1Dproj( sampler1D sampler, vec2 texcoord ) { return textureProj(
-    //sampler, texcoord ); }\n" "vec4 tex2Dproj( sampler2D sampler, vec3
-    //texcoord ) { return textureProj( sampler, texcoord ); }\n" "vec4
-    //tex3Dproj( sampler3D sampler, vec4 texcoord ) { return textureProj(
-    //sampler, texcoord ); }\n"
+    // sampler, texcoord ); }\n" "vec4 tex2Dproj( sampler2D sampler, vec3
+    // texcoord ) { return textureProj( sampler, texcoord ); }\n" "vec4
+    // tex3Dproj( sampler3D sampler, vec4 texcoord ) { return textureProj(
+    // sampler, texcoord ); }\n"
     //"\n"
     //"vec4 tex1Dbias( sampler1D sampler, vec4 texcoord ) { return texture(
-    //sampler, texcoord.x, texcoord.w ); }\n" "vec4 tex2Dbias( sampler2D
-    //sampler, vec4 texcoord ) { return texture( sampler, texcoord.xy,
-    //texcoord.w ); }\n" "vec4 tex3Dbias( sampler3D sampler, vec4 texcoord ) {
-    //return texture( sampler, texcoord.xyz, texcoord.w ); }\n" "vec4
-    //texCUBEbias( samplerCube sampler, vec4 texcoord ) { return texture(
-    //sampler, texcoord.xyz, texcoord.w ); }\n"
+    // sampler, texcoord.x, texcoord.w ); }\n" "vec4 tex2Dbias( sampler2D
+    // sampler, vec4 texcoord ) { return texture( sampler, texcoord.xy,
+    // texcoord.w ); }\n" "vec4 tex3Dbias( sampler3D sampler, vec4 texcoord ) {
+    // return texture( sampler, texcoord.xyz, texcoord.w ); }\n" "vec4
+    // texCUBEbias( samplerCube sampler, vec4 texcoord ) { return texture(
+    // sampler, texcoord.xyz, texcoord.w ); }\n"
     //"\n"
     //"vec4 tex1Dlod( sampler1D sampler, vec4 texcoord ) { return textureLod(
-    //sampler, texcoord.x, texcoord.w ); }\n" "vec4 tex2Dlod( sampler2D sampler,
-    //vec4 texcoord ) { return textureLod( sampler, texcoord.xy, texcoord.w );
+    // sampler, texcoord.x, texcoord.w ); }\n" "vec4 tex2Dlod( sampler2D
+    // sampler, vec4 texcoord ) { return textureLod( sampler, texcoord.xy,
+    // texcoord.w );
     //}\n" "vec4 tex3Dlod( sampler3D sampler, vec4 texcoord ) { return
-    //textureLod( sampler, texcoord.xyz, texcoord.w ); }\n" "vec4 texCUBElod(
-    //samplerCube sampler, vec4 texcoord ) { return textureLod( sampler,
-    //texcoord.xyz, texcoord.w ); }\n"
+    // textureLod( sampler, texcoord.xyz, texcoord.w ); }\n" "vec4 texCUBElod(
+    // samplerCube sampler, vec4 texcoord ) { return textureLod( sampler,
+    // texcoord.xyz, texcoord.w ); }\n"
     //"\n"
 };
 
@@ -757,7 +638,7 @@ const char* vertexInsert_GLSL_ES_3_00 = {
     "vec3 saturate( vec3 v ) { return clamp( v, 0.0, 1.0 ); }\n"
     "vec4 saturate( vec4 v ) { return clamp( v, 0.0, 1.0 ); }\n"
     //"vec4 tex2Dlod( sampler2D sampler, vec4 texcoord ) { return textureLod(
-    //sampler, texcoord.xy, texcoord.w ); }\n"
+    // sampler, texcoord.xy, texcoord.w ); }\n"
     "\n"};
 
 const char* fragmentInsert_GLSL_ES_3_00 = {
@@ -801,14 +682,14 @@ const char* fragmentInsert_GLSL_ES_3_00 = {
     "texture( sampler, texcoord.xyzw ) ); }\n"
     "\n"
     //"vec4 tex1Dproj( sampler1D sampler, vec2 texcoord ) { return textureProj(
-    //sampler, texcoord ); }\n"
+    // sampler, texcoord ); }\n"
     "vec4 tex2Dproj( sampler2D sampler, vec3 texcoord ) { return textureProj( "
     "sampler, texcoord ); }\n"
     "vec4 tex3Dproj( sampler3D sampler, vec4 texcoord ) { return textureProj( "
     "sampler, texcoord ); }\n"
     "\n"
     //"vec4 tex1Dbias( sampler1D sampler, vec4 texcoord ) { return texture(
-    //sampler, texcoord.x, texcoord.w ); }\n"
+    // sampler, texcoord.x, texcoord.w ); }\n"
     "vec4 tex2Dbias( sampler2D sampler, vec4 texcoord ) { return texture( "
     "sampler, texcoord.xy, texcoord.w ); }\n"
     "vec4 tex3Dbias( sampler3D sampler, vec4 texcoord ) { return texture( "
@@ -817,7 +698,7 @@ const char* fragmentInsert_GLSL_ES_3_00 = {
     "sampler, texcoord.xyz, texcoord.w ); }\n"
     "\n"
     //"vec4 tex1Dlod( sampler1D sampler, vec4 texcoord ) { return textureLod(
-    //sampler, texcoord.x, texcoord.w ); }\n"
+    // sampler, texcoord.x, texcoord.w ); }\n"
     "vec4 tex2Dlod( sampler2D sampler, vec4 texcoord ) { return textureLod( "
     "sampler, texcoord.xy, texcoord.w ); }\n"
     "vec4 tex3Dlod( sampler3D sampler, vec4 texcoord ) { return textureLod( "
