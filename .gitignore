@@ -45,3 +45,7 @@ neo/.kdev4
 neo/neo.kdev4
 neo/.idea/
 neo/cmake-build-*/
+
+# macOS support
+Resources
+.DS_Store
