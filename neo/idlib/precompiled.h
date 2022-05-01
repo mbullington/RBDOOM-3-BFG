@@ -4,24 +4,32 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
+This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
+Source Code").
 
-Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
 
-Doom 3 BFG Edition Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
+Doom 3 BFG Edition Source Code is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Doom 3 BFG Edition Source Code.  If not, see <http://www.gnu.org/licenses/>.
+along with Doom 3 BFG Edition Source Code.  If not, see
+<http://www.gnu.org/licenses/>.
 
-In addition, the Doom 3 BFG Edition Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a copy in writing from id Software at the address below.
+In addition, the Doom 3 BFG Edition Source Code is also subject to certain
+additional terms. You should have received a copy of these additional terms
+immediately following the terms and conditions of the GNU General Public License
+which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a
+copy in writing from id Software at the address below.
 
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
+If you have questions concerning this license or the applicable additional
+terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
+120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
 */
@@ -39,7 +47,9 @@ If you have questions concerning this license or the applicable additional terms
 
 //-----------------------------------------------------
 
-#define ID_TIME_T int64 // Signed because -1 means "File not found" and we don't want that to compare > than any other time
+#define ID_TIME_T \
+  int64  // Signed because -1 means "File not found" and we don't want that to
+         // compare > than any other time
 
 // non-portable system services
 #include "../sys/sys_public.h"
@@ -88,18 +98,19 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 // to be double buffered to allow it to run in
 // parallel on a dual cpu machine
 #if defined(__APPLE__) && defined(USE_VULKAN)
-	// SRS - macOS MoltenVK/Metal needs triple buffering for full screen to work properly
-	const uint32 NUM_FRAME_DATA	= 3;
+// SRS - macOS MoltenVK/Metal needs triple buffering for full screen to work
+// properly
+const uint32 NUM_FRAME_DATA = 3;
 #else
-	const uint32 NUM_FRAME_DATA = 2;
+const uint32 NUM_FRAME_DATA = 2;
 #endif
 
 #if defined(USE_VULKAN)
-	#include "../renderer/Vulkan/qvk.h"
+#include "../renderer/Vulkan/qvk.h"
 #else
-	// RB: replaced QGL with GLEW
-	#include <GL/glew.h>
-	// RB end
+// RB: replaced QGL with GLEW
+#include <GL/glew.h>
+// RB end
 #endif
 #include "../renderer/Cinematic.h"
 #include "../renderer/Material.h"
@@ -163,25 +174,25 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 
 #ifndef _D3SDK
 
-	#ifdef GAME_DLL
+#ifdef GAME_DLL
 
-		#include "../d3xp/Game_local.h"
+#include "../d3xp/Game_local.h"
 
-	#else
+#else
 
-		#include "../framework/DemoChecksum.h"
+#include "../framework/DemoChecksum.h"
 
-		// framework
-		#include "../framework/Compressor.h"
-		#include "../framework/EventLoop.h"
-		#include "../framework/KeyInput.h"
-		#include "../framework/EditField.h"
-		#include "../framework/DebugGraph.h"
-		#include "../framework/Console.h"
-		#include "../framework/DemoFile.h"
-		#include "../framework/Common_dialog.h"
+// framework
+#include "../framework/Compressor.h"
+#include "../framework/EventLoop.h"
+#include "../framework/KeyInput.h"
+#include "../framework/EditField.h"
+#include "../framework/DebugGraph.h"
+#include "../framework/Console.h"
+#include "../framework/DemoFile.h"
+#include "../framework/Common_dialog.h"
 
-	#endif /* !GAME_DLL */
+#endif /* !GAME_DLL */
 
 #endif /* !_D3SDK */
 
@@ -189,6 +200,6 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 
 #undef min
 #undef max
-#include <algorithm>	// for min / max / swap
+#include <algorithm>  // for min / max / swap
 
 #endif /* !__PRECOMPILED_H__ */

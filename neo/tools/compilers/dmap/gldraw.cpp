@@ -19,9 +19,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Doom 3 Source Code.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, the Doom 3 Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 Source Code.  If not, please request a copy in writing from id Software at the address below.
+In addition, the Doom 3 Source Code is also subject to certain additional terms.
+You should have received a copy of these additional terms immediately following
+the terms and conditions of the GNU General Public License which accompanied the
+Doom 3 Source Code.  If not, please request a copy in writing from id Software
+at the address below.
 
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
+If you have questions concerning this license or the applicable additional
+terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
+120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
 */
@@ -37,7 +43,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <GL/glu.h>
 //#include <GL/glaux.h>
 
-#define	WIN_SIZE	1024
+#define WIN_SIZE 1024
 
 void Draw_ClearWindow()
 {
@@ -235,7 +241,7 @@ void DrawLine( idVec3 v1, idVec3 v2, int color )
 
 //============================================================
 
-#define	GLSERV_PORT	25001
+#define GLSERV_PORT 25001
 
 bool	wins_init;
 int			draw_socket;
@@ -321,28 +327,16 @@ void GLS_EndScene()
 
 #else
 
-void Draw_ClearWindow()
-{
-}
+void Draw_ClearWindow() {}
 
-void DrawWinding( const idWinding* w )
-{
-}
+void DrawWinding(const idWinding* w) {}
 
-void DrawAuxWinding( const idWinding* w )
-{
-}
+void DrawAuxWinding(const idWinding* w) {}
 
-void GLS_Winding( const idWinding* w, int code )
-{
-}
+void GLS_Winding(const idWinding* w, int code) {}
 
-void GLS_BeginScene()
-{
-}
+void GLS_BeginScene() {}
 
-void GLS_EndScene()
-{
-}
+void GLS_EndScene() {}
 
 #endif

@@ -4,24 +4,32 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 2014-2016 Robert Beckebans
 
-This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
+This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
+Source Code").
 
-Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
 
-Doom 3 BFG Edition Source Code is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
+Doom 3 BFG Edition Source Code is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Doom 3 BFG Edition Source Code.  If not, see <http://www.gnu.org/licenses/>.
+along with Doom 3 BFG Edition Source Code.  If not, see
+<http://www.gnu.org/licenses/>.
 
-In addition, the Doom 3 BFG Edition Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a copy in writing from id Software at the address below.
+In addition, the Doom 3 BFG Edition Source Code is also subject to certain
+additional terms. You should have received a copy of these additional terms
+immediately following the terms and conditions of the GNU General Public License
+which accompanied the Doom 3 BFG Edition Source Code.  If not, please request a
+copy in writing from id Software at the address below.
 
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
+If you have questions concerning this license or the applicable additional
+terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
+120, Rockville, Maryland 20850 USA.
 
 ===========================================================================
 */
@@ -32,115 +40,101 @@ If you have questions concerning this license or the applicable additional terms
 static const int MAX_SHADOWMAP_RESOLUTIONS = 5;
 static const int MAX_BLOOM_BUFFERS = 2;
 static const int MAX_SSAO_BUFFERS = 2;
-static const int MAX_HIERARCHICAL_ZBUFFERS = 6; // native resolution + 5 MIP LEVELS
+static const int MAX_HIERARCHICAL_ZBUFFERS =
+    6;  // native resolution + 5 MIP LEVELS
 
 static const int ENVPROBE_CAPTURE_SIZE = 256;
 static const int RADIANCE_OCTAHEDRON_SIZE = 512;
 static const int IRRADIANCE_OCTAHEDRON_SIZE = 30 + 2;
 
 #if 1
-static	int shadowMapResolutions[MAX_SHADOWMAP_RESOLUTIONS] = { 2048, 1024, 512, 512, 256 };
+static int shadowMapResolutions[MAX_SHADOWMAP_RESOLUTIONS] = {2048, 1024, 512,
+                                                              512, 256};
 #else
-static	int shadowMapResolutions[MAX_SHADOWMAP_RESOLUTIONS] = { 1024, 1024, 1024, 1024, 1024 };
+static int shadowMapResolutions[MAX_SHADOWMAP_RESOLUTIONS] = {1024, 1024, 1024,
+                                                              1024, 1024};
 #endif
 
+class Framebuffer {
+ public:
+  Framebuffer(const char* name, int width, int height);
+  virtual ~Framebuffer();
 
-class Framebuffer
-{
-public:
+  static void Init();
+  static void Shutdown();
+  static void CheckFramebuffers();
+  static Framebuffer* Find(const char* name);
+  static void ResizeFramebuffers();
 
-	Framebuffer( const char* name, int width, int height );
-	virtual ~Framebuffer();
+  void Bind();
+  bool IsBound();
+  static void Unbind();
+  static bool IsDefaultFramebufferActive();
+  static Framebuffer* GetActiveFramebuffer();
 
-	static void				Init();
-	static void				Shutdown();
-	static void				CheckFramebuffers();
-	static Framebuffer*		Find( const char* name );
-	static void				ResizeFramebuffers();
+  void AddColorBuffer(int format, int index, int multiSamples = 0);
+  void AddDepthBuffer(int format, int multiSamples = 0);
+  void AddStencilBuffer(int format, int multiSamples = 0);
 
-	void					Bind();
-	bool					IsBound();
-	static void				Unbind();
-	static bool				IsDefaultFramebufferActive();
-	static Framebuffer*		GetActiveFramebuffer();
+  void AttachImage2D(int target, idImage* image, int index, int mipmapLod = 0);
+  void AttachImageDepth(int target, idImage* image);
+  void AttachImageDepthLayer(idImage* image, int layer);
 
-	void					AddColorBuffer( int format, int index, int multiSamples = 0 );
-	void					AddDepthBuffer( int format, int multiSamples = 0 );
-	void					AddStencilBuffer( int format, int multiSamples = 0 );
+  // check for OpenGL errors
+  void Check();
+  uint32_t GetFramebuffer() const { return frameBuffer; }
 
-	void					AttachImage2D( int target, idImage* image, int index, int mipmapLod = 0 );
-	void					AttachImageDepth( int target, idImage* image );
-	void					AttachImageDepthLayer( idImage* image, int layer );
+  int GetWidth() const { return width; }
 
-	// check for OpenGL errors
-	void					Check();
-	uint32_t				GetFramebuffer() const
-	{
-		return frameBuffer;
-	}
+  int GetHeight() const { return height; }
 
-	int						GetWidth() const
-	{
-		return width;
-	}
+  bool IsMultiSampled() const { return msaaSamples; }
 
-	int						GetHeight() const
-	{
-		return height;
-	}
+  void Resize(int width_, int height_) {
+    width = width_;
+    height = height_;
+  }
 
-	bool					IsMultiSampled() const
-	{
-		return msaaSamples;
-	}
+ private:
+  idStr fboName;
 
-	void					Resize( int width_, int height_ )
-	{
-		width = width_;
-		height = height_;
-	}
+  // FBO object
+  uint32_t frameBuffer;
 
-private:
-	idStr					fboName;
+  uint32_t colorBuffers[16];
+  int colorFormat;
 
-	// FBO object
-	uint32_t				frameBuffer;
+  uint32_t depthBuffer;
+  int depthFormat;
 
-	uint32_t				colorBuffers[16];
-	int						colorFormat;
+  uint32_t stencilBuffer;
+  int stencilFormat;
 
-	uint32_t				depthBuffer;
-	int						depthFormat;
+  int width;
+  int height;
 
-	uint32_t				stencilBuffer;
-	int						stencilFormat;
+  bool msaaSamples;
 
-	int						width;
-	int						height;
-
-	bool					msaaSamples;
-
-	static idList<Framebuffer*>	framebuffers;
+  static idList<Framebuffer*> framebuffers;
 };
 
-struct globalFramebuffers_t
-{
-	Framebuffer*				shadowFBO[MAX_SHADOWMAP_RESOLUTIONS];
-	Framebuffer*				hdrFBO;
+struct globalFramebuffers_t {
+  Framebuffer* shadowFBO[MAX_SHADOWMAP_RESOLUTIONS];
+  Framebuffer* hdrFBO;
 #if defined(USE_HDR_MSAA)
-	Framebuffer*				hdrNonMSAAFBO;
+  Framebuffer* hdrNonMSAAFBO;
 #endif
-//	Framebuffer*				hdrQuarterFBO;
-	Framebuffer*				hdr64FBO;
-	Framebuffer*				envprobeFBO;
-	Framebuffer*				bloomRenderFBO[MAX_BLOOM_BUFFERS];
-	Framebuffer*				ambientOcclusionFBO[MAX_SSAO_BUFFERS];
-	Framebuffer*				csDepthFBO[MAX_HIERARCHICAL_ZBUFFERS];
-	Framebuffer*				geometryBufferFBO;
-	Framebuffer*				smaaEdgesFBO;
-	Framebuffer*				smaaBlendFBO;
+  //	Framebuffer*				hdrQuarterFBO;
+  Framebuffer* hdr64FBO;
+  Framebuffer* envprobeFBO;
+  Framebuffer* bloomRenderFBO[MAX_BLOOM_BUFFERS];
+  Framebuffer* ambientOcclusionFBO[MAX_SSAO_BUFFERS];
+  Framebuffer* csDepthFBO[MAX_HIERARCHICAL_ZBUFFERS];
+  Framebuffer* geometryBufferFBO;
+  Framebuffer* smaaEdgesFBO;
+  Framebuffer* smaaBlendFBO;
 };
 
 extern globalFramebuffers_t globalFramebuffers;
 
-#endif // __FRAMEBUFFER_H__
+#endif  // __FRAMEBUFFER_H__
