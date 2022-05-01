@@ -128,10 +128,7 @@ idBufferObject::idBufferObject() {
 
 #if defined(USE_VULKAN)
   apiObject = VK_NULL_HANDLE;
-
-#if defined(USE_AMD_ALLOCATOR)
   vmaAllocation = NULL;
-#endif
 
 #else
   apiObject = NULL;

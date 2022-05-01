@@ -61,6 +61,13 @@ PFN_vkCmdInsertDebugUtilsLabelEXT qvkCmdInsertDebugUtilsLabelEXT =
 #include "Staging_VK.h"
 //#include "../../framework/Common_local.h"
 
+#define VMA_IMPLEMENTATION
+#include "vendor/VulkanMemoryAllocator/vk_mem_alloc.h"
+
+VmaAllocator vmaAllocator;
+
+idCVar r_vkDeviceLocalMemoryMB("r_vkDeviceLocalMemoryMB", "256",
+                               CVAR_INTEGER | CVAR_INIT, "");
 idCVar r_drawFlickerBox("r_drawFlickerBox", "0", CVAR_RENDERER | CVAR_BOOL,
                         "visual test for dropping frames");
 idCVar stereoRender_warp(
@@ -1365,27 +1372,12 @@ static void CreateRenderTargets() {
     ID_VK_CHECK(vkCreateImage(vkcontext.device, &createInfo, NULL,
                               &vkcontext.msaaImage));
 
-#if defined(USE_AMD_ALLOCATOR)
-    VmaMemoryRequirements vmaReq = {};
+    VmaAllocationCreateInfo vmaReq = {};
     vmaReq.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
     ID_VK_CHECK(vmaCreateImage(
         vmaAllocator, &createInfo, &vmaReq, &vkcontext.msaaImage,
         &vkcontext.msaaVmaAllocation, &vkcontext.msaaAllocation));
-#else
-    VkMemoryRequirements memoryRequirements = {};
-    vkGetImageMemoryRequirements(vkcontext.device, vkcontext.msaaImage,
-                                 &memoryRequirements);
-
-    vkcontext.msaaAllocation = vulkanAllocator.Allocate(
-        memoryRequirements.size, memoryRequirements.alignment,
-        memoryRequirements.memoryTypeBits, VULKAN_MEMORY_USAGE_GPU_ONLY,
-        VULKAN_ALLOCATION_TYPE_IMAGE_OPTIMAL);
-
-    ID_VK_CHECK(vkBindImageMemory(vkcontext.device, vkcontext.msaaImage,
-                                  vkcontext.msaaAllocation.deviceMemory,
-                                  vkcontext.msaaAllocation.offset));
-#endif
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1411,16 +1403,10 @@ DestroyRenderTargets
 static void DestroyRenderTargets() {
   vkDestroyImageView(vkcontext.device, vkcontext.msaaImageView, NULL);
 
-#if defined(USE_AMD_ALLOCATOR)
   vmaDestroyImage(vmaAllocator, vkcontext.msaaImage,
                   vkcontext.msaaVmaAllocation);
   vkcontext.msaaAllocation = VmaAllocationInfo();
   vkcontext.msaaVmaAllocation = NULL;
-#else
-  vkDestroyImage(vkcontext.device, vkcontext.msaaImage, NULL);
-  vulkanAllocator.Free(vkcontext.msaaAllocation);
-  vkcontext.msaaAllocation = vulkanAllocation_t();
-#endif
 
   vkcontext.msaaImage = VK_NULL_HANDLE;
   vkcontext.msaaImageView = VK_NULL_HANDLE;
@@ -1607,12 +1593,8 @@ static void ClearContext() {
   vkcontext.currentSwapIndex = 0;
   vkcontext.msaaImage = VK_NULL_HANDLE;
   vkcontext.msaaImageView = VK_NULL_HANDLE;
-#if defined(USE_AMD_ALLOCATOR)
   vkcontext.msaaVmaAllocation = NULL;
   vkcontext.msaaAllocation = VmaAllocationInfo();
-#else
-  vkcontext.msaaAllocation = vulkanAllocation_t();
-#endif
   vkcontext.swapchainImages.Zero();
   vkcontext.swapchainViews.Zero();
   vkcontext.frameBuffers.Zero();
@@ -1714,23 +1696,15 @@ void idRenderBackend::Init() {
   idLib::Printf("Creating command buffer...\n");
   CreateCommandBuffer();
 
-  // Setup the allocator
-#if defined(USE_AMD_ALLOCATOR)
-  extern idCVar r_vkHostVisibleMemoryMB;
   extern idCVar r_vkDeviceLocalMemoryMB;
 
   VmaAllocatorCreateInfo createInfo = {};
   createInfo.physicalDevice = vkcontext.physicalDevice;
   createInfo.device = vkcontext.device;
-  createInfo.preferredSmallHeapBlockSize =
-      r_vkHostVisibleMemoryMB.GetInteger() * 1024 * 1024;
   createInfo.preferredLargeHeapBlockSize =
       r_vkDeviceLocalMemoryMB.GetInteger() * 1024 * 1024;
 
   vmaCreateAllocator(&createInfo, &vmaAllocator);
-#else
-  vulkanAllocator.Init();
-#endif
 
   // Start the Staging Manager
   idLib::Printf("Creating staging manager...\n");
@@ -1825,11 +1799,7 @@ void idRenderBackend::Shutdown() {
   }
 
   // Dump all our memory
-#if defined(USE_AMD_ALLOCATOR)
   vmaDestroyAllocator(vmaAllocator);
-#else
-  vulkanAllocator.Shutdown();
-#endif
 
   // Destroy Logical Device
   vkDestroyDevice(vkcontext.device, NULL);
@@ -1882,10 +1852,6 @@ void idRenderBackend::ResizeImages() {
 
   // Destroy Current Surface
   vkDestroySurfaceKHR(vkcontext.instance, vkcontext.surface, NULL);
-
-#if !defined(USE_AMD_ALLOCATOR)
-  vulkanAllocator.EmptyGarbage();
-#endif
 
   // Create New Surface
   CreateSurface();
@@ -2138,9 +2104,6 @@ void idRenderBackend::GL_StartFrame() {
 
   idImage::EmptyGarbage();
 
-#if !defined(USE_AMD_ALLOCATOR)
-  vulkanAllocator.EmptyGarbage();
-#endif
   stagingManager.Flush();
 
   // reset descriptor pool

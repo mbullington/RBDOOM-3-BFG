@@ -111,8 +111,13 @@ void idVulkanStagingManager::Init() {
   VkMemoryAllocateInfo memoryAllocateInfo = {};
   memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   memoryAllocateInfo.allocationSize = alignedSize * NUM_FRAME_DATA;
-  memoryAllocateInfo.memoryTypeIndex = FindMemoryTypeIndex(
-      memoryRequirements.memoryTypeBits, VULKAN_MEMORY_USAGE_CPU_TO_GPU);
+
+  VmaAllocationCreateInfo vmaReq = {};
+  vmaReq.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+
+  ID_VK_CHECK(vmaFindMemoryTypeIndex(vmaAllocator,
+                                     memoryRequirements.memoryTypeBits, &vmaReq,
+                                     &memoryAllocateInfo.memoryTypeIndex));
 
   ID_VK_CHECK(
       vkAllocateMemory(vkcontext.device, &memoryAllocateInfo, NULL, &memory));

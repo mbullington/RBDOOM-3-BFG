@@ -533,6 +533,8 @@ file(GLOB IMGUI_SOURCES ../vendor/imgui/*.cpp)
 
 file(GLOB STB_INCLUDES ../vendor/stb/*.h)
 
+file(GLOB VULKAN_MEMORY_ALLOCATOR_INCLUDES ../vendor/VulkanMemoryAllocator/*.h)
+
 file(GLOB MESA_INCLUDES ../vendor/mesa/*.h)
 
 file(GLOB TINYEXR_INCLUDES ../vendor/tinyexr/*.h)
@@ -1143,6 +1145,8 @@ source_group("vendor\\imgui" FILES ${IMGUI_SOURCES})
 
 source_group("vendor\\stb" FILES ${STB_INCLUDES})
 
+source_group("vendor\\VulkanMemoryAllocator" FILES ${VULKAN_MEMORY_ALLOCATOR_INCLUDES})
+
 source_group("vendor\\mesa" FILES ${MESA_INCLUDES})
 
 source_group("vendor\\tinyexr" FILES ${TINYEXR_INCLUDES})
@@ -1429,7 +1433,7 @@ if(MSVC)
 	endif()
 	
 	if(USE_VULKAN)
-		list(APPEND RBDOOM3_INCLUDES ${RENDERER_VULKAN_INCLUDES})
+		list(APPEND RBDOOM3_INCLUDES ${RENDERER_VULKAN_INCLUDES} ${VULKAN_MEMORY_ALLOCATOR_INCLUDES})
 		list(APPEND RBDOOM3_SOURCES ${RENDERER_VULKAN_SOURCES})
 		
 		set(Vulkan_LIBRARIES 

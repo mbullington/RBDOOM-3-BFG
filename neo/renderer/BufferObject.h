@@ -38,7 +38,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #define __BUFFEROBJECT_H__
 
 #if defined(USE_VULKAN)
-#include "Vulkan/Allocator_VK.h"
+#include "../renderer/Vulkan/qvk.h"
 #endif
 
 enum bufferMapType_t {
@@ -96,12 +96,8 @@ class idBufferObject {
 #if defined(USE_VULKAN)
   VkBuffer apiObject;
 
-#if defined(USE_AMD_ALLOCATOR)
   VmaAllocation vmaAllocation;
   VmaAllocationInfo allocation;
-#else
-  vulkanAllocation_t allocation;
-#endif
 
 #else
   // GL

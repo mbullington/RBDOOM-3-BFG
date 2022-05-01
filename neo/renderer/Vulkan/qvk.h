@@ -44,13 +44,10 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include <Windows.h>
 #endif
 
-#define USE_AMD_ALLOCATOR
-
 #include <vulkan/vulkan.h>
+#include "vendor/VulkanMemoryAllocator/vk_mem_alloc.h"
 
-#if defined(USE_AMD_ALLOCATOR)
-#include "vma.h"
-#endif
+extern VmaAllocator vmaAllocator;
 
 #define ID_VK_CHECK(x)                                             \
   {                                                                \

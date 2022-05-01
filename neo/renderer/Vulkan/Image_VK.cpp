@@ -50,11 +50,7 @@ Contains the Image implementation for Vulkan
 #include "Staging_VK.h"
 
 int idImage::garbageIndex = 0;
-#if defined(USE_AMD_ALLOCATOR)
 idList<VmaAllocation> idImage::allocationGarbage[NUM_FRAME_DATA];
-#else
-idList<vulkanAllocation_t> idImage::allocationGarbage[NUM_FRAME_DATA];
-#endif
 idList<VkImage> idImage::imageGarbage[NUM_FRAME_DATA];
 idList<VkImageView> idImage::viewGarbage[NUM_FRAME_DATA];
 idList<VkSampler> idImage::samplerGarbage[NUM_FRAME_DATA];
@@ -337,32 +333,15 @@ idImage::EmptyGarbage
 void idImage::EmptyGarbage() {
   garbageIndex = (garbageIndex + 1) % NUM_FRAME_DATA;
 
-#if defined(USE_AMD_ALLOCATOR)
   idList<VmaAllocation>& allocationsToFree = allocationGarbage[garbageIndex];
-#else
-  idList<vulkanAllocation_t>& allocationsToFree =
-      allocationGarbage[garbageIndex];
-#endif
   idList<VkImage>& imagesToFree = imageGarbage[garbageIndex];
   idList<VkImageView>& viewsToFree = viewGarbage[garbageIndex];
   idList<VkSampler>& samplersToFree = samplerGarbage[garbageIndex];
 
-#if defined(USE_AMD_ALLOCATOR)
   const int numAllocations = allocationsToFree.Num();
   for (int i = 0; i < numAllocations; ++i) {
     vmaDestroyImage(vmaAllocator, imagesToFree[i], allocationsToFree[i]);
   }
-#else
-  const int numAllocations = allocationsToFree.Num();
-  for (int i = 0; i < numAllocations; ++i) {
-    vulkanAllocator.Free(allocationsToFree[i]);
-  }
-
-  const int numImages = imagesToFree.Num();
-  for (int i = 0; i < numImages; ++i) {
-    vkDestroyImage(vkcontext.device, imagesToFree[i], NULL);
-  }
-#endif
 
   const int numViews = viewsToFree.Num();
   for (int i = 0; i < numViews; ++i) {
@@ -539,26 +518,11 @@ void idImage::AllocImage() {
   imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-#if defined(USE_AMD_ALLOCATOR)
-  VmaMemoryRequirements vmaReq = {};
+  VmaAllocationCreateInfo vmaReq = {};
   vmaReq.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
   ID_VK_CHECK(vmaCreateImage(vmaAllocator, &imageCreateInfo, &vmaReq, &image,
                              &allocation, NULL));
-#else
-  ID_VK_CHECK(vkCreateImage(vkcontext.device, &imageCreateInfo, NULL, &image));
-
-  VkMemoryRequirements memoryRequirements;
-  vkGetImageMemoryRequirements(vkcontext.device, image, &memoryRequirements);
-
-  allocation = vulkanAllocator.Allocate(
-      memoryRequirements.size, memoryRequirements.alignment,
-      memoryRequirements.memoryTypeBits, VULKAN_MEMORY_USAGE_GPU_ONLY,
-      VULKAN_ALLOCATION_TYPE_IMAGE_OPTIMAL);
-
-  ID_VK_CHECK(vkBindImageMemory(vkcontext.device, image,
-                                allocation.deviceMemory, allocation.offset));
-#endif
 
   // Eric: disable for now to clean the terminal output
   // idLib::Printf( "Vulkan Image alloc '%s': %p\n", GetName(), image );
@@ -602,11 +566,7 @@ void idImage::PurgeImage() {
     viewGarbage[garbageIndex].Append(view);
     imageGarbage[garbageIndex].Append(image);
 
-#if defined(USE_AMD_ALLOCATOR)
     allocation = NULL;
-#else
-    allocation = vulkanAllocation_t();
-#endif
 
     view = VK_NULL_HANDLE;
     image = VK_NULL_HANDLE;

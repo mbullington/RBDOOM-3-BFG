@@ -193,12 +193,8 @@ struct vulkanContext_t {
   uint32 currentSwapIndex;
   VkImage msaaImage;
   VkImageView msaaImageView;
-#if defined(USE_AMD_ALLOCATOR)
   VmaAllocation msaaVmaAllocation;
   VmaAllocationInfo msaaAllocation;
-#else
-  vulkanAllocation_t msaaAllocation;
-#endif
   idArray<VkImage, NUM_FRAME_DATA> swapchainImages;
   idArray<VkImageView, NUM_FRAME_DATA> swapchainViews;
 
@@ -360,16 +356,16 @@ class idRenderBackend {
   void GL_SetDefaultState();
 
   void GL_State(uint64 stateBits, bool forceGlState = false);
-  //	void				GL_SeparateStencil( stencilFace_t face, uint64
-  //stencilBits );
+  //	void				GL_SeparateStencil( stencilFace_t face,
+  //uint64 stencilBits );
 
   void GL_SelectTexture(int unit);
   //	void				GL_BindTexture( idImage* image );
 
-  //	void				GL_CopyFrameBuffer( idImage* image, int x, int y,
-  //int imageWidth, int imageHeight );
-  //	void				GL_CopyDepthBuffer( idImage* image, int x, int y,
-  //int imageWidth, int imageHeight );
+  //	void				GL_CopyFrameBuffer( idImage* image, int x, int
+  //y, int imageWidth, int imageHeight ); 	void
+  //GL_CopyDepthBuffer( idImage* image, int x, int y, int imageWidth, int
+  // imageHeight );
 
   // RB: HDR parm
   void GL_Clear(bool color, bool depth, bool stencil, byte stencilValue,

@@ -449,13 +449,8 @@ class idImage {
   VkImageLayout layout;
   VkSampler sampler;
 
-#if defined(USE_AMD_ALLOCATOR)
   VmaAllocation allocation;
   static idList<VmaAllocation> allocationGarbage[NUM_FRAME_DATA];
-#else
-  vulkanAllocation_t allocation;
-  static idList<vulkanAllocation_t> allocationGarbage[NUM_FRAME_DATA];
-#endif
 
   static int garbageIndex;
   static idList<VkImage> imageGarbage[NUM_FRAME_DATA];
