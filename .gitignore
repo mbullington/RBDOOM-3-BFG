@@ -9,6 +9,9 @@ neo/ipch
 *.zip
 imgui.ini
 
+.cache
+compile_commands.json
+
 Doom3BFG.exe
 base/_common.crc
 base/_common.resources
