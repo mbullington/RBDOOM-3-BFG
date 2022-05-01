@@ -13810,8 +13810,9 @@ VmaAllocator_T::VmaAllocator_T(const VmaAllocatorCreateInfo* pCreateInfo)
     VMA_ASSERT(VMA_DEBUG_MARGIN % sizeof(uint32_t) == 0);
   }
 
-  VMA_ASSERT(pCreateInfo->physicalDevice && pCreateInfo->device &&
-             pCreateInfo->instance);
+  VMA_ASSERT(pCreateInfo->physicalDevice);
+  VMA_ASSERT(pCreateInfo->device);
+  VMA_ASSERT(pCreateInfo->instance);
 
   if (m_VulkanApiVersion < VK_MAKE_VERSION(1, 1, 0)) {
 #if !(VMA_DEDICATED_ALLOCATION)

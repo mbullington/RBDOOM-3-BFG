@@ -1703,6 +1703,7 @@ void idRenderBackend::Init() {
   createInfo.device = vkcontext.device;
   createInfo.preferredLargeHeapBlockSize =
       r_vkDeviceLocalMemoryMB.GetInteger() * 1024 * 1024;
+  createInfo.instance = vkcontext.instance;
 
   vmaCreateAllocator(&createInfo, &vmaAllocator);
 
