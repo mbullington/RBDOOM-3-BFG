@@ -189,6 +189,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 		endif()
 	endif()
 
+	# Otherwise, assume x86_64 v3 (Haswell and above).
+	if(NOT CMAKE_CROSSCOMPILING AND NOT ONATIVE AND CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+		add_definitions(-march=haswell)
+	endif()
+
 	add_compile_options(-fno-strict-aliasing)
 
 	# SRS - Make sure OSX can find system headers and add support for minimum OSX runtime version
