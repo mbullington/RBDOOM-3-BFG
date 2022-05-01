@@ -12,9 +12,6 @@ endif()
 option(STANDALONE
 		"Skip DOOM-3-BFG base/ folder and use assets/ instead" OFF)
 
-option(DOOM_CLASSIC
-		"Build with Doom 1 & 2" ON)
-
 option(FORCE_COLOR_OUTPUT
 		"Always produce ANSI-colored output (GNU/Clang only)." OFF)
 
@@ -313,8 +310,6 @@ endif()
 
 if(STANDALONE)
 	add_definitions(-DSTANDALONE)
-
-	set(DOOM_CLASSIC OFF)
 endif()
 
 if (USE_SYSTEM_ZLIB)
@@ -978,20 +973,6 @@ file(GLOB IMGUI_EDITOR_SOURCES tools/imgui/*.cpp)
 file(GLOB IMGUI_EDITOR_LIGHT_INCLUDES tools/imgui/lighteditor/*.h)
 file(GLOB IMGUI_EDITOR_LIGHT_SOURCES tools/imgui/lighteditor/*.cpp)
 
-file(GLOB DOOMCLASSIC_INCLUDES ../doomclassic/doom/*.h)
-file(GLOB DOOMCLASSIC_SOURCES ../doomclassic/doom/*.cpp)
-
-set(DOOMCLASSIC_STUBAUDIO_SOURCES ../doomclassic/doom/i_sound_stub.cpp)
-set(DOOMCLASSIC_OPENAL_SOURCES ../doomclassic/doom/i_sound_openal.cpp)
-set(DOOMCLASSIC_XAUDIO2_SOURCES ../doomclassic/doom/i_sound_win32.cpp)
-
-list(REMOVE_ITEM DOOMCLASSIC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../doomclassic/doom/i_sound_stub.cpp)
-list(REMOVE_ITEM DOOMCLASSIC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../doomclassic/doom/i_sound_openal.cpp)
-list(REMOVE_ITEM DOOMCLASSIC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../doomclassic/doom/i_sound_win32.cpp)
-
-file(GLOB TIMIDITY_INCLUDES libs/timidity/*.h)
-file(GLOB TIMIDITY_SOURCES libs/timidity/*.cpp)
-
 file(GLOB_RECURSE WIN32_INCLUDES sys/win32/*.h)
 #file(GLOB_RECURSE WIN32_SOURCES sys/win32/*.cpp)
 
@@ -1216,17 +1197,6 @@ source_group("swf" FILES ${SWF_SOURCES})
 source_group("sys" FILES ${SYS_INCLUDES})
 source_group("sys" FILES ${SYS_SOURCES})
 
-source_group("doomclassic" FILES ${DOOMCLASSIC_INCLUDES})
-source_group("doomclassic" FILES ${DOOMCLASSIC_SOURCES})
-
-source_group("doomclassic" FILES ${DOOMCLASSIC_STUBAUDIO_SOURCES})
-source_group("doomclassic" FILES ${DOOMCLASSIC_OPENAL_SOURCES})
-source_group("doomclassic" FILES ${DOOMCLASSIC_XAUDIO2_SOURCES})
-
-source_group("libs\\timidity" FILES ${TIMIDITY_INCLUDES})
-source_group("libs\\timidity" FILES ${TIMIDITY_SOURCES})
-
-
 source_group("game-d3xp" FILES ${GAMED3XP_INCLUDES})
 source_group("game-d3xp" FILES ${GAMED3XP_SOURCES})
 
@@ -1432,16 +1402,6 @@ set(RBDOOM3_SOURCES
 			${GAMED3XP_SCRIPT_SOURCES}
 			)
 
-if(DOOM_CLASSIC)
-	add_definitions(-DUSE_DOOMCLASSIC)
-
-	list(APPEND RBDOOM3_INCLUDES ${DOOMCLASSIC_INCLUDES})
-	list(APPEND RBDOOM3_INCLUDES ${TIMIDITY_INCLUDES})
-	
-	list(APPEND RBDOOM3_SOURCES ${DOOMCLASSIC_SOURCES})
-	list(APPEND RBDOOM3_SOURCES ${TIMIDITY_SOURCES})
-endif()
-
 add_definitions(-D__DOOM__
 				#-DBUILD_FREETYPE
 				#-DFT2_BUILD_LIBRARY
@@ -1508,9 +1468,6 @@ if(MSVC)
 		
 		list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
 		list(APPEND RBDOOM3_SOURCES	${OPENAL_SOURCES})
-		if(DOOM_CLASSIC)
-			list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_OPENAL_SOURCES})
-		endif()		
 		
 		set(OpenAL_LIBRARIES
 			OpenAL32)
@@ -1524,10 +1481,6 @@ if(MSVC)
 	else()
 		list(APPEND RBDOOM3_INCLUDES ${XAUDIO2_INCLUDES})
 		list(APPEND RBDOOM3_SOURCES	${XAUDIO2_SOURCES})
-
-		if(DOOM_CLASSIC)
-			list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_XAUDIO2_SOURCES})
-		endif()
 	endif()
 	
 	if(FFMPEG)
@@ -1730,17 +1683,9 @@ else()
 
 			list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
 			list(APPEND RBDOOM3_SOURCES ${OPENAL_SOURCES})
-				
-			if(DOOM_CLASSIC)
-				list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_OPENAL_SOURCES})
-			endif()
 		else()
 			list(APPEND RBDOOM3_INCLUDES ${STUBAUDIO_INCLUDES})
 			list(APPEND RBDOOM3_SOURCES ${STUBAUDIO_SOURCES})
-			
-			if(DOOM_CLASSIC)
-				list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_STUBAUDIO_SOURCES})
-			endif()
 		endif()
 		
 		if(USE_VULKAN)
