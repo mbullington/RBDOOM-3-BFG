@@ -250,7 +250,8 @@ class idFileSystemLocal : public idFileSystem {
   static void TouchFile_f(const idCmdArgs& args);
   static void TouchFileList_f(const idCmdArgs& args);
   static void BuildGame_f(const idCmdArgs& args);
-  // static void				FileStats_f( const idCmdArgs &args
+  // static void				FileStats_f( const idCmdArgs
+  // &args
   // );
   static void WriteResourceFile_f(const idCmdArgs& args);
   static void ExtractResourceFile_f(const idCmdArgs& args);
@@ -2793,6 +2794,10 @@ void idFileSystemLocal::SetupGameDirectories(const char* gameName) {
   if (fs_basepath.GetString()[0]) {
     AddGameDirectory(fs_basepath.GetString(), gameName);
   }
+// setup devpath for additional resources
+#if !defined(ID_RETAIL)
+  AddGameDirectory(Sys_DefaultDevPath(), gameName);
+#endif
   // setup savepath
   if (fs_savepath.GetString()[0]) {
     AddGameDirectory(fs_savepath.GetString(), gameName);

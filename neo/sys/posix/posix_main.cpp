@@ -68,6 +68,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #define COMMAND_HISTORY 64
 
 static idStr basepath;
+static idStr devpath;
 static idStr savepath;
 
 static int input_hide = 0;
@@ -447,6 +448,12 @@ const char* Sys_DefaultBasePath() {
   return DEFAULT_BASEPATH;
 }
 
+const char* Sys_DefaultDevPath() {
+  devpath = Posix_Cwd();
+  devpath += "/../";
+  return devpath.c_str();
+}
+
 /*
 ================
 Sys_Mkdir
@@ -784,9 +791,9 @@ ID_TIME_T Sys_FileTimeStamp(idFileHandle fp) {
 }
 
 void Sys_Sleep(int msec) {
-#if 0  // DG: I don't really care, this spams the console (and on windows this
-       // case isn't handled either) Furthermore, there are several Sys_Sleep(
-       // 10 ) calls throughout the code
+#if 0   // DG: I don't really care, this spams the console (and on windows this
+        // case isn't handled either) Furthermore, there are several Sys_Sleep(
+        // 10 ) calls throughout the code
 	if( msec < 20 )
 	{
 		static int last = 0;

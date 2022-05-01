@@ -614,6 +614,11 @@ const char* Sys_TimeStampToStr(ID_TIME_T timeStamp);
 const char* Sys_SecToStr(int sec);
 
 const char* Sys_DefaultBasePath();
+// devpath is where for Doom 3 BFG, we have additional resources (scripts,
+// shaders) that aren't part of the base game.
+//
+// On POSIX, this is analogous to $(pwd)/../
+const char* Sys_DefaultDevPath();
 const char* Sys_DefaultSavePath();
 
 // know early if we are performing a fatal error shutdown so the error message

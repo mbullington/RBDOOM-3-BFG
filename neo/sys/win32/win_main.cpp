@@ -94,6 +94,7 @@ Win32Vars_t win32;
 static char sys_cmdline[MAX_STRING_CHARS];
 
 static idStr basepath;
+static idStr devpath;
 
 static sysMemoryStats_t exeLaunchMemoryStats;
 
@@ -772,6 +773,12 @@ const char* Sys_DefaultBasePath() {
   return Sys_Cwd();
 }
 
+const char* Sys_DefaultDevPath() {
+  devpath = Sys_Cwd();
+  devpath += "/../";
+  return devpath.c_str();
+}
+
 // Vista shit
 typedef HRESULT(WINAPI* SHGetKnownFolderPath_t)(const GUID& rfid, DWORD dwFlags,
                                                 HANDLE hToken, PWSTR* ppszPath);
@@ -1248,7 +1255,7 @@ void Sys_PumpEvents() {
     if (win32.sysMsgTime && win32.sysMsgTime > (int)msg.time) {
       // don't ever let the event times run backwards
       //			common->Printf( "Sys_PumpEvents:
-      //win32.sysMsgTime (%i) > msg.time (%i)\n", win32.sysMsgTime, msg.time );
+      // win32.sysMsgTime (%i) > msg.time (%i)\n", win32.sysMsgTime, msg.time );
     } else {
       win32.sysMsgTime = msg.time;
     }
