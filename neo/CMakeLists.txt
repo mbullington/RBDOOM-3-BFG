@@ -13,7 +13,7 @@ option(STANDALONE
 		"Skip DOOM-3-BFG base/ folder and use assets/ instead" OFF)
 
 option(FORCE_COLOR_OUTPUT
-		"Always produce ANSI-colored output (GNU/Clang only)." OFF)
+		"Always produce ANSI-colored output (GNU/Clang only)." ON)
 
 option(COMPILE_COMMANDS
 		"Generate compile_commands.json" OFF)
@@ -101,7 +101,9 @@ if(UNIX)
 		
 		# RB: disable precompiled headers on Linux with Vulkan because of error: POSIX thread support was disabled in PCH file but is currently enabled
 		if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-            set(USE_PRECOMPILED_HEADERS OFF)
+			if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+            	set(USE_PRECOMPILED_HEADERS OFF)
+			endif()
         endif()
 	endif()
 endif()
