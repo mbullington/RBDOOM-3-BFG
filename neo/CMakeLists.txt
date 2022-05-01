@@ -23,10 +23,7 @@ option(USE_MFC_TOOLS
 
 option(USE_PRECOMPILED_HEADERS
 		"Use precompiled headers during build" ON)
-		
-option(SDL2
-		"Use SDL2 instead of SDL1.2" ON)
-		
+
 option(OPENAL
 		"Use OpenAL soft instead of XAudio2" OFF)
 
@@ -96,9 +93,7 @@ if(UNIX)
         set(USE_PRECOMPILED_HEADERS OFF)
     endif()
 
-	if(USE_VULKAN)
-		SET(SDL2 ON)
-		
+	if(USE_VULKAN)		
 		# RB: disable precompiled headers on Linux with Vulkan because of error: POSIX thread support was disabled in PCH file but is currently enabled
 		if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 			if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -1655,16 +1650,10 @@ else()
 			link_directories(${FFMPEG_LIBRARIES_DIRS})
 		endif()
 
-		if(SDL2)
-			find_package(SDL2 REQUIRED)
-			include_directories(${SDL2_INCLUDE_DIRS})
-			set(SDLx_LIBRARY ${SDL2_LIBRARIES})
-		else()
-			find_package(SDL REQUIRED)
-			include_directories(${SDL_INCLUDE_DIR})
-			set(SDLx_LIBRARY ${SDL_LIBRARY})
-		endif()
-
+		find_package(SDL2 REQUIRED)
+		include_directories(${SDL2_INCLUDE_DIRS})
+		set(SDLx_LIBRARY ${SDL2_LIBRARIES})
+	
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 			list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_linux.cpp)
 		else()
