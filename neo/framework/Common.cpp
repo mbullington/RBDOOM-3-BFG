@@ -350,19 +350,9 @@ idCommonLocal::InitTool
 */
 void idCommonLocal::InitTool(const toolFlag_t tool, const idDict* dict,
                              idEntity* entity) {
-#if defined(USE_MFC_TOOLS)
-  if (tool & EDITOR_SOUND) {
-    // SoundEditorInit( dict ); // TODO: implement this somewhere
-  } else if (tool & EDITOR_PARTICLE) {
-    // ParticleEditorInit( dict );
-  } else if (tool & EDITOR_AF) {
-    // AFEditorInit( dict );
-  }
-#else
   if (tool & EDITOR_LIGHT) {
     ImGuiTools::LightEditorInit(dict, entity);
   }
-#endif
 }
 // DG end
 

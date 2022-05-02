@@ -7,11 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#if defined(USE_MFC_TOOLS)
 #include "afxres.h"
-#else
-#include <winresrc.h>
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -84,9 +80,9 @@ BEGIN
             VALUE "FileDescription", "DOOM 3: BFG Edition"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Doom3BFG"
-            VALUE "LegalCopyright", "© 1993-2012 id Software LLC, a ZeniMax Media company"
+            VALUE "LegalCopyright", "ï¿½ 1993-2012 id Software LLC, a ZeniMax Media company"
             VALUE "OriginalFilename", "Doom3BFG"
-            VALUE "ProductName", "DOOM® 3: BFG Edition™"
+            VALUE "ProductName", "DOOMï¿½ 3: BFG Editionï¿½"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END

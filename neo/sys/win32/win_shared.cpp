@@ -57,11 +57,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include <Wbemidl.h>
 
 // RB: no <atlbase.h> with Visual C++ 2010 Express
-#if defined(USE_MFC_TOOLS)
-#include <atlbase.h>
-#else
 #include "win_nanoafx.h"
-#endif
 
 #endif  // #if !defined(__MINGW32__)
 // RB end
