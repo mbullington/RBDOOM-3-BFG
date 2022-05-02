@@ -274,7 +274,9 @@ bool VKimp_Init(glimpParms_t parms) {
      * monitor", at least on my box it's the monitor with the mouse cursor.
      */
 
-    window = SDL_CreateWindow(GAME_NAME, windowPos, windowPos, parms.width,
+    auto gameName = fileSystem->GetGameInfo(GAMEINFO_GAME_NAME);
+
+    window = SDL_CreateWindow(gameName, windowPos, windowPos, parms.width,
                               parms.height, flags);
     // DG end
 

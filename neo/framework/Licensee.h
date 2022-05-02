@@ -44,21 +44,13 @@ and location.
 ===============================================================================
 */
 
-#define GAME_NAME "DOOM 3: BFG Edition"  // appears on window titles and errors
-
 // RB: changed home folder so we don't break the savegame of the original game
-#define SAVE_PATH "\\id Software\\RBDOOM 3 BFG"
+#define SAVE_PATH "RBDOOM3BFG"
 
-#define ENGINE_VERSION "RBDOOM 3 BFG 1.4.0"  // printed in console
+#define ENGINE_VERSION "RBDOOM v1.4.0"  // printed in console
 // RB end
 
-// jmarshall
-#define ENGINE_BRANCH "master"
-// jmarshall end
-
 #define BASE_GAMEDIR "base"
-
-#define CONFIG_FILE "D3BFGConfig.cfg"
 
 // see ASYNC_PROTOCOL_VERSION
 // use a different major for each game
@@ -73,19 +65,3 @@ and location.
 #define WIN32_CONSOLE_CLASS "D3BFG_WinConsole"
 #define WIN32_WINDOW_CLASS_NAME "D3BFG"
 #define WIN32_FAKE_WINDOW_CLASS_NAME "D3BFG_WGL_FAKE"
-
-// RB begin
-// Default base path (used only if none could be found)
-#ifdef __APPLE__
-#define DEFAULT_BASEPATH "/Applications/RBDOOM-3-BFG.app/Contents/Resources"
-#else
-#define DEFAULT_BASEPATH "/usr/share/games/doom3bfg"
-#endif
-// RB end
-
-// raynorpat: Steam AppID and Steam App Name for figuring out Steam base path
-#define STEAMPATH_APPID "208200"
-#define STEAMPATH_NAME "DOOM 3 BFG Edition"
-
-// raynorpat: GOG.com Galaxy Launcher Game ID for figuring out Steam base path
-#define GOGPATH_ID "1733124578"

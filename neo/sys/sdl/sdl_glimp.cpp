@@ -261,7 +261,9 @@ bool GLimp_Init(glimpParms_t parms) {
      * monitor", at least on my box it's the monitor with the mouse cursor.
      */
 
-    window = SDL_CreateWindow(GAME_NAME, windowPos, windowPos, parms.width,
+    auto gameName = fileSystem->GetGameInfo(GAMEINFO_GAME_NAME);
+
+    window = SDL_CreateWindow(gameName, windowPos, windowPos, parms.width,
                               parms.height, flags);
     // DG end
 
@@ -287,7 +289,8 @@ bool GLimp_Init(glimpParms_t parms) {
 #else
     glConfig.driverType = GLDRV_OPENGL3X;
 
-    SDL_WM_SetCaption(GAME_NAME, GAME_NAME);
+    auto gameName = fileSystem->GetGameInfo(GAMEINFO_GAME_NAME);
+    SDL_WM_SetCaption(gameName, gameName);
 
     if (SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, r_swapInterval.GetInteger()) <
         0) {

@@ -105,7 +105,7 @@ static char exit_spawn[1024];
  */
 const char* Sys_DefaultSavePath() {
 #if defined(__APPLE__)
-  char* base_path = SDL_GetPrefPath("", "RBDOOM-3-BFG");
+  char* base_path = SDL_GetPrefPath("", SAVE_PATH);
   if (base_path) {
     savepath = SDL_strdup(base_path);
     SDL_free(base_path);
@@ -113,9 +113,9 @@ const char* Sys_DefaultSavePath() {
 #else
   const char* xdg_data_home = getenv("XDG_DATA_HOME");
   if (xdg_data_home != NULL) {
-    sprintf(savepath, "%s/rbdoom3bfg", xdg_data_home);
+    sprintf(savepath, "%s/%s", xdg_data_home, SAVE_PATH);
   } else {
-    sprintf(savepath, "%s/.local/share/rbdoom3bfg", getenv("HOME"));
+    sprintf(savepath, "%s/.local/share/%s", getenv("HOME"), SAVE_PATH);
   }
 #endif
 
@@ -443,9 +443,13 @@ const char* Sys_DefaultBasePath() {
                      BASE_GAMEDIR, basepath.c_str());
     }
   }
-  common->Printf("WARNING: using hardcoded default base path %s\n",
-                 DEFAULT_BASEPATH);
-  return DEFAULT_BASEPATH;
+
+  Sys_Error(
+      "no '%s' directory found in exe path, cwd path or "
+      "hardcoded " BASE_GAMEDIR);
+
+  // We shouldn't hit this code path.
+  return NULL;
 }
 
 const char* Sys_DefaultDevPath() {

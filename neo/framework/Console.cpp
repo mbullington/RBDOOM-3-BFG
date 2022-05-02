@@ -425,7 +425,7 @@ float idConsoleLocal::DrawFPS(float y) {
 
       // ImGui::Text( "Cull: %i box in %i box out\n",
       //					commonLocal.stats_frontend.c_box_cull_in,
-      //commonLocal.stats_frontend.c_box_cull_out );
+      // commonLocal.stats_frontend.c_box_cull_out );
 
       ImGui::TextColored(colorLtGrey,
                          "ADDMODEL: callback:%-2i createInteractions:%i "
@@ -1368,24 +1368,15 @@ void idConsoleLocal::DrawSolidConsole(float frac) {
         version[x]);
   }
   // jmarshall
-  idStr branchVersion = va("Branch %s", ENGINE_BRANCH);
-  i = branchVersion.Length();
-
-  for (x = 0; x < i; x++) {
-    renderSystem->DrawSmallChar(
-        LOCALSAFE_WIDTH - (i - x) * SMALLCHAR_WIDTH,
-        (lines - (SMALLCHAR_HEIGHT + SMALLCHAR_HEIGHT / 2)) -
-            (VERSION_LINE_SPACE - 2),
-        branchVersion[x]);
-  }
-
   idStr builddate = va("%s %s", __DATE__, __TIME__);
   i = builddate.Length();
 
   for (x = 0; x < i; x++) {
     renderSystem->DrawSmallChar(
         LOCALSAFE_WIDTH - (i - x) * SMALLCHAR_WIDTH,
-        (lines - (SMALLCHAR_HEIGHT + SMALLCHAR_HEIGHT / 2)), builddate[x]);
+        (lines - (SMALLCHAR_HEIGHT + SMALLCHAR_HEIGHT / 2)) -
+            (VERSION_LINE_SPACE - 2),
+        builddate[x]);
   }
   // jmarshall end
 

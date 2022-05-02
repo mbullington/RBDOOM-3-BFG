@@ -50,7 +50,7 @@ idCVar idDemoFile::com_preloadDemos(
     "com_preloadDemos", "0", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE,
     "Load the whole demo in to RAM before running it");
 
-#define DEMO_MAGIC GAME_NAME " RDEMO"
+#define DEMO_MAGIC "RDEMO"
 
 /*
 ================

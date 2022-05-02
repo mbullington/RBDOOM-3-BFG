@@ -279,9 +279,11 @@ CreateVulkanInstance
 static void CreateVulkanInstance() {
   VkApplicationInfo appInfo = {};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  appInfo.pApplicationName = GAME_NAME;
+
+  auto gameName = fileSystem->GetGameInfo(GAMEINFO_GAME_NAME);
+  appInfo.pApplicationName = gameName;
   appInfo.applicationVersion = 1;
-  appInfo.pEngineName = "idTech 4.5x";
+  appInfo.pEngineName = ENGINE_VERSION;
   appInfo.engineVersion = 1;
   appInfo.apiVersion = VK_MAKE_VERSION(1, 0, VK_HEADER_VERSION);
 

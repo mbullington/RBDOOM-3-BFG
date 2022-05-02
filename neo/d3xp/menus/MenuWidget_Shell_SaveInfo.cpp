@@ -114,10 +114,12 @@ void idMenuWidget_Shell_SaveInfo::Update() {
 
     info.Append(summary);
 
+    auto buildNumber = fileSystem->GetGameInfoInt(GAMEINFO_BUILD_NUMBER);
+
     if (details.damaged) {
       info.Append("\n");
       info.Append(va("^1%s^0", idLocalization::GetString("#str_swf_damaged")));
-    } else if (details.GetSaveVersion() > BUILD_NUMBER) {
+    } else if (details.GetSaveVersion() > buildNumber) {
       info.Append("\n");
       info.Append(
           va("^1%s^0", idLocalization::GetString("#str_swf_wrong_version")));

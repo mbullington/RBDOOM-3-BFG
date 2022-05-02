@@ -60,7 +60,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "sys/sys_filesystem.h"
 
 // framework
-#include "../framework/BuildVersion.h"
 #include "../framework/Licensee.h"
 #include "../framework/CmdSystem.h"
 #include "../framework/CVarSystem.h"

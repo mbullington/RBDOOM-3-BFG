@@ -621,105 +621,6 @@ static int WidePath2ASCI(char* dst, size_t size, const WCHAR* src) {
 
 /*
 ==============
-Sys_SteamBasePath
-==============
-*/
-static char steamPathBuffer[MAX_OSPATH] = {0};
-
-static const char* Sys_SteamBasePath() {
-#if defined(STEAMPATH_NAME) || defined(STEAMPATH_APPID)
-  WCHAR wideBuffer[MAX_OSPATH] = {0};
-  HKEY steamRegKey;
-  DWORD steamRegKeyLen = MAX_OSPATH;
-
-  // Let's try the Steam appid path first
-#ifdef STEAMPATH_APPID
-  if (!RegOpenKeyExW(HKEY_LOCAL_MACHINE,
-                     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
-                     L"\\Steam App " STEAMPATH_APPID,
-                     0, KEY_QUERY_VALUE, &steamRegKey)) {
-    if (!RegQueryValueExW(steamRegKey, L"InstallLocation", NULL, NULL,
-                          (LPBYTE)wideBuffer, &steamRegKeyLen)) {
-      // Convert our path from widechar to asci
-      if (WidePath2ASCI(steamPathBuffer, steamRegKeyLen, wideBuffer)) {
-        if (Sys_IsFolder(steamPathBuffer) == FOLDER_YES) {
-          common->Printf("^4Using Steam app id base path '%s'\n",
-                         steamPathBuffer);
-          return steamPathBuffer;
-        }
-      }
-    }
-
-    RegCloseKey(steamRegKey);
-  }
-#endif
-
-  // Let's try the Steam install path next (this only works if the user has the
-  // default steamlibrary set to match the install path)
-#ifdef STEAMPATH_NAME
-  if (!RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Steam", 0,
-                    KEY_QUERY_VALUE | KEY_WOW64_32KEY, &steamRegKey)) {
-    steamRegKeyLen =
-        MAX_OSPATH;  // reset steamRegKeyLen to MAX_OSPATH from above
-    if (!RegQueryValueEx(steamRegKey, "SteamPath", NULL, NULL,
-                         (LPBYTE)wideBuffer, &steamRegKeyLen)) {
-      if (!RegQueryValueEx(steamRegKey, "InstallPath", NULL, NULL,
-                           (LPBYTE)wideBuffer, &steamRegKeyLen)) {
-        // Convert our path from widechar to asci
-        if (WidePath2ASCI(steamPathBuffer, steamRegKeyLen, wideBuffer)) {
-          idStr steamInstallPath;
-          steamInstallPath = steamPathBuffer;
-          steamInstallPath.AppendPath("steamapps\\common\\" STEAMPATH_NAME);
-          if (Sys_IsFolder(steamInstallPath.c_str()) == FOLDER_YES) {
-            common->Printf("^4Using Steam install base path '%s'\n",
-                           steamInstallPath.c_str());
-            return steamInstallPath.c_str();
-          }
-        }
-      }
-    }
-  }
-#endif
-#endif
-
-  return steamPathBuffer;
-}
-
-/*
-================
-Sys_GogBasePath
-================
-*/
-static char gogPathBuffer[MAX_OSPATH] = {0};
-
-static const char* Sys_GogBasePath(void) {
-#ifdef GOGPATH_ID
-  HKEY gogRegKey;
-  DWORD gogRegKeyLen = MAX_OSPATH;
-  WCHAR wideBuffer[MAX_OSPATH] = {0};
-
-  // Let's try checking the GOG.com launcher game ID
-  if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\GOG.com\\Games\\" GOGPATH_ID,
-                    0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &gogRegKey)) {
-    if (!RegQueryValueEx(gogRegKey, "PATH", NULL, NULL, (LPBYTE)gogPathBuffer,
-                         &gogRegKeyLen)) {
-      // Convert our path from widechar to asci
-      if (WidePath2ASCI(gogPathBuffer, gogRegKeyLen, wideBuffer)) {
-        common->Printf("^4Using GOG.com Game ID base path '%s'\n",
-                       gogPathBuffer);
-        return gogPathBuffer;
-      }
-    }
-
-    RegCloseKey(gogRegKey);
-  }
-#endif
-
-  return gogPathBuffer;
-}
-
-/*
-==============
 Sys_DefaultBasePath
 ==============
 */
@@ -737,34 +638,6 @@ const char* Sys_DefaultBasePath() {
       return basepath.c_str();
     } else {
       common->Printf("no '%s' directory in exe path %s, skipping\n",
-                     BASE_GAMEDIR, basepath.c_str());
-    }
-  }
-
-  // Try the Steam path next
-  basepath = Sys_SteamBasePath();
-  if (basepath.Length() && win32.sys_useSteamPath.GetBool()) {
-    testbase = basepath;
-    testbase += "/";
-    testbase += BASE_GAMEDIR;
-    if (Sys_IsFolder(testbase.c_str()) == FOLDER_YES) {
-      return basepath.c_str();
-    } else {
-      common->Printf("no '%s' directory in Steam path %s, skipping\n",
-                     BASE_GAMEDIR, basepath.c_str());
-    }
-  }
-
-  // Try the GOG.com path next
-  basepath = Sys_GogBasePath();
-  if (basepath.Length() && win32.sys_useGOGPath.GetBool()) {
-    testbase = basepath;
-    testbase += "/";
-    testbase += BASE_GAMEDIR;
-    if (Sys_IsFolder(testbase.c_str()) == FOLDER_YES) {
-      return basepath.c_str();
-    } else {
-      common->Printf("no '%s' directory in GOG.com path %s, skipping\n",
                      BASE_GAMEDIR, basepath.c_str());
     }
   }
@@ -1395,10 +1268,10 @@ void Sys_Init() {
   }
 
   if (win32.osversion.dwMajorVersion < 4) {
-    Sys_Error(GAME_NAME " requires Windows version 4 (NT) or greater");
+    Sys_Error("Requires Windows version 4 (NT) or greater");
   }
   if (win32.osversion.dwPlatformId == VER_PLATFORM_WIN32s) {
-    Sys_Error(GAME_NAME " doesn't run on Win32s");
+    Sys_Error("Doesn't run on Win32s");
   }
 
   if (win32.osversion.dwPlatformId == VER_PLATFORM_WIN32_NT) {

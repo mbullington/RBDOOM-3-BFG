@@ -122,7 +122,7 @@ const char* idSessionLocal::stateToString[NUM_STATES] = {
 };
 
 struct netVersion_s {
-  netVersion_s() { sprintf(string, "%s.%d", ENGINE_VERSION, BUILD_NUMBER); }
+  netVersion_s() { sprintf(string, "%s ", ENGINE_VERSION); }
   char string[256];
 } netVersion;
 

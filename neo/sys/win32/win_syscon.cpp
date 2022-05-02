@@ -344,8 +344,10 @@ void Sys_CreateConsole() {
   // s_wcd.hbmLogo = LoadBitmap( win32.hInstance, MAKEINTRESOURCE(
   // IDB_BITMAP_LOGO) );
 
+  auto gameName = fileSystem->GetGameInfo(GAMEINFO_GAME_NAME);
+
   s_wcd.hWnd = CreateWindowEx(
-      0, DEDCLASS, GAME_NAME, DEDSTYLE, (swidth - 600) / 2, (sheight - 450) / 2,
+      0, DEDCLASS, gameName, DEDSTYLE, (swidth - 600) / 2, (sheight - 450) / 2,
       rect.right - rect.left + 1, rect.bottom - rect.top + 1, NULL, NULL,
       win32.hInstance, NULL);
 

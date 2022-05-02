@@ -51,8 +51,8 @@ All game cvars should be defined here.
 
 struct gameVersion_s {
   gameVersion_s() {
-    sprintf(string, "%s.%d%s %s %s %s", ENGINE_VERSION, BUILD_NUMBER,
-            BUILD_DEBUG, BUILD_STRING, __DATE__, __TIME__);
+    sprintf(string, "%s %s %s %s %s", ENGINE_VERSION, BUILD_DEBUG, BUILD_STRING,
+            __DATE__, __TIME__);
   }
   char string[256];
 } gameVersion;
@@ -80,9 +80,9 @@ idCVar si_spectators("si_spectators", "1",
                      CVAR_GAME | CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_BOOL,
                      "allow spectators or require all clients to play");
 
-// idCVar si_pointLimit(				"si_pointlimit",			"8",
-// CVAR_GAME | CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_INTEGER, "team points limit
-// to win in CTF" );
+// idCVar si_pointLimit(				"si_pointlimit",
+// "8", CVAR_GAME | CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_INTEGER, "team points
+// limit to win in CTF" );
 idCVar si_flagDropTimeLimit("si_flagDropTimeLimit", "30",
                             CVAR_GAME | CVAR_SERVERINFO | CVAR_ARCHIVE |
                                 CVAR_INTEGER,

@@ -393,7 +393,8 @@ saveGameHandle_t idSessionLocal::LoadGameSync(const char* name,
         GetSaveGameManager().GetEnumeratedSavegames();
     for (int i = 0; i < details.Num(); ++i) {
       if (idStr::Cmp(name, details[i].slotName) == 0) {
-        if (details[i].GetSaveVersion() > BUILD_NUMBER) {
+        auto buildNumber = fileSystem->GetGameInfoInt(GAMEINFO_BUILD_NUMBER);
+        if (details[i].GetSaveVersion() > buildNumber) {
           parms.errorCode = SAVEGAME_E_INCOMPATIBLE_NEWER_VERSION;
           return 0;
         }
@@ -769,7 +770,8 @@ bool idSessionLocal::LoadGameCheckDescriptionFile(idSaveLoadParms& parms) {
   if (!SavegameReadDetailsFromFile(*detailsFile, parms.description)) {
     parms.errorCode = SAVEGAME_E_CORRUPTED;
   } else {
-    if (parms.description.GetSaveVersion() > BUILD_NUMBER) {
+    auto buildNumber = fileSystem->GetGameInfoInt(GAMEINFO_BUILD_NUMBER);
+    if (parms.description.GetSaveVersion() > buildNumber) {
       parms.errorCode = SAVEGAME_E_INCOMPATIBLE_NEWER_VERSION;
     }
   }

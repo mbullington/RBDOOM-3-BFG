@@ -188,10 +188,12 @@ void idMenuScreen_Shell_Load::UpdateSaveEnumerations() {
       for (int slot = 0; slot < sortedSaves.Num(); ++slot) {
         idStr& slotSaveName = saveList[slot].Alloc();
         const idSaveGameDetails& details = sortedSaves[slot];
+        auto buildNumber = fileSystem->GetGameInfoInt(GAMEINFO_BUILD_NUMBER);
+
         if (details.damaged) {
           slotSaveName = va(S_COLOR_RED "%s",
                             idLocalization::GetString("#str_swf_corrupt_file"));
-        } else if (details.GetSaveVersion() > BUILD_NUMBER) {
+        } else if (details.GetSaveVersion() > buildNumber) {
           slotSaveName =
               va(S_COLOR_RED "%s",
                  idLocalization::GetString("#str_swf_wrong_version"));

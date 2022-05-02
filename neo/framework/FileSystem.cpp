@@ -36,6 +36,10 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 
 #include "precompiled.h"
+
+#include "rapidjson/document.h"
+#include "rapidjson/pointer.h"
+
 #pragma hdrstop
 
 #include "Unzip.h"
@@ -53,6 +57,10 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #endif
 #include <unistd.h>
 #endif
+
+using rapidjson::Document;
+using rapidjson::Pointer;
+using rapidjson::Value;
 
 /*
 =============================================================================
@@ -261,7 +269,12 @@ class idFileSystemLocal : public idFileSystem {
 
   void BuildOrderedStartupContainer();
 
+  virtual idStr GetGameInfo(const char* jsonPointer);
+  virtual int GetGameInfoInt(const char* jsonPointer);
+
  private:
+  Document gameInfo;
+
   idList<searchpath_t> searchPaths;
   int loadCount;     // total files read
   int loadStack;     // total files in memory
@@ -323,6 +336,7 @@ class idFileSystemLocal : public idFileSystem {
   int FindResourceFile(const char* resourceFileName);
 
   void SetupGameDirectories(const char* gameName);
+  void LoadGameInfo();
   void Startup();
   void InitPrecache();
   void ReOpenCacheFiles();
@@ -2852,6 +2866,9 @@ void idFileSystemLocal::Startup() {
     SetupGameDirectories(fs_game.GetString());
   }
 
+  // Load gameinfo.json file for the current game.
+  LoadGameInfo();
+
   // add our commands
   cmdSystem->AddCommand("dir", Dir_f, CMD_FL_SYSTEM, "lists a folder",
                         idCmdSystem::ArgCompletion_FileName);
@@ -3546,4 +3563,68 @@ idFileSystemLocal::IsFolder
 sysFolder_t idFileSystemLocal::IsFolder(const char* relativePath,
                                         const char* basePath) {
   return Sys_IsFolder(RelativePathToOSPath(relativePath, basePath));
+}
+
+/*
+===============
+idFileSystemLocal::LoadGameInfo
+
+Loads the gameinfo.json file for the current game.
+===============
+*/
+void idFileSystemLocal::LoadGameInfo() {
+  Document& d = this->gameInfo;
+  const char* fbuffer = NULL;
+  ID_TIME_T timestamp;
+
+  int fileSize = ReadFile("gameinfo.json", (void**)&fbuffer, &timestamp);
+  if (!fbuffer) {
+    return;
+  }
+
+  d.Parse(fbuffer);
+  idassert(d.IsObject());
+}
+
+/*
+===============
+idFileSystemLocal::GetGameInfo
+===============
+*/
+idStr idFileSystemLocal::GetGameInfo(const char* jsonPointer) {
+  Document& d = this->gameInfo;
+  idassert(d.IsObject());
+
+  // https://rapidjson.org/md_doc_pointer.html
+  const auto value = Pointer(jsonPointer).Get(d);
+
+  if (!value->IsString()) {
+    common->Error("idFileSystemLocal::GetGameInfo: %s doesn't exist!",
+                  jsonPointer);
+    return idStr("");
+  }
+
+  const char* stringVal = value->GetString();
+  return idStr(stringVal);
+}
+
+/*
+===============
+idFileSystemLocal::GetGameInfoInt
+===============
+*/
+int idFileSystemLocal::GetGameInfoInt(const char* jsonPointer) {
+  Document& d = this->gameInfo;
+  idassert(d.IsObject());
+
+  // https://rapidjson.org/md_doc_pointer.html
+  const auto value = Pointer(jsonPointer).Get(d);
+
+  if (!value->IsString()) {
+    common->Error("idFileSystemLocal::GetGameInfo: %s doesn't exist!",
+                  jsonPointer);
+    return -1;
+  }
+
+  return value->GetInt();
 }

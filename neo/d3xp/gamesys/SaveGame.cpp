@@ -817,7 +817,10 @@ void idSaveGame::WriteSoundCommands() { gameSoundWorld->WriteToSaveGame(file); }
 idSaveGame::WriteBuildNumber
 ======================
 */
-void idSaveGame::WriteBuildNumber(const int value) { WriteInt(BUILD_NUMBER); }
+void idSaveGame::WriteBuildNumber(const int value) {
+  auto buildNumber = fileSystem->GetGameInfoInt(GAMEINFO_BUILD_NUMBER);
+  WriteInt(buildNumber);
+}
 
 /***********************************************************************
 

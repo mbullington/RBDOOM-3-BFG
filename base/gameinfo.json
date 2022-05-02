@@ -1,0 +1,12 @@
+{
+  "gameName": "DOOM 3 BFG Edition",
+  "buildNumber": 1401,
+  "configFile": "D3BFGConfig.cfg",
+  "steam": {
+    "appId": "208200",
+    "appName": "DOOM 3 BFG Edition"
+  },
+  "gog": {
+    "pathId": "1733124578"
+  }
+}

@@ -54,8 +54,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 struct version_s {
   version_s() {
-    sprintf(string, "%s.%d%s %s %s %s", ENGINE_VERSION, BUILD_NUMBER,
-            BUILD_DEBUG, BUILD_STRING, __DATE__, __TIME__);
+    sprintf(string, "%s %s %s %s %s", ENGINE_VERSION, BUILD_DEBUG, BUILD_STRING,
+            __DATE__, __TIME__);
   }
   char string[256];
 } version;
@@ -420,16 +420,15 @@ void idCommonLocal::WriteConfiguration() {
     user->SaveProfileSettings();
   }
 
-#ifdef CONFIG_FILE
   // disable printing out the "Writing to:" message
   bool developer = com_developer.GetBool();
   com_developer.SetBool(false);
 
-  WriteConfigToFile(CONFIG_FILE);
+  auto configFile = fileSystem->GetGameInfo(GAMEINFO_CONFIG_FILE);
+  WriteConfigToFile(configFile);
 
   // restore the developer cvar
   com_developer.SetBool(developer);
-#endif
 }
 
 /*
@@ -1119,7 +1118,7 @@ void idCommonLocal::Init(int argc, const char* const* argv,
     idLib::Init();
 
     // clear warning buffer
-    ClearWarnings(GAME_NAME " initialization");
+    ClearWarnings("Initialization");
 
     idLib::Printf("Command line: %s\n", cmdline);
     //::MessageBox( NULL, cmdline, "blah", MB_OK );
@@ -1203,12 +1202,13 @@ void idCommonLocal::Init(int argc, const char* const* argv,
     // exec the startup scripts
     cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec default.cfg\n");
 
-#ifdef CONFIG_FILE
+    auto configFile = fileSystem->GetGameInfo(GAMEINFO_CONFIG_FILE);
     // skip the config file if "safe" is on the command line
     if (!SafeMode() && !g_demoMode.GetBool()) {
-      cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec " CONFIG_FILE "\n");
+      char buf[256];
+      sprintf(buf, "exec %s\n", configFile.c_str());
+      cmdSystem->BufferCommandText(CMD_EXEC_APPEND, buf);
     }
-#endif
 
     cmdSystem->BufferCommandText(CMD_EXEC_APPEND, "exec autoexec.cfg\n");
 
@@ -1534,8 +1534,8 @@ void idCommonLocal::Shutdown() {
   cmdSystem->Shutdown();
 
   // free any buffered warning messages
-  printf("ClearWarnings( GAME_NAME \" shutdown\" );\n");
-  ClearWarnings(GAME_NAME " shutdown");
+  printf("ClearWarnings( \"Shutdown\" );\n");
+  ClearWarnings("Shutdown");
   printf("warningCaption.Clear();\n");
   warningCaption.Clear();
   printf("errorList.Clear();\n");

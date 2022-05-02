@@ -257,7 +257,21 @@ class idFileSystem {
   virtual void AddAnimPreload(const char* resName) = 0;
   virtual void AddParticlePreload(const char* resName) = 0;
   virtual void AddCollisionPreload(const char* resName) = 0;
+
+  // This uses JSON Pointer syntax, /which/looks/like/this/0
+  // https://datatracker.ietf.org/doc/html/rfc6901
+  virtual idStr GetGameInfo(const char* jsonPointer) = 0;
+  virtual int GetGameInfoInt(const char* jsonPointer) = 0;
 };
+
+#define GAMEINFO_GAME_NAME "/gameName"
+#define GAMEINFO_BUILD_NUMBER "/buildNumber"
+#define GAMEINFO_CONFIG_FILE "/configFile"
+
+#define GAMEINFO_STEAM_APP_ID "/steam/appId"
+#define GAMEINFO_STEAM_APP_NAME "/steam/appName"
+
+#define GAMEINFO_GOG_PATH_ID "/gog/pathId"
 
 extern idFileSystem* fileSystem;
 

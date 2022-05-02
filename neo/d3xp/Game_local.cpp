@@ -36,6 +36,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 ===========================================================================
 */
 
+#include "framework/FileSystem.h"
 #include "precompiled.h"
 #pragma hdrstop
 
@@ -478,7 +479,8 @@ void idGameLocal::SaveGame(idFile* f, idFile* strings) {
     }
   }
 
-  idSaveGame savegame(f, strings, BUILD_NUMBER);
+  auto buildNumber = fileSystem->GetGameInfoInt(GAMEINFO_BUILD_NUMBER);
+  idSaveGame savegame(f, strings, buildNumber);
 
   if (g_flushSave.GetBool() == true) {
     // force flushing with each write... for tracking down
@@ -696,8 +698,11 @@ void idGameLocal::GetSaveGameDetails(idSaveGameDetails& gameDetails) {
                                  expansionType);
   gameDetails.descriptors.Set(SAVEGAME_DETAIL_FIELD_MAP, mapPrettyName);
   gameDetails.descriptors.Set(SAVEGAME_DETAIL_FIELD_MAP_LOCATE, locationStr);
+
+  auto buildNumber = fileSystem->GetGameInfoInt(GAMEINFO_BUILD_NUMBER);
   gameDetails.descriptors.SetInt(SAVEGAME_DETAIL_FIELD_SAVE_VERSION,
-                                 BUILD_NUMBER);
+                                 buildNumber);
+
   gameDetails.descriptors.SetInt(SAVEGAME_DETAIL_FIELD_DIFFICULTY,
                                  g_skill.GetInteger());
   gameDetails.descriptors.SetInt(SAVEGAME_DETAIL_FIELD_PLAYTIME, playTime);
@@ -1454,17 +1459,13 @@ bool idGameLocal::InitFromSaveGame(
 
   // FIXME: save smoke particles
 
-  if (saveGameVersion > BUILD_NUMBER_SAVE_VERSION_BEFORE_SKIP_CINEMATIC) {
-    savegame.ReadInt(cinematicSkipTime);
-    savegame.ReadInt(cinematicStopTime);
-    savegame.ReadInt(cinematicMaxSkipTime);
-  }
+  savegame.ReadInt(cinematicSkipTime);
+  savegame.ReadInt(cinematicStopTime);
+  savegame.ReadInt(cinematicMaxSkipTime);
 
   savegame.ReadBool(inCinematic);
 
-  if (saveGameVersion > BUILD_NUMBER_SAVE_VERSION_BEFORE_SKIP_CINEMATIC) {
-    savegame.ReadBool(skipCinematic);
-  }
+  savegame.ReadBool(skipCinematic);
 
   savegame.ReadInt((int&)gameType);
 
@@ -4983,7 +4984,7 @@ idEntity* idGameLocal::SelectInitialSpawnPoint(idPlayer* player) {
       which = random.RandomInt(teamSpawnSpots[team].Num() / 2);
       spot = teamSpawnSpots[team][which];
       //			assert( teamSpawnSpots[ team ][ which ].dist !=
-      //0 );
+      // 0 );
 
       return spot.ent;
     }

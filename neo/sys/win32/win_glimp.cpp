@@ -294,10 +294,12 @@ static void GLW_GetWGLExtensionsWithFakeWindow() {
   HWND hWnd;
   MSG msg;
 
+  auto gameName = fileSystem->GetGameInfo(GAMEINFO_GAME_NAME);
+
   // Create a window for the sole purpose of getting
   // a valid context to get the wglextensions
   hWnd =
-      CreateWindow(WIN32_FAKE_WINDOW_CLASS_NAME, GAME_NAME, WS_OVERLAPPEDWINDOW,
+      CreateWindow(WIN32_FAKE_WINDOW_CLASS_NAME, gameName, WS_OVERLAPPEDWINDOW,
                    40, 40, 640, 480, NULL, NULL, win32.hInstance, NULL);
   if (!hWnd) {
     common->FatalError(
@@ -1021,8 +1023,10 @@ static bool GLW_CreateWindow(glimpParms_t parms) {
     stylebits = WINDOW_STYLE | WS_SYSMENU;
   }
 
+  auto gameName = fileSystem->GetGameInfo(GAMEINFO_GAME_NAME);
+
   win32.hWnd =
-      CreateWindowEx(exstyle, WIN32_WINDOW_CLASS_NAME, GAME_NAME, stylebits, x,
+      CreateWindowEx(exstyle, WIN32_WINDOW_CLASS_NAME, gameName, stylebits, x,
                      y, w, h, NULL, NULL, win32.hInstance, NULL);
 
   if (!win32.hWnd) {
