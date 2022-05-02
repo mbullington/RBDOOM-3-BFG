@@ -17,6 +17,46 @@ For discussions join the id Tech 4 Discord: https://discord.gg/Q3E9rUFnnP , #rbd
 
 <img src="https://i.imgur.com/nSWBSUB.png">
 
+# Changes from RBDOOM-3-BFG
+
+## Gameplay
+- 
+
+## For modders
+- Added a `gameinfo.json` file that lets you specify window decorations, Steam ID for future Steamworks support, etc... similar in spirit (not in format) to Valve's [Gameinfo.txt](https://developer.valvesoftware.com/wiki/Gameinfo.txt).
+
+```json
+{
+  "gameName": "DOOM 3 BFG Edition",
+  "buildNumber": 1401,
+  "configFile": "D3BFGConfig.cfg",
+  "steam": {
+    "appId": "208200",
+    "appName": "DOOM 3 BFG Edition"
+  },
+  "gog": {
+    "pathId": "1733124578"
+  }
+}
+```
+
+- Add `(pwd)/..` dev_path to non-retail builds that makes it easier to separate additional assets (renderprogs, etc) from DOOM 3 BFG assets.
+
+## Renderer
+- Swap out Vulkan allocator for newest VulkanMemoryAllocator checkout
+- Move all in-game image loading to use `stb_image`, clean up old dependencies.
+
+## Engine
+- Switch build system from Make to Ninja (**faster**)
+- Add configurations for debug/intellisense on VSCode
+- Move `neo/libs` into `vendor` where they can be tracked easier
+- Use Google clang-format style
+- Remove `doom_classic` to simplify source code
+- Bump to C++20
+- Expect minimum CPU Haskell-generation (v86_64_v3)
+- Fix MoltenVK support through Homebrew
+- Remove (in my opinion, odd) system for inlining shaders as `.h` text files
+
 # Table of Contents
 
 This file contains the following sections:
