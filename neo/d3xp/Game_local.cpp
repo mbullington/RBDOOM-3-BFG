@@ -2621,7 +2621,8 @@ void idGameLocal::RunFrame(idUserCmdMgr& cmdMgr, gameReturn_t& ret) {
 
       // see if a target_sessionCommand has forced a changelevel
       if (sessionCommand.Length()) {
-        strncpy(ret.sessionCommand, sessionCommand, sizeof(ret.sessionCommand));
+        idStr::Copynz(ret.sessionCommand, sessionCommand,
+                      sizeof(ret.sessionCommand));
         break;
       }
 
@@ -2676,7 +2677,8 @@ void idGameLocal::BuildReturnValue(gameReturn_t& ret) {
 
   // see if a target_sessionCommand has forced a changelevel
   if (sessionCommand.Length()) {
-    strncpy(ret.sessionCommand, sessionCommand, sizeof(ret.sessionCommand));
+    idStr::Copynz(ret.sessionCommand, sessionCommand,
+                  sizeof(ret.sessionCommand));
     sessionCommand
         .Clear();  // Fixes a double loading bug for the e3 demo.  Since we run
                    // the game thread in SMP mode, we could run this twice and

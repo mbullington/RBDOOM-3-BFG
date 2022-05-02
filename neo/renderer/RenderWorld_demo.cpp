@@ -382,7 +382,7 @@ void idRenderWorldLocal::WriteLoadMap() {
   f->WriteInt(DC_LOADMAP);
 
   demoHeader_t header;
-  strncpy(header.mapname, mapName.c_str(), sizeof(header.mapname) - 1);
+  idStr::Copynz(header.mapname, mapName.c_str(), sizeof(header.mapname) - 1);
   header.version = 4;
   header.sizeofRenderEntity = sizeof(renderEntity_t);
   header.sizeofRenderLight = sizeof(renderLight_t);

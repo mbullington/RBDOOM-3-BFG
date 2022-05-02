@@ -187,7 +187,7 @@ void PC_BeginNamedEvent(const char* szName, const idVec4& color) {
 	GL_CheckErrors();
 
 	pixEvent_t* ev = &pixEvents[numPixEvents++];
-	strncpy( ev->name, szName, sizeof( ev->name ) - 1 );
+	idStr::Copynz( ev->name, szName, sizeof( ev->name ) - 1 );
 	ev->cpuTime = Sys_Microseconds();
 #endif
 }

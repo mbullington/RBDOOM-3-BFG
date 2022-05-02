@@ -63,6 +63,7 @@ For discussions join the id Tech 4 Discord: https://discord.gg/Q3E9rUFnnP , #rbd
 External contributions:
 
 - `dhewm3`: https://github.com/dhewm/dhewm3/commit/befe732dbb60d5b408ccb86515a7d91a2d55fbb0
+- `dhewm3`: https://github.com/dhewm/dhewm3/commit/ea781c577e703667e024916ccef240b19c393e79
 - https://github.com/RobertBeckebans/RBDOOM-3-BFG/pull/659
 
 # Table of Contents
