@@ -47,9 +47,32 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 extern idCVar s_noSound;
 
 #define JPEG_INTERNALS
-// extern "C" {
 #include <jpeglib.h>
-//}
+#include <jerror.h>
+
+// hooks from jpeg lib to our system
+
+void jpg_Error(const char* fmt, ...) {
+  va_list argptr;
+  char msg[2048];
+
+  va_start(argptr, fmt);
+  vsprintf(msg, fmt, argptr);
+  va_end(argptr);
+
+  common->FatalError("%s", msg);
+}
+
+void jpg_Printf(const char* fmt, ...) {
+  va_list argptr;
+  char msg[2048];
+
+  va_start(argptr, fmt);
+  vsprintf(msg, fmt, argptr);
+  va_end(argptr);
+
+  common->Printf("%s", msg);
+}
 
 #include "RenderCommon.h"
 

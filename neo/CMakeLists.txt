@@ -51,9 +51,6 @@ option(WINDOWS10
 option(USE_SYSTEM_ZLIB
                 "Use the system zlib instead of the bundled one" OFF)
 
-option(USE_SYSTEM_LIBPNG
-                "Use the system libpng instead of the bundled one" OFF)
-
 option(USE_SYSTEM_LIBJPEG
                 "Use the system libjpeg instead of the bundled one" OFF)
 
@@ -333,14 +330,6 @@ if(USE_SYSTEM_LIBPNG)
 	find_package(PNG REQUIRED)
 endif (USE_SYSTEM_LIBPNG)
 
-if (PNG_FOUND)
-    include_directories(${PNG_INCLUDE_DIRS})
-    set(PNG_LIBRARY ${PNG_LIBRARIES})
-else (PNG_FOUND)
-    include_directories("../vendor/png")
-    set(PNG_LIBRARY "" )
-endif (PNG_FOUND)
-
 if(USE_SYSTEM_LIBJPEG)
 	find_package(JPEG REQUIRED)
 endif(USE_SYSTEM_LIBJPEG)
@@ -609,14 +598,6 @@ else (NOT JPEG_FOUND)
    set(JPEG_INCLUDES "")
    set(JPEG_SOURCES "")
 endif (NOT JPEG_FOUND)
-
-if (NOT PNG_FOUND)
-    file(GLOB PNG_INCLUDES ../vendor/png/*.h)
-    file(GLOB PNG_SOURCES ../vendor/png/*.c)
-else (NOT PNG_FOUND)
-    set(PNG_INCLUDES "")
-    set(PNG_SOURCES "")
-endif (NOT PNG_FOUND)
 
 if (NOT ZLIB_FOUND)
 file(GLOB ZLIB_INCLUDES ../vendor/zlib/*.h)
@@ -1160,9 +1141,6 @@ source_group("vendor\\jpeg-6" FILES ${JPEG_SOURCES})
 source_group("vendor\\libbinkdec" FILES ${BINKDEC_INCLUDES})
 source_group("vendor\\libbinkdec" FILES ${BINKDEC_SOURCES})
 
-source_group("vendor\\png" FILES ${PNG_INCLUDES})
-source_group("vendor\\png" FILES ${PNG_SOURCES})
-
 source_group("vendor\\zlib" FILES ${ZLIB_INCLUDES})
 source_group("vendor\\zlib" FILES ${ZLIB_SOURCES})
 
@@ -1558,7 +1536,7 @@ if(MSVC)
 	
 	if(USE_PRECOMPILED_HEADERS) 
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${PNG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/zlib/minizip/ioapi.c)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
