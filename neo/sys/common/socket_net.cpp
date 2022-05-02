@@ -958,6 +958,7 @@ void Sys_InitNetworking() {
     // DG end
     num_interfaces++;
   }
+  freeifaddrs(ifap);
 #else   // not _WIN32, OSX or FreeBSD
   int s;
   char buf[MAX_INTERFACES * sizeof(ifreq)];
