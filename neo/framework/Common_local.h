@@ -142,12 +142,14 @@ class idCommonLocal : public idCommon {
   virtual void UpdateScreen(bool captureToImage, bool releaseMouse = true);
   // DG end
   virtual void UpdateLevelLoadPacifier();  // Indefinate
-  //	virtual void				UpdateLevelLoadPacifier( int mProgress
-  //);
-  //	virtual void				UpdateLevelLoadPacifier( bool Secondary
+  //	virtual void				UpdateLevelLoadPacifier( int
+  // mProgress
   //);
   //	virtual void				UpdateLevelLoadPacifier( bool
-  //updateSecondary, int mProgress );
+  // Secondary
+  //);
+  //	virtual void				UpdateLevelLoadPacifier( bool
+  // updateSecondary, int mProgress );
   virtual void StartupVariable(const char* match);
   virtual void InitTool(const toolFlag_t tool, const idDict* dict,
                         idEntity* entity);
@@ -226,8 +228,6 @@ class idCommonLocal : public idCommon {
   virtual const idList<mpMap_t>& GetMapList() const { return mpGameMaps; }
 
   virtual void ResetPlayerInput(int playerIndex);
-
-  virtual bool JapaneseCensorship() const;
 
   virtual void QueueShowShell() { showShellRequested = true; }
 
@@ -345,7 +345,6 @@ class idCommonLocal : public idCommon {
   bool com_refreshOnPrint;  // update the screen every print for dmap
   errorParm_t com_errorEntered;
   bool com_shuttingDown;
-  bool com_isJapaneseSKU;
 
   idFile* logFile;
 
