@@ -54,9 +54,6 @@ option(USE_SYSTEM_LIBJPEG
 option(USE_SYSTEM_LIBGLEW
                 "Use the system libglew instead of the bundled one" OFF)
 
-option(USE_SYSTEM_RAPIDJSON
-                "Use the system rapidjson instead of the bundled one" OFF)
-
 set(CPU_TYPE "" CACHE STRING "When set, passes this string as CPU-ID which will be embedded into the binary.")
 
 # Make sure to include repo root for vendor.
@@ -439,19 +436,8 @@ else()
 	endif()
 endif()
 
-if(USE_SYSTEM_RAPIDJSON)
-find_package(rapidjson REQUIRED)
-endif(USE_SYSTEM_RAPIDJSON)
+include_directories("../vendor/rapidjson/include")
 
-if (RAPIDJSON_FOUND)
-	include_directories("${RAPIDJSON_INCLUDE_DIRS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RAPIDJSON_CXX_FLAGS}")
-else (RAPIDJSON_FOUND)
-	include_directories("../vendor/rapidjson/include")
-endif (RAPIDJSON_FOUND)
-
-
-	
 add_subdirectory(idlib)
 
 file(GLOB AAS_INCLUDES aas/*.h)
