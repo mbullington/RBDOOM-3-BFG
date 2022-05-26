@@ -3620,7 +3620,7 @@ int idFileSystemLocal::GetGameInfoInt(const char* jsonPointer) {
   // https://rapidjson.org/md_doc_pointer.html
   const auto value = Pointer(jsonPointer).Get(d);
 
-  if (!value->IsString()) {
+  if (!value->IsInt()) {
     common->Error("idFileSystemLocal::GetGameInfo: %s doesn't exist!",
                   jsonPointer);
     return -1;
