@@ -525,43 +525,7 @@ file(GLOB BINKDEC_SOURCES ../vendor/libbinkdec/src/*.c ../vendor/libbinkdec/src/
 include_directories("../vendor/libbinkdec/include")
 
 file(GLOB MINIZIP_INCLUDES ../vendor/zlib/minizip/*.h)
-file(GLOB MINIZIP_SOURCES ../vendor/zlib/minizip/*.c ../vendor/zlib/minizip/*.cpp)
-
-set(FREETYPE_SOURCES
-	../vendor/freetype/src/autofit/autofit.c
-	../vendor/freetype/src/bdf/bdf.c
-	../vendor/freetype/src/cff/cff.c
-	../vendor/freetype/src/base/ftbase.c
-	../vendor/freetype/src/base/ftbitmap.c
-	../vendor/freetype/src/cache/ftcache.c
-	../vendor/freetype/src/base/ftdebug.c
-	../vendor/freetype/src/base/ftgasp.c
-	../vendor/freetype/src/base/ftglyph.c
-	../vendor/freetype/src/gzip/ftgzip.c
-	../vendor/freetype/src/base/ftinit.c
-	../vendor/freetype/src/lzw/ftlzw.c
-	../vendor/freetype/src/base/ftstroke.c
-	../vendor/freetype/src/base/ftsystem.c
-	../vendor/freetype/src/smooth/smooth.c
-	../vendor/freetype/src/base/ftbbox.c
-	../vendor/freetype/src/base/ftmm.c
-	../vendor/freetype/src/base/ftpfr.c
-	../vendor/freetype/src/base/ftsynth.c
-	../vendor/freetype/src/base/fttype1.c
-	../vendor/freetype/src/base/ftwinfnt.c
-	../vendor/freetype/src/pcf/pcf.c
-	../vendor/freetype/src/pfr/pfr.c
-	../vendor/freetype/src/psaux/psaux.c
-	../vendor/freetype/src/pshinter/pshinter.c
-	../vendor/freetype/src/psnames/psmodule.c
-	../vendor/freetype/src/raster/raster.c
-	../vendor/freetype/src/sfnt/sfnt.c
-	../vendor/freetype/src/truetype/truetype.c
-	../vendor/freetype/src/type1/type1.c
-	../vendor/freetype/src/cid/type1cid.c
-	../vendor/freetype/src/type42/type42.c
-	../vendor/freetype/src/winfonts/winfnt.c)
-	
+file(GLOB MINIZIP_SOURCES ../vendor/zlib/minizip/*.c ../vendor/zlib/minizip/*.cpp)	
 	
 set(SOUND_INCLUDES
 	sound/snd_local.h
@@ -590,36 +554,6 @@ set(OPENAL_SOURCES
 	sound/OpenAL/AL_SoundVoice.cpp
 	sound/OpenAL/AL_CinematicAudio.cpp)
 	
-set(OGGVORBIS_INCLUDES
-	../vendor/oggvorbis/ogg/ogg.h
-	../vendor/oggvorbis/ogg/os_types.h)
-	
-set(OGGVORBIS_SOURCES
-	../vendor/oggvorbis/oggsrc/bitwise.c
-	../vendor/oggvorbis/oggsrc/framing.c
-	
-	../vendor/oggvorbis/vorbissrc/mdct.c
-	../vendor/oggvorbis/vorbissrc/smallft.c
-	../vendor/oggvorbis/vorbissrc/block.c
-	../vendor/oggvorbis/vorbissrc/envelope.c
-	../vendor/oggvorbis/vorbissrc/windowvb.c
-	../vendor/oggvorbis/vorbissrc/lsp.c
-	../vendor/oggvorbis/vorbissrc/lpc.c
-	../vendor/oggvorbis/vorbissrc/analysis.c
-	../vendor/oggvorbis/vorbissrc/synthesis.c
-	../vendor/oggvorbis/vorbissrc/psy.c
-	../vendor/oggvorbis/vorbissrc/info.c
-	../vendor/oggvorbis/vorbissrc/floor1.c
-	../vendor/oggvorbis/vorbissrc/floor0.c
-	../vendor/oggvorbis/vorbissrc/res0.c
-	../vendor/oggvorbis/vorbissrc/mapping0.c
-	../vendor/oggvorbis/vorbissrc/registry.c
-	../vendor/oggvorbis/vorbissrc/codebook.c
-	../vendor/oggvorbis/vorbissrc/sharedbook.c
-	../vendor/oggvorbis/vorbissrc/lookup.c
-	../vendor/oggvorbis/vorbissrc/bitrate.c
-	../vendor/oggvorbis/vorbissrc/vorbisfile.c)
-
 file(GLOB RAPIDJSON_INCLUDES ../vendor/rapidjson/include/rapidjson/*.h)
 	
 file(GLOB SYS_INCLUDES sys/*.h)
@@ -938,16 +872,11 @@ source_group("vendor\\glew" FILES ${GLEW_SOURCES})
 
 source_group("vendor\\rapidjson" FILES ${RAPIDJSON_INCLUDES})
 
-source_group("vendor\\freetype" FILES ${FREETYPE_SOURCES})
-
 source_group("sound" FILES ${SOUND_INCLUDES})
 source_group("sound" FILES ${SOUND_SOURCES})
 
 source_group("sound\\OpenAL" FILES ${OPENAL_INCLUDES})
 source_group("sound\\OpenAL" FILES ${OPENAL_SOURCES})
-
-source_group("vendor\\oggvorbis" FILES ${OGGVORBIS_INCLUDES})
-source_group("vendor\\oggvorbis" FILES ${OGGVORBIS_SOURCES})
 
 source_group("ui" FILES ${UI_INCLUDES})
 source_group("ui" FILES ${UI_SOURCES})
@@ -1053,9 +982,7 @@ set(RBDOOM3_INCLUDES
 			${BINKDEC_INCLUDES}
 			${GLEW_INCLUDES}
 			${RAPIDJSON_INCLUDES}
-			#${FREETYPE_SOURCES}
 			${SOUND_INCLUDES}
-			#${OGGVORBIS_INCLUDES}
 			${UI_INCLUDES}
 			${SWF_INCLUDES}
 			${COMMON_INCLUDES}
@@ -1099,9 +1026,7 @@ set(RBDOOM3_SOURCES
 			${MINIZIP_SOURCES}
 			${BINKDEC_SOURCES}
 			${GLEW_SOURCES}
-			#${FREETYPE_SOURCES}
 			${SOUND_SOURCES}
-			#${OGGVORBIS_INCLUDES} ${OGGVORBIS_SOURCES}
 			${UI_SOURCES}
 			${SWF_SOURCES}
 			${COMMON_SOURCES}
@@ -1122,7 +1047,6 @@ set(RBDOOM3_SOURCES
 			)
 
 add_definitions(-D__DOOM__
-				#-DBUILD_FREETYPE
 				#-DFT2_BUILD_LIBRARY
 				)
 				
