@@ -19,8 +19,18 @@ For discussions join the id Tech 4 Discord: https://discord.gg/Q3E9rUFnnP , #rbd
 
 # Changes from RBDOOM-3-BFG
 
+This is mostly a playground for me to try out new libraries, techniques, and learn C++ concepts with more depth.
+
+Therefore, I might switch things out for fun with little / no functional difference.
+
+I may also try to optimize DOOM 3 and improve the experience on the platforms I have available:
+- x86_64 macOS
+- SteamOS under Wayland (Steam Deck)
+
+That means my fork is also unsupported, and you should use [RBDOOM-3-BFG](https://github.com/RobertBeckebans/RBDOOM-3-BFG) in most cases.
+
 ## Gameplay
-- 
+- tbd
 
 ## For modders
 
@@ -45,7 +55,7 @@ For discussions join the id Tech 4 Discord: https://discord.gg/Q3E9rUFnnP , #rbd
 
 ## Renderer
 
-- Swap out Vulkan allocator for newest VulkanMemoryAllocator checkout
+- Swap out Vulkan allocator for newest VulkanMemoryAllocator checkout.
 - Move all in-game image loading to use `stb_image`, clean up old dependencies.
 
 ## Engine
