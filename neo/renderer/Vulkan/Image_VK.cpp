@@ -650,7 +650,7 @@ void idImage::SubImageUpload(int mipLevel, int x, int y, int z, int width,
 		}
 	}
 #endif
-#if defined(__APPLE__) && defined(USE_BINKDEC)
+#if defined(__APPLE__)
   else if (opts.format == FMT_LUM8 &&
            (imgName == "_cinematicCr" || imgName == "_cinematicCb")) {
     // SRS - When decoding YUV420 cinematics on OSX, copy and duplicate

@@ -22,12 +22,6 @@ option(USE_PRECOMPILED_HEADERS
 
 option(OPENAL
 		"Use OpenAL soft instead of XAudio2" OFF)
-
-option(FFMPEG
-		"Use FMPEG to render Bink videos" ON)
-
-option(BINKDEC
-		"Use included libbinkdec to render Bink videos" OFF)
 		
 option(USE_VULKAN
 		"Use Vulkan instead of OpenGL" OFF)
@@ -59,10 +53,6 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)|(e2k)|(E2K)" AND 
 	option(USE_INTRINSICS_SSE "Compile using SSE intrinsics (e.g mmx, sse, msse2)" ON)
 else()
 	option(USE_INTRINSICS_SSE "Compile using SSE intrinsics (e.g mmx, sse, msse2)" OFF)
-endif()
-
-if(FFMPEG AND BINKDEC)
-	message(FATAL_ERROR "Only one of FFMPEG and BINKDEC (or neither) can be enabled at a time")
 endif()
 
 if(UNIX)
@@ -554,12 +544,9 @@ else (NOT ZLIB_FOUND)
   set(ZLIB_SOURCES "")
 endif (NOT ZLIB_FOUND)
 
-if(BINKDEC)
-	file(GLOB BINKDEC_INCLUDES ../vendor/libbinkdec/include/*.h)
-	file(GLOB BINKDEC_SOURCES ../vendor/libbinkdec/src/*.c ../vendor/libbinkdec/src/*.cpp)
-	add_definitions(-DUSE_BINKDEC)
-	include_directories("../vendor/libbinkdec/include")
-endif()
+file(GLOB BINKDEC_INCLUDES ../vendor/libbinkdec/include/*.h)
+file(GLOB BINKDEC_SOURCES ../vendor/libbinkdec/src/*.c ../vendor/libbinkdec/src/*.cpp)
+include_directories("../vendor/libbinkdec/include")
 
 file(GLOB MINIZIP_INCLUDES ../vendor/zlib/minizip/*.h)
 file(GLOB MINIZIP_SOURCES ../vendor/zlib/minizip/*.c ../vendor/zlib/minizip/*.cpp)
@@ -1402,38 +1389,6 @@ if(MSVC)
 		list(APPEND RBDOOM3_SOURCES	${XAUDIO2_SOURCES})
 	endif()
 	
-	if(FFMPEG)
-		add_definitions(-DUSE_FFMPEG)
-	
-		if(CMAKE_CL_64)
-			include_directories(../vendor/ffmpeg-win64/include)
-			include_directories(../vendor/ffmpeg-win64/include/libswscale)
-			include_directories(../vendor/ffmpeg-win64/include/libavformat)
-			include_directories(../vendor/ffmpeg-win64/include/libavdevice)
-			include_directories(../vendor/ffmpeg-win64/include/libavcodec)
-			include_directories(../vendor/ffmpeg-win64/include/libswresample)
-			
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/ffmpeg-win64/lib)
-		else()
-			include_directories(../vendor/ffmpeg-win32/include)
-			include_directories(../vendor/ffmpeg-win32/include/libswscale)
-			include_directories(../vendor/ffmpeg-win32/include/libavformat)
-			include_directories(../vendor/ffmpeg-win32/include/libavdevice)
-			include_directories(../vendor/ffmpeg-win32/include/libavcodec)
-			include_directories(../vendor/ffmpeg-win32/include/libswresample)
-			
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/ffmpeg-win32/lib)
-		endif()
-		
-		set(FFmpeg_LIBRARIES
-				avcodec
-				avformat
-				avutil
-				swscale
-				swresample)
-		
-	endif()
-	
 	list(APPEND RBDOOM3_INCLUDES
 		${SYS_INCLUDES} 
 		${WIN32_INCLUDES})
@@ -1506,7 +1461,6 @@ if(MSVC)
 		${Vulkan_LIBRARIES}
 		${OpenGL_LIBRARIES}
 		${OpenAL_LIBRARIES}
-		${FFmpeg_LIBRARIES}
         ${ZLIB_LIBRARY}
         ${PNG_LIBRARY}
         ${JPEG_LIBRARY}
@@ -1534,14 +1488,6 @@ else()
 		${SYS_INCLUDES} ${SYS_SOURCES})
 	
 	if(UNIX)
-		if(FFMPEG)
-			find_package(FFMPEG REQUIRED)
-			add_definitions(-DUSE_FFMPEG)
-			
-			include_directories(${FFMPEG_INCLUDE_DIR})
-			link_directories(${FFMPEG_LIBRARIES_DIRS})
-		endif()
-
 		find_package(SDL2 REQUIRED)
 		include_directories(${SDL2_INCLUDE_DIRS})
 		set(SDLx_LIBRARY ${SDL2_LIBRARIES})
@@ -1692,7 +1638,6 @@ else()
 			${RT_LIBRARY}
 			${SDLx_LIBRARY}
 			${OPENAL_LIBRARY}
-			${FFMPEG_LIBRARIES}
             ${ZLIB_LIBRARY}
             ${PNG_LIBRARY}
             ${JPEG_LIBRARY}

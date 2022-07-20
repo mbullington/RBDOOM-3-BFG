@@ -25,16 +25,7 @@
 #include "AL_CinematicAudio.h"
 #include <sound/snd_local.h>
 
-#if defined(USE_FFMPEG)
-extern "C" {
-#define __STDC_CONSTANT_MACROS
-#include <libavcodec/avcodec.h>
-}
-#endif
-
-#if defined(USE_BINKDEC)
 #include <BinkDecoder.h>
-#endif
 
 extern idCVar s_noSound;
 extern idCVar s_volume_dB;
@@ -57,43 +48,10 @@ CinematicAudio_OpenAL::CinematicAudio_OpenAL()
 }
 
 void CinematicAudio_OpenAL::InitAudio(void* audioContext) {
-#if defined(USE_FFMPEG)
-  AVCodecContext* dec_ctx2 = (AVCodecContext*)audioContext;
-  av_rate_cin = dec_ctx2->sample_rate;
-
-  switch (dec_ctx2->sample_fmt) {
-    case AV_SAMPLE_FMT_U8:
-    case AV_SAMPLE_FMT_U8P: {
-      av_sample_cin =
-          dec_ctx2->channels == 2 ? AL_FORMAT_STEREO8 : AL_FORMAT_MONO8;
-      break;
-    }
-    case AV_SAMPLE_FMT_S16:
-    case AV_SAMPLE_FMT_S16P: {
-      av_sample_cin =
-          dec_ctx2->channels == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
-      break;
-    }
-    case AV_SAMPLE_FMT_FLT:
-    case AV_SAMPLE_FMT_FLTP: {
-      av_sample_cin = dec_ctx2->channels == 2 ? AL_FORMAT_STEREO_FLOAT32
-                                              : AL_FORMAT_MONO_FLOAT32;
-      break;
-    }
-    default: {
-      common->Warning(
-          "Unknown or incompatible cinematic audio format for OpenAL, "
-          "sample_fmt = %d\n",
-          dec_ctx2->sample_fmt);
-      return;
-    }
-  }
-#elif defined(USE_BINKDEC)
   AudioInfo* binkInfo = (AudioInfo*)audioContext;
   av_rate_cin = binkInfo->sampleRate;
   av_sample_cin =
       binkInfo->nChannels == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
-#endif
 
   alSourceRewind(alMusicSourceVoicecin);
   alSourcei(alMusicSourceVoicecin, AL_BUFFER, 0);
@@ -131,11 +89,7 @@ void CinematicAudio_OpenAL::PlayAudio(uint8_t* data, int size) {
           alBufferData(bufid, av_sample_cin, tempdata, tempSize, av_rate_cin);
           // SRS - We must free the audio buffer once it has been copied into an
           // alBuffer
-#if defined(USE_FFMPEG)
-          av_freep(&tempdata);
-#elif defined(USE_BINKDEC)
           Mem_Free(tempdata);
-#endif
           alSourceQueueBuffers(alMusicSourceVoicecin, 1, &bufid);
           ALenum error = alGetError();
           if (error != AL_NO_ERROR) {
@@ -154,11 +108,7 @@ void CinematicAudio_OpenAL::PlayAudio(uint8_t* data, int size) {
                  av_rate_cin);
     // SRS - We must free the audio buffer once it has been copied into an
     // alBuffer
-#if defined(USE_FFMPEG)
-    av_freep(&data);
-#elif defined(USE_BINKDEC)
     Mem_Free(data);
-#endif
     offset++;
     if (offset == NUM_BUFFERS) {
       alSourceQueueBuffers(alMusicSourceVoicecin, offset, alMusicBuffercin);
@@ -201,11 +151,7 @@ void CinematicAudio_OpenAL::ResetAudio() {
     if (tempdata) {
       // SRS - We must free any audio buffers that have not been copied into an
       // alBuffer
-#if defined(USE_FFMPEG)
-      av_freep(&tempdata);
-#elif defined(USE_BINKDEC)
       Mem_Free(tempdata);
-#endif
     }
   }
 
@@ -238,11 +184,7 @@ void CinematicAudio_OpenAL::ShutdownAudio() {
     if (tempdata) {
       // SRS - We must free any audio buffers that have not been copied into an
       // alBuffer
-#if defined(USE_FFMPEG)
-      av_freep(&tempdata);
-#elif defined(USE_BINKDEC)
       Mem_Free(tempdata);
-#endif
     }
   }
 

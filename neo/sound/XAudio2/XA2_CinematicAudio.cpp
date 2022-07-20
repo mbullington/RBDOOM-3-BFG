@@ -25,16 +25,7 @@
 #include "XA2_CinematicAudio.h"
 #include <sound/snd_local.h>
 
-#if defined(USE_FFMPEG)
-extern "C" {
-#define __STDC_CONSTANT_MACROS
-#include <libavcodec/avcodec.h>
-}
-#endif
-
-#if defined(USE_BINKDEC)
 #include <BinkDecoder.h>
-#endif
 
 CinematicAudio_XAudio2::CinematicAudio_XAudio2() : pMusicSourceVoice1(NULL) {}
 
@@ -43,13 +34,7 @@ CinematicAudio_XAudio2::CinematicAudio_XAudio2() : pMusicSourceVoice1(NULL) {}
 class VoiceCallback : public IXAudio2VoiceCallback {
  public:
   // SRS - We must free the audio buffer once it has finished playing
-  void OnBufferEnd(void* data) {
-#if defined(USE_FFMPEG)
-    av_freep(&data);
-#elif defined(USE_BINKDEC)
-    Mem_Free(data);
-#endif
-  }
+  void OnBufferEnd(void* data) { Mem_Free(data); }
   // Unused methods are stubs
   void OnBufferStart(void* pBufferContext) {}
   void OnLoopEnd(void* pBufferContext) {}
@@ -63,50 +48,11 @@ VoiceCallback voiceCallback;
 // SRS end
 
 void CinematicAudio_XAudio2::InitAudio(void* audioContext) {
-#if defined(USE_FFMPEG)
-  AVCodecContext* dec_ctx2 = (AVCodecContext*)audioContext;
-  int format_byte = 0;
-  bool use_ext = false;
-
-  switch (dec_ctx2->sample_fmt) {
-    case AV_SAMPLE_FMT_U8:
-    case AV_SAMPLE_FMT_U8P: {
-      format_byte = 1;
-      break;
-    }
-    case AV_SAMPLE_FMT_S16:
-    case AV_SAMPLE_FMT_S16P: {
-      format_byte = 2;
-      break;
-    }
-    case AV_SAMPLE_FMT_S32:
-    case AV_SAMPLE_FMT_S32P: {
-      format_byte = 4;
-      break;
-    }
-    case AV_SAMPLE_FMT_FLT:
-    case AV_SAMPLE_FMT_FLTP: {
-      format_byte = 4;
-      use_ext = true;
-      break;
-    }
-    default: {
-      common->Warning(
-          "Unknown or incompatible cinematic audio format for XAudio2, "
-          "sample_fmt = %d\n",
-          dec_ctx2->sample_fmt);
-      return;
-    }
-  }
-  voiceFormatcine.nChannels = dec_ctx2->channels;          // fixed
-  voiceFormatcine.nSamplesPerSec = dec_ctx2->sample_rate;  // fixed
-#elif defined(USE_BINKDEC)
   AudioInfo* binkInfo = (AudioInfo*)audioContext;
   int format_byte = 2;
   bool use_ext = false;
   voiceFormatcine.nChannels = binkInfo->nChannels;        // fixed
   voiceFormatcine.nSamplesPerSec = binkInfo->sampleRate;  // fixed
-#endif
 
   WAVEFORMATEXTENSIBLE exvoice = {0};
   voiceFormatcine.wFormatTag =
