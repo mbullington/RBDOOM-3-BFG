@@ -36,14 +36,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
-// RB: <DxErr.h> not available on Windows 8 SDK
-#if defined(__MINGW32__)
-#include <sal.h>
-#elif !defined(USE_WINRT)  // (_WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/)
-#include <DxErr.h>
-#endif
-// RB end
-
 #include <ks.h>
 #include <ksmedia.h>
 #include "../../sound/snd_local.h"

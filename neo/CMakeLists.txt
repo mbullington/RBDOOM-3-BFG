@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 project(RBDoom3BFG)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-if(CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 6)
-	# set MSVC startup project
-	set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT RBDoom3BFG)
-endif()
+# set MSVC startup project
+set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT RBDoom3BFG)
 	
 option(STANDALONE
 		"Skip DOOM-3-BFG base/ folder and use assets/ instead" OFF)
@@ -31,9 +28,6 @@ option(USE_MoltenVK
 
 option(ONATIVE
 		"Optimize for the host CPU" OFF)
-		
-option(WINDOWS10
-		"Build for Windows 10+" OFF)
 		
 set(CPU_TYPE "" CACHE STRING "When set, passes this string as CPU-ID which will be embedded into the binary.")
 
@@ -255,10 +249,6 @@ elseif(MSVC)
 					-D_CRT_SECURE_NO_WARNINGS
 					-D_MBCS
 					-DUSE_EXCEPTIONS)
-
-	if( WINDOWS10 ) # Windows RT
-		add_definitions(-DUSE_WINRT)
-	endif()
 endif()
 
 if (USE_INTRINSICS_SSE)
@@ -1283,19 +1273,14 @@ include_directories(
 
 if(MSVC)
 	
-	if(WINDOWS10)
-		set(DirectX_LIBRARIES
-			dinput8
-			dsound
-			dxguid
-			#dxerr
-			Xinput
-			)
-	else()
-		find_package(DirectX REQUIRED)
-		include_directories(${DirectX_INCLUDE_DIR})
-	endif()
-	
+	set(DirectX_LIBRARIES
+		dinput8
+		dsound
+		dxguid
+		#dxerr
+		Xinput
+		)
+
 	if(USE_VULKAN)
 		list(APPEND RBDOOM3_INCLUDES ${RENDERER_VULKAN_INCLUDES} ${VULKAN_MEMORY_ALLOCATOR_INCLUDES})
 		list(APPEND RBDOOM3_SOURCES ${RENDERER_VULKAN_SOURCES})
