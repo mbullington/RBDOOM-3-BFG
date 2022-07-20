@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.2)
-
 project(RBDoom3BFG)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -45,15 +44,6 @@ option(ONATIVE
 option(WINDOWS10
 		"Build for Windows 10+" OFF)
 		
-option(USE_SYSTEM_ZLIB
-                "Use the system zlib instead of the bundled one" OFF)
-
-option(USE_SYSTEM_LIBJPEG
-                "Use the system libjpeg instead of the bundled one" OFF)
-
-option(USE_SYSTEM_LIBGLEW
-                "Use the system libglew instead of the bundled one" OFF)
-
 set(CPU_TYPE "" CACHE STRING "When set, passes this string as CPU-ID which will be embedded into the binary.")
 
 # Make sure to include repo root for vendor.
@@ -298,10 +288,6 @@ if(STANDALONE)
 	add_definitions(-DSTANDALONE)
 endif()
 
-if (USE_SYSTEM_ZLIB)
-  find_package(ZLIB REQUIRED)
-endif(USE_SYSTEM_ZLIB)
-
 if (ZLIB_FOUND)
     include_directories(${ZLIB_INCLUDE_DIRS})
     set(ZLIB_LIBRARY ${ZLIB_LIBRARIES})
@@ -309,14 +295,6 @@ else (ZLIB_FOUND)
     include_directories("../vendor/zlib")
     set(ZLIB_LIBRARY "" )
 endif (ZLIB_FOUND)
-
-if(USE_SYSTEM_LIBPNG)
-	find_package(PNG REQUIRED)
-endif (USE_SYSTEM_LIBPNG)
-
-if(USE_SYSTEM_LIBJPEG)
-	find_package(JPEG REQUIRED)
-endif(USE_SYSTEM_LIBJPEG)
 
 if (JPEG_FOUND)
     include_directories(${JPEG_INCLUDE_DIRS})
@@ -411,10 +389,6 @@ if(USE_VULKAN)
 	endif()
 
 else()
-
-	if(USE_SYSTEM_LIBGLEW)
-		find_package(GLEW)
-	endif()
 
 	if(GLEW_FOUND)
 		include_directories(${GLEW_INCLUDE_DIRS})
