@@ -744,17 +744,6 @@ file(GLOB COMPILER_DMAP_SOURCES tools/compilers/dmap/*.cpp)
 
 set(TOOLS_INCLUDES tools/edit_public.h)
 
-set(TOOLS_COMMON_SOURCES
-	tools/common/AlphaPopup.cpp
-	tools/common/ColorButton.cpp
-	tools/common/MaskEdit.cpp
-	tools/common/OpenFileDialog.cpp
-	tools/common/PropertyGrid.cpp
-	tools/common/RegistryOptions.cpp
-	#tools/common/RenderBumpFlatDialog.cpp
-	tools/common/RollupPanel.cpp
-	tools/common/SpinButton.cpp)
-
 file(GLOB IMGUI_EDITOR_INCLUDES tools/imgui/*.h)
 file(GLOB IMGUI_EDITOR_SOURCES tools/imgui/*.cpp)
 
