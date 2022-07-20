@@ -38,11 +38,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #include "precompiled.h"
 #pragma hdrstop
-#if defined(_MSC_VER) && !defined(USE_OPENAL)
-#include <sound/XAudio2/XA2_CinematicAudio.h>
-#else
 #include <sound/OpenAL/AL_CinematicAudio.h>
-#endif
 
 extern idCVar s_noSound;
 
@@ -185,8 +181,7 @@ class idCinematicLocal : public idCinematic {
   void RoQReset();
   // RB end
 
-  // GK:Also init variables for XAudio2 or OpenAL (SRS - this must be an
-  // instance variable)
+  // GK:Also init variables for CinematicAudio instance
   CinematicAudio* cinematicAudio;
 };
 
@@ -419,11 +414,7 @@ idCinematicLocal::idCinematicLocal() {
   }
 
   // GK: Make sure the cinematic voices are the first to be initialized
-#if defined(_MSC_VER) && !defined(USE_OPENAL)
-  cinematicAudio = new (TAG_AUDIO) CinematicAudio_XAudio2;
-#else
   cinematicAudio = new (TAG_AUDIO) CinematicAudio_OpenAL;
-#endif
 }
 
 /*
@@ -450,7 +441,7 @@ idCinematicLocal::~idCinematicLocal() {
   delete img;
   img = NULL;
 
-  // GK: Properly close local XAudio2 or OpenAL voice
+  // GK: Properly close local cinematic audio voice
   cinematicAudio->ShutdownAudio();
 }
 

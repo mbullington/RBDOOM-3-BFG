@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.plist": "xml",
+    ".env": "bash",
+    "new": "cpp"
+  }
+}

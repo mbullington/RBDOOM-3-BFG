@@ -23,10 +23,7 @@
  */
 #include <precompiled.h>
 #include "../CinematicAudio.h"
-// SRS - Added check on OSX for OpenAL Soft headers vs macOS SDK headers
-#if defined(__APPLE__) && !defined(USE_OPENAL_SOFT_INCLUDES)
-#include <OpenAL/al.h>
-#else
+#if defined(__APPLE__)
 #include <AL/al.h>
 #endif
 #ifndef __CINEMATIC_AUDIO_AL_H__
@@ -53,11 +50,12 @@ class CinematicAudio_OpenAL : public CinematicAudio {
 
   // GK: Unlike XAudio2 which can accept buffer until the end of this world.
   //	  OpenAL can accept buffers only as long as there are freely available
-  //buffers. 	  So, what happens if there are no freely available buffers but we
-  //still geting audio frames ? Loss of data. 	  That why now I am using two queues
-  //in order to store the frames (and their sizes) and when we have available
-  //buffers, 	  then start popping those frames instead of the current, so we don't
-  //lose any audio frames and the sound doesn't crack anymore.
+  // buffers. 	  So, what happens if there are no freely available buffers but
+  // we still geting audio frames ? Loss of data. 	  That why now I am
+  // using two queues in order to store the frames (and their sizes) and when we
+  // have available buffers, 	  then start popping those frames instead of the
+  // current, so we don't lose any audio frames and the sound doesn't crack
+  // anymore.
   std::queue<uint8_t*> tBuffer;
   std::queue<int> sizes;
   std::queue<ALuint> bufids;  // SRS - Added queue of free alBuffer ids to

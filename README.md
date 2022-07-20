@@ -57,18 +57,25 @@ That means my fork is also unsupported, and you should use [RBDOOM-3-BFG](https:
 
 - Swap out Vulkan allocator for newest VulkanMemoryAllocator checkout.
 - Move all in-game image loading to use `stb_image`, clean up old dependencies.
+- Fix MoltenVK support through Homebrew
 
 ## Engine
 
+**Developer quality of life:**
 - Switch build system from Make to Ninja (**faster**)
 - Add configurations for debug/intellisense on VSCode
 - Move `neo/libs` into `vendor` where they can be tracked easier
 - Use Google clang-format style
-- Remove `doom_classic` to simplify source code
 - Bump to C++20
+
+**Speed improvements:**
 - Expect minimum CPU Haskell-generation (v86_64_v3)
-- Fix MoltenVK support through Homebrew
+
+**Removals:**
 - Remove (in my opinion, odd) system for inlining shaders as `.h` text files
+- Remove `doom_classic` to simplify source code
+- Remove option to use FFMPEG, force using libbinkdec (doesn't affect build times much for me, especially re: Ninja)
+- Remove option to use XAudio2, focus on OpenAL Soft
 
 External contributions:
 

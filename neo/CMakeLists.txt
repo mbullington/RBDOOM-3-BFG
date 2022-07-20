@@ -19,9 +19,6 @@ option(COMPILE_COMMANDS
 
 option(USE_PRECOMPILED_HEADERS
 		"Use precompiled headers during build" ON)
-
-option(OPENAL
-		"Use OpenAL soft instead of XAudio2" OFF)
 		
 option(USE_VULKAN
 		"Use Vulkan instead of OpenGL" OFF)
@@ -55,9 +52,7 @@ else()
 	option(USE_INTRINSICS_SSE "Compile using SSE intrinsics (e.g mmx, sse, msse2)" OFF)
 endif()
 
-if(UNIX)
-	set(OPENAL ON)
-	
+if(UNIX)	
     # SRS - Disable precompiled headers when cross-compiling on OSX, e.g. when creating universal binaries
     if((CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64" AND CMAKE_OSX_ARCHITECTURES MATCHES "arm64" ) OR
        (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64"  AND CMAKE_OSX_ARCHITECTURES MATCHES "x86_64"))
@@ -264,10 +259,6 @@ elseif(MSVC)
 	if( WINDOWS10 ) # Windows RT
 		add_definitions(-DUSE_WINRT)
 	endif()
-					
-	if(NOT CMAKE_CL_64)
-		add_definitions(-D_USE_32BIT_TIME_T)
-	endif()
 endif()
 
 if (USE_INTRINSICS_SSE)
@@ -317,12 +308,7 @@ if(USE_VULKAN)
 	if(SPIRV_SHADERC)
 		add_definitions(-DSPIRV_SHADERC)
 
-		# SRS - Add case for UNIX/OSX
-		if(CMAKE_CL_64 OR UNIX)
-			link_directories($ENV{VULKAN_SDK}/Lib)
-		else()
-			link_directories($ENV{VULKAN_SDK}/Lib32)
-		endif()
+		link_directories($ENV{VULKAN_SDK}/Lib)
 
 	else()
 		# override Glslang build options
@@ -601,19 +587,7 @@ set(SOUND_SOURCES
 	sound/snd_world.cpp
 	sound/SoundVoice.cpp
 	sound/WaveFile.cpp)
-	
-set(XAUDIO2_INCLUDES
-	sound/XAudio2/XA2_SoundHardware.h
-	sound/XAudio2/XA2_SoundSample.h
-	sound/XAudio2/XA2_SoundVoice.h
-	sound/Xaudio2/XA2_CinematicAudio.h)
-	
-set(XAUDIO2_SOURCES
-	sound/XAudio2/XA2_SoundHardware.cpp
-	sound/XAudio2/XA2_SoundSample.cpp
-	sound/XAudio2/XA2_SoundVoice.cpp
-	sound/Xaudio2/XA2_CinematicAudio.cpp)
-	
+			
 set(OPENAL_INCLUDES
 	sound/OpenAL/AL_SoundHardware.h
 	sound/OpenAL/AL_SoundSample.h
@@ -625,12 +599,6 @@ set(OPENAL_SOURCES
 	sound/OpenAL/AL_SoundSample.cpp
 	sound/OpenAL/AL_SoundVoice.cpp
 	sound/OpenAL/AL_CinematicAudio.cpp)
-
-set(STUBAUDIO_INCLUDES
-	sound/stub/SoundStub.h)
-
-set(STUBAUDIO_SOURCES
-	sound/stub/SoundSample.cpp)
 	
 set(OGGVORBIS_INCLUDES
 	../vendor/oggvorbis/ogg/ogg.h
@@ -1082,14 +1050,8 @@ source_group("vendor\\freetype" FILES ${FREETYPE_SOURCES})
 source_group("sound" FILES ${SOUND_INCLUDES})
 source_group("sound" FILES ${SOUND_SOURCES})
 
-source_group("sound\\XAudio2" FILES ${XAUDIO2_INCLUDES})
-source_group("sound\\XAudio2" FILES ${XAUDIO2_SOURCES})
-
 source_group("sound\\OpenAL" FILES ${OPENAL_INCLUDES})
 source_group("sound\\OpenAL" FILES ${OPENAL_SOURCES})
-
-source_group("sound\\stub" FILES ${STUBAUDIO_INCLUDES})
-source_group("sound\\stub" FILES ${STUBAUDIO_SOURCES})
 
 source_group("vendor\\oggvorbis" FILES ${OGGVORBIS_INCLUDES})
 source_group("vendor\\oggvorbis" FILES ${OGGVORBIS_SOURCES})
@@ -1328,7 +1290,6 @@ if(MSVC)
 			dxguid
 			#dxerr
 			Xinput
-			xaudio2.lib
 			)
 	else()
 		find_package(DirectX REQUIRED)
@@ -1361,33 +1322,16 @@ if(MSVC)
 			glu32)
 	endif()
 	
-	if(OPENAL)
-		add_definitions(-DUSE_OPENAL)
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/include)
+	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/lib/win64)
 	
-		include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/include)
+	list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
+	list(APPEND RBDOOM3_SOURCES	${OPENAL_SOURCES})
+	
+	set(OpenAL_LIBRARIES
+		OpenAL32)
 		
-		if(CMAKE_CL_64)
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/lib/win64)
-		else()
-			link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/openal-soft/lib/win32)
-		endif()
-		
-		list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
-		list(APPEND RBDOOM3_SOURCES	${OPENAL_SOURCES})
-		
-		set(OpenAL_LIBRARIES
-			OpenAL32)
-			
-		if(CMAKE_CL_64)
-			install(FILES ../vendor/openal-soft/lib/bin/win64/OpenAL32.dll DESTINATION .)
-		else()
-			install(FILES ../vendor/openal-soft/lib/bin/win32/OpenAL32.dll DESTINATION .)
-			install(FILES ../vendor/openal-soft/lib/bin/win32/OpenAL32.pdb DESTINATION .)
-		endif()
-	else()
-		list(APPEND RBDOOM3_INCLUDES ${XAUDIO2_INCLUDES})
-		list(APPEND RBDOOM3_SOURCES	${XAUDIO2_SOURCES})
-	endif()
+	install(FILES ../vendor/openal-soft/lib/bin/win64/OpenAL32.dll DESTINATION .)
 	
 	list(APPEND RBDOOM3_INCLUDES
 		${SYS_INCLUDES} 
@@ -1474,13 +1418,8 @@ if(MSVC)
 	endif()
 	
 	#CMAKE_BINARY_DIR
-	if(CMAKE_CL_64)
-		install(TARGETS RBDoom3BFG
-			RUNTIME DESTINATION .)
-	else()
-		install(TARGETS RBDoom3BFG
-			RUNTIME DESTINATION .)
-	endif()	
+	install(TARGETS RBDoom3BFG
+		RUNTIME DESTINATION .)
 
 else()
 
@@ -1502,22 +1441,16 @@ else()
 			${POSIX_INCLUDES} ${POSIX_SOURCES}
 			${SDL_INCLUDES} ${SDL_SOURCES})
 			
-		if(OPENAL)
-			find_package(OpenAL REQUIRED)
-			add_definitions(-DUSE_OPENAL)
+		find_package(OpenAL REQUIRED)
 
-			# SRS - Added support for OpenAL Soft headers on OSX (vs default macOS SDK headers)
-			if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND NOT OPENAL_INCLUDE_DIR MATCHES "SDKs/MacOSX.*\.sdk")
-				include_directories(${OPENAL_INCLUDE_DIR})
-				add_definitions(-DUSE_OPENAL_SOFT_INCLUDES)
-			endif()
-
-			list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
-			list(APPEND RBDOOM3_SOURCES ${OPENAL_SOURCES})
-		else()
-			list(APPEND RBDOOM3_INCLUDES ${STUBAUDIO_INCLUDES})
-			list(APPEND RBDOOM3_SOURCES ${STUBAUDIO_SOURCES})
+		# Add Homebrew directory for OpenAL Soft
+		# TODO(mbullington): Inline this so it's not dynamically linked
+		if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+			include_directories(${OPENAL_INCLUDE_DIR})
 		endif()
+
+		list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
+		list(APPEND RBDOOM3_SOURCES ${OPENAL_SOURCES})
 		
 		if(USE_VULKAN)
             list(APPEND RBDOOM3_INCLUDES ${RENDERER_VULKAN_INCLUDES})

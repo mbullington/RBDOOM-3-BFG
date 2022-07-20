@@ -374,12 +374,6 @@ void idSoundWorldLocal::Update() {
 
       // check if this channel contributes at all
       const bool canMute = channel->CanMute();
-      if (canMute && channel->volumeDB <= DB_SILENCE) {
-#if !defined(USE_OPENAL)
-        channel->Mute();
-        continue;
-#endif
-      }
 
       // Calculate the sort key.
       // VO can't be stopped and restarted accurately, so always keep VO
