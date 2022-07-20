@@ -29,6 +29,11 @@ else
     CMAKE_FLAGS+=(-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE="-DID_RETAIL")
 fi
 
+TESTS_OR_NOT=$((echo "No tests" && echo "Tests") | fzf)
+if [[ "$TESTS_OR_NOT" == "Tests" ]]; then
+    CMAKE_FLAGS+=(-DRUN_TESTS=ON)
+fi
+
 # Stuff that's generally useful.
 CMAKE_FLAGS+=(
     # change or remove -DCMAKE_OSX_DEPLOYMENT_TARGET=<version> to match supported runtime targets
@@ -37,7 +42,7 @@ CMAKE_FLAGS+=(
     -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include
 )
 
-echo "$NINJA_OR_XCODE $VULKAN_OR_OPENGL $DEBUG_RELEASE_OR_RETAIL"
+echo "$NINJA_OR_XCODE $VULKAN_OR_OPENGL $DEBUG_RELEASE_OR_RETAIL $TESTS_OR_NOT"
 echo $CMAKE_FLAGS
 sleep 2
 

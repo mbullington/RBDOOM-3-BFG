@@ -29,6 +29,9 @@ option(USE_MoltenVK
 option(ONATIVE
 		"Optimize for the host CPU" OFF)
 		
+option(RUN_TESTS
+		"Run tests instead of building RBDOOM3-BFG" OFF)
+
 set(CPU_TYPE "" CACHE STRING "When set, passes this string as CPU-ID which will be embedded into the binary.")
 
 # Make sure to include repo root for vendor.
@@ -259,22 +262,8 @@ if(STANDALONE)
 	add_definitions(-DSTANDALONE)
 endif()
 
-if (ZLIB_FOUND)
-    include_directories(${ZLIB_INCLUDE_DIRS})
-    set(ZLIB_LIBRARY ${ZLIB_LIBRARIES})
-else (ZLIB_FOUND)
-    include_directories("../vendor/zlib")
-    set(ZLIB_LIBRARY "" )
-endif (ZLIB_FOUND)
-
-if (JPEG_FOUND)
-    include_directories(${JPEG_INCLUDE_DIRS})
-    set(JPEG_LIBRARY ${JPEG_LIBRARIES})
-    add_definitions(-DUSE_NEWER_JPEG)
-else (JPEG_FOUND)
-    include_directories("../vendor/jpeg-6")
-    set(JPEG_LIBRARY "" )
-endif (JPEG_FOUND)
+include_directories("../vendor/zlib")
+include_directories("../vendor/jpeg-6")
 
 
 macro(SET_OPTION option value)
@@ -356,24 +345,18 @@ if(USE_VULKAN)
 
 else()
 
-	if(GLEW_FOUND)
-		include_directories(${GLEW_INCLUDE_DIRS})
-		set(GLEW_LIBRARY ${GLEW_LIBRARIES})
-	else()
-		include_directories("../vendor/glew/include")
-		set(GLEW_LIBRARY "" )
-		add_definitions(-DGLEW_STATIC)
-		
-		set(GLEW_INCLUDES ../vendor/glew/include/GL/glew.h)
-		set(GLEW_SOURCES ../vendor/glew/src/glew.c)
+	include_directories("../vendor/glew/include")
+	add_definitions(-DGLEW_STATIC)
+	
+	set(GLEW_INCLUDES ../vendor/glew/include/GL/glew.h)
+	set(GLEW_SOURCES ../vendor/glew/src/glew.c)
 
-		if(WIN32)
-			set(GLEW_INCLUDES ${GLEW_INCLUDES} ../vendor/glew/include/GL/wglew.h)
-		else()
-			set(GLEW_INCLUDES ${GLEW_INCLUDES} ../vendor/glew/include/GL/glxew.h)
-		endif()
-		
+	if(WIN32)
+		set(GLEW_INCLUDES ${GLEW_INCLUDES} ../vendor/glew/include/GL/wglew.h)
+	else()
+		set(GLEW_INCLUDES ${GLEW_INCLUDES} ../vendor/glew/include/GL/glxew.h)
 	endif()
+
 endif()
 
 include_directories("../vendor/rapidjson/include")
@@ -444,81 +427,71 @@ file(GLOB TINYEXR_INCLUDES ../vendor/tinyexr/*.h)
 file(GLOB MIKKTSPACE_INCLUDES ../vendor/mikktspace/*.h)
 file(GLOB MIKKTSPACE_SOURCES ../vendor/mikktspace/*.c)
 
-if (NOT JPEG_FOUND)
-    set(JPEG_INCLUDES
-        ../vendor/jpeg-6/jchuff.h
-        ../vendor/jpeg-6/jconfig.h
-        ../vendor/jpeg-6/jdct.h
-        ../vendor/jpeg-6/jdhuff.h
-        ../vendor/jpeg-6/jerror.h
-        ../vendor/jpeg-6/jinclude.h
-        ../vendor/jpeg-6/jmemsys.h
-        ../vendor/jpeg-6/jmorecfg.h
-        ../vendor/jpeg-6/jpegint.h
-        ../vendor/jpeg-6/jpeglib.h
-        ../vendor/jpeg-6/jversion.h)
+set(JPEG_INCLUDES
+	../vendor/jpeg-6/jchuff.h
+	../vendor/jpeg-6/jconfig.h
+	../vendor/jpeg-6/jdct.h
+	../vendor/jpeg-6/jdhuff.h
+	../vendor/jpeg-6/jerror.h
+	../vendor/jpeg-6/jinclude.h
+	../vendor/jpeg-6/jmemsys.h
+	../vendor/jpeg-6/jmorecfg.h
+	../vendor/jpeg-6/jpegint.h
+	../vendor/jpeg-6/jpeglib.h
+	../vendor/jpeg-6/jversion.h)
 
-    set(JPEG_SOURCES
-        ../vendor/jpeg-6/jcapimin.cpp
-        ../vendor/jpeg-6/jcapistd.cpp
-        ../vendor/jpeg-6/jccoefct.cpp
-        ../vendor/jpeg-6/jccolor.cpp
-        ../vendor/jpeg-6/jcdctmgr.cpp
-        ../vendor/jpeg-6/jchuff.cpp
-        ../vendor/jpeg-6/jcinit.cpp
-        ../vendor/jpeg-6/jcmainct.cpp
-        ../vendor/jpeg-6/jcmarker.cpp
-        ../vendor/jpeg-6/jcmaster.cpp
-        ../vendor/jpeg-6/jcomapi.cpp
-        ../vendor/jpeg-6/jcparam.cpp
-        ../vendor/jpeg-6/jcphuff.cpp
-        ../vendor/jpeg-6/jcprepct.cpp
-        ../vendor/jpeg-6/jcsample.cpp
-        ../vendor/jpeg-6/jctrans.cpp
-        ../vendor/jpeg-6/jdapimin.cpp
-        ../vendor/jpeg-6/jdapistd.cpp
-        ../vendor/jpeg-6/jdatadst.cpp
-        ../vendor/jpeg-6/jdatasrc.cpp
-        ../vendor/jpeg-6/jdcoefct.cpp
-        ../vendor/jpeg-6/jdcolor.cpp
-        ../vendor/jpeg-6/jddctmgr.cpp
-        ../vendor/jpeg-6/jdhuff.cpp
-        ../vendor/jpeg-6/jdinput.cpp
-        ../vendor/jpeg-6/jdmainct.cpp
-        ../vendor/jpeg-6/jdmarker.cpp
-        ../vendor/jpeg-6/jdmaster.cpp
-        ../vendor/jpeg-6/jdmerge.cpp
-        ../vendor/jpeg-6/jdphuff.cpp
-        ../vendor/jpeg-6/jdpostct.cpp
-        ../vendor/jpeg-6/jdsample.cpp
-        ../vendor/jpeg-6/jdtrans.cpp
-        ../vendor/jpeg-6/jerror.cpp
-        ../vendor/jpeg-6/jfdctflt.cpp
-        ../vendor/jpeg-6/jfdctfst.cpp
-        ../vendor/jpeg-6/jfdctint.cpp
-        ../vendor/jpeg-6/jidctflt.cpp
-        ../vendor/jpeg-6/jidctfst.cpp
-        ../vendor/jpeg-6/jidctint.cpp
-        ../vendor/jpeg-6/jidctred.cpp
-        #../vendor/jpeg-6/jload.cpp
-        ../vendor/jpeg-6/jmemmgr.cpp
-        ../vendor/jpeg-6/jmemnobs.cpp
-        #../vendor/jpeg-6/jpegtran.cpp
-        ../vendor/jpeg-6/jquant1.cpp
-        ../vendor/jpeg-6/jquant2.cpp
-        ../vendor/jpeg-6/jutils.cpp)
-else (NOT JPEG_FOUND)
-   set(JPEG_INCLUDES "")
-   set(JPEG_SOURCES "")
-endif (NOT JPEG_FOUND)
+set(JPEG_SOURCES
+	../vendor/jpeg-6/jcapimin.cpp
+	../vendor/jpeg-6/jcapistd.cpp
+	../vendor/jpeg-6/jccoefct.cpp
+	../vendor/jpeg-6/jccolor.cpp
+	../vendor/jpeg-6/jcdctmgr.cpp
+	../vendor/jpeg-6/jchuff.cpp
+	../vendor/jpeg-6/jcinit.cpp
+	../vendor/jpeg-6/jcmainct.cpp
+	../vendor/jpeg-6/jcmarker.cpp
+	../vendor/jpeg-6/jcmaster.cpp
+	../vendor/jpeg-6/jcomapi.cpp
+	../vendor/jpeg-6/jcparam.cpp
+	../vendor/jpeg-6/jcphuff.cpp
+	../vendor/jpeg-6/jcprepct.cpp
+	../vendor/jpeg-6/jcsample.cpp
+	../vendor/jpeg-6/jctrans.cpp
+	../vendor/jpeg-6/jdapimin.cpp
+	../vendor/jpeg-6/jdapistd.cpp
+	../vendor/jpeg-6/jdatadst.cpp
+	../vendor/jpeg-6/jdatasrc.cpp
+	../vendor/jpeg-6/jdcoefct.cpp
+	../vendor/jpeg-6/jdcolor.cpp
+	../vendor/jpeg-6/jddctmgr.cpp
+	../vendor/jpeg-6/jdhuff.cpp
+	../vendor/jpeg-6/jdinput.cpp
+	../vendor/jpeg-6/jdmainct.cpp
+	../vendor/jpeg-6/jdmarker.cpp
+	../vendor/jpeg-6/jdmaster.cpp
+	../vendor/jpeg-6/jdmerge.cpp
+	../vendor/jpeg-6/jdphuff.cpp
+	../vendor/jpeg-6/jdpostct.cpp
+	../vendor/jpeg-6/jdsample.cpp
+	../vendor/jpeg-6/jdtrans.cpp
+	../vendor/jpeg-6/jerror.cpp
+	../vendor/jpeg-6/jfdctflt.cpp
+	../vendor/jpeg-6/jfdctfst.cpp
+	../vendor/jpeg-6/jfdctint.cpp
+	../vendor/jpeg-6/jidctflt.cpp
+	../vendor/jpeg-6/jidctfst.cpp
+	../vendor/jpeg-6/jidctint.cpp
+	../vendor/jpeg-6/jidctred.cpp
+	#../vendor/jpeg-6/jload.cpp
+	../vendor/jpeg-6/jmemmgr.cpp
+	../vendor/jpeg-6/jmemnobs.cpp
+	#../vendor/jpeg-6/jpegtran.cpp
+	../vendor/jpeg-6/jquant1.cpp
+	../vendor/jpeg-6/jquant2.cpp
+	../vendor/jpeg-6/jutils.cpp)
 
-if (NOT ZLIB_FOUND)
 file(GLOB ZLIB_INCLUDES ../vendor/zlib/*.h)
 file(GLOB ZLIB_SOURCES ../vendor/zlib/*.c)
-else (NOT ZLIB_FOUND)
-  set(ZLIB_INCLUDES "")
-  set(ZLIB_SOURCES "")
-endif (NOT ZLIB_FOUND)
 
 file(GLOB BINKDEC_INCLUDES ../vendor/libbinkdec/include/*.h)
 file(GLOB BINKDEC_SOURCES ../vendor/libbinkdec/src/*.c ../vendor/libbinkdec/src/*.cpp)
@@ -1175,10 +1148,6 @@ if(MSVC)
 		${Vulkan_LIBRARIES}
 		${OpenGL_LIBRARIES}
 		${OpenAL_LIBRARIES}
-        ${ZLIB_LIBRARY}
-        ${PNG_LIBRARY}
-        ${JPEG_LIBRARY}
-        ${GLEW_LIBRARY}
 		${CMAKE_DL_LIBS}
 		)
 		
@@ -1200,11 +1169,14 @@ else()
 		find_package(SDL2 REQUIRED)
 		include_directories(${SDL2_INCLUDE_DIRS})
 		set(SDLx_LIBRARY ${SDL2_LIBRARIES})
+
+		list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_linux.cpp)
+		list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_osx.cpp)
 	
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-			list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_linux.cpp)
+			set(RBDOOM3_POSIX_PLATFORM ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_osx.cpp)
 		else()
-			list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_osx.cpp)
+			set(RBDOOM3_POSIX_PLATFORM ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_linux.cpp)
 		endif()
 
 		list(APPEND RBDOOM3_SOURCES
@@ -1281,13 +1253,11 @@ else()
 		FOREACH(item ${_directory_flags})
 			LIST(APPEND _compiler_FLAGS " -I${item}")
 		ENDFOREACH(item)
-	endif()
-		
-	GET_DIRECTORY_PROPERTY(_directory_flags DEFINITIONS)
-	LIST(APPEND _compiler_FLAGS ${_directory_flags})
-	SEPARATE_ARGUMENTS(_compiler_FLAGS)
+
+		GET_DIRECTORY_PROPERTY(_directory_flags DEFINITIONS)
+		LIST(APPEND _compiler_FLAGS ${_directory_flags})
+		SEPARATE_ARGUMENTS(_compiler_FLAGS)
 	
-	if(USE_PRECOMPILED_HEADERS)
 		# we need to recreate the precompiled header for RBDoom3BFG 
 		# (i.e. can't use the one created for idlib before)
 		# because some definitions (e.g. -D__IDLIB__ -D__DOOM_DLL__) differ
@@ -1296,15 +1266,12 @@ else()
 				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 				COMMENT "Creating idlib/precompiled.h.gch for RBDoom3BFG"
 				)
-	endif()
-	
-	if(WIN32)
-		set(remove_command "del")
-	else()
-		set(remove_command "rm")
-	endif()
-	
-	if (USE_PRECOMPILED_HEADERS)
+		if(WIN32)
+			set(remove_command "del")
+		else()
+			set(remove_command "rm")
+		endif()
+			
 		# it's ugly enough that the precompiled header binary needs to be in the 
 		# source directory (instead of the build directory), so let's at least
 		# delete it after build.
@@ -1318,35 +1285,47 @@ else()
 		add_dependencies(precomp_header_rbdoom3bfg idlib)
 	endif()
 
-	add_executable(RBDoom3BFG WIN32 ${RBDOOM3_SOURCES})
-
-	if (USE_PRECOMPILED_HEADERS)
-		# make sure precompiled header is created before executable is compiled
-		add_dependencies(RBDoom3BFG precomp_header_rbdoom3bfg)
-		
-		# make sure precompiled header is deleted after executable is compiled
-		add_dependencies(rm_precomp_header RBDoom3BFG)
-	endif()	
-
 	if(NOT WIN32)
 		if(NOT "${CMAKE_SYSTEM}" MATCHES "Darwin")
 			set(RT_LIBRARY rt)
 		endif()
 
-		target_link_libraries(RBDoom3BFG
-			idlib
+		set(LIBRARIES idlib
 			${Vulkan_LIBRARIES}
 			${OPENGL_LIBRARIES}
 			pthread
 			${RT_LIBRARY}
 			${SDLx_LIBRARY}
 			${OPENAL_LIBRARY}
-            ${ZLIB_LIBRARY}
-            ${PNG_LIBRARY}
-            ${JPEG_LIBRARY}
-            ${GLEW_LIBRARY}
-	    	${CMAKE_DL_LIBS}
+			${CMAKE_DL_LIBS}
 			)
+	elseif()
+		set(LIBRARIES "")
 	endif()
-    
+
+	if (!RUN_TESTS)
+		add_executable(RBDoom3BFG WIN32 ${RBDOOM3_POSIX_PLATFORM} ${RBDOOM3_SOURCES})
+		
+		if (USE_PRECOMPILED_HEADERS)
+			# make sure precompiled header is created before executable is compiled
+			add_dependencies(RBDoom3BFG precomp_header_rbdoom3bfg)
+			# make sure precompiled header is deleted after executable is compiled
+			add_dependencies(rm_precomp_header RBDoom3BFG)
+		endif()	
+
+		target_link_libraries(RBDoom3BFG ${LIBRARIES})
+	else()
+		find_package(Catch2 3 REQUIRED)
+		file(GLOB RBDOOM3_TESTS tests/*.cpp)
+		add_executable(RBDoom3BFGTests WIN32 sys/posix/platform_stub.cpp ${RBDOOM3_SOURCES} ${RBDOOM3_TESTS})
+
+		if (USE_PRECOMPILED_HEADERS)
+			# make sure precompiled header is created before executable is compiled
+			add_dependencies(RBDoom3BFGTests precomp_header_rbdoom3bfg)
+			# make sure precompiled header is deleted after executable is compiled
+			add_dependencies(rm_precomp_header RBDoom3BFGTests)
+		endif()	
+
+		target_link_libraries(RBDoom3BFGTests ${LIBRARIES} Catch2::Catch2WithMain)
+	endif()
 endif()

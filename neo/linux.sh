@@ -21,7 +21,12 @@ else
     CMAKE_FLAGS+=(-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE="-DID_RETAIL")
 fi
 
-echo "$VULKAN_OR_OPENGL $DEBUG_RELEASE_OR_RETAIL"
+TESTS_OR_NOT=$((echo "No tests" && echo "Tests") | fzf)
+if [[ "$TESTS_OR_NOT" == "Tests" ]]; then
+    CMAKE_FLAGS+=(-DRUN_TESTS=ON)
+fi
+
+echo "$VULKAN_OR_OPENGL $DEBUG_RELEASE_OR_RETAIL $TESTS_OR_NOT"
 echo $CMAKE_FLAGS
 sleep 2
 
