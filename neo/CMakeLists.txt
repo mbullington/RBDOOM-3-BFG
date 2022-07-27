@@ -1015,7 +1015,8 @@ else()
 
 		list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_linux.cpp)
 		list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_osx.cpp)
-	
+		list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_stub.cpp)
+
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 			set(RBDOOM3_POSIX_PLATFORM ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_osx.cpp)
 		else()
@@ -1146,7 +1147,7 @@ else()
 		set(LIBRARIES "")
 	endif()
 
-	if (!RUN_TESTS)
+	if (NOT RUN_TESTS)
 		add_executable(RBDoom3BFG WIN32 ${RBDOOM3_POSIX_PLATFORM} ${RBDOOM3_SOURCES})
 		
 		if (USE_PRECOMPILED_HEADERS)
