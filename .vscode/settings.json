@@ -2,6 +2,15 @@
   "files.associations": {
     "*.plist": "xml",
     ".env": "bash",
-    "new": "cpp"
+    "new": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "*.tcc": "cpp",
+    "complex": "cpp",
+    "numeric": "cpp",
+    "istream": "cpp",
+    "ostream": "cpp",
+    "ranges": "cpp",
+    "*.inc": "cpp"
   }
 }
