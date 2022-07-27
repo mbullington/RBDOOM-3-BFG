@@ -1,6 +1,4 @@
 
-add_definitions(-D__IDLIB__ -D__DOOM_DLL__)
-
 file(GLOB ID__INCLUDES *.h)
 file(GLOB ID__SOURCES *.cpp)
 file(GLOB ID_BV_INCLUDES bv/*.h)

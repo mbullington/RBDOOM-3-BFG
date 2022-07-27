@@ -1089,44 +1089,6 @@ else()
 				COMPILE_FLAGS "-include ${CMAKE_CURRENT_SOURCE_DIR}/idlib/precompiled.h"
 				)
 		endforeach()
-
-		# precompiled magic for GCC/clang, adapted from https://gist.github.com/573926
-		STRING(TOUPPER "CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}" _flags_var_name)
-		SET(_compiler_FLAGS "${${_flags_var_name}} -std=c++${CMAKE_CXX_STANDARD}")
-		GET_DIRECTORY_PROPERTY(_directory_flags INCLUDE_DIRECTORIES)
-		FOREACH(item ${_directory_flags})
-			LIST(APPEND _compiler_FLAGS " -I${item}")
-		ENDFOREACH(item)
-
-		GET_DIRECTORY_PROPERTY(_directory_flags DEFINITIONS)
-		LIST(APPEND _compiler_FLAGS ${_directory_flags})
-		SEPARATE_ARGUMENTS(_compiler_FLAGS)
-	
-		# we need to recreate the precompiled header for RBDoom3BFG 
-		# (i.e. can't use the one created for idlib before)
-		# because some definitions (e.g. -D__IDLIB__ -D__DOOM_DLL__) differ
-		add_custom_target(precomp_header_rbdoom3bfg ALL
-				COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -x c++-header idlib/precompiled.h -o idlib/precompiled.h.gch
-				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-				COMMENT "Creating idlib/precompiled.h.gch for RBDoom3BFG"
-				)
-		if(WIN32)
-			set(remove_command "del")
-		else()
-			set(remove_command "rm")
-		endif()
-			
-		# it's ugly enough that the precompiled header binary needs to be in the 
-		# source directory (instead of the build directory), so let's at least
-		# delete it after build.
-		add_custom_target(rm_precomp_header ALL
-				COMMAND ${remove_command} "idlib/precompiled.h.gch"
-				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-				COMMENT "remove idlib/precompiled.h.gch"
-				)
-				
-		# make sure this is run after creating idlib
-		add_dependencies(precomp_header_rbdoom3bfg idlib)
 	endif()
 
 	if(NOT WIN32)
@@ -1152,9 +1114,7 @@ else()
 		
 		if (USE_PRECOMPILED_HEADERS)
 			# make sure precompiled header is created before executable is compiled
-			add_dependencies(RBDoom3BFG precomp_header_rbdoom3bfg)
-			# make sure precompiled header is deleted after executable is compiled
-			add_dependencies(rm_precomp_header RBDoom3BFG)
+			add_dependencies(RBDoom3BFG precomp_header_idlib)
 		endif()	
 
 		target_link_libraries(RBDoom3BFG ${LIBRARIES})
@@ -1165,9 +1125,7 @@ else()
 
 		if (USE_PRECOMPILED_HEADERS)
 			# make sure precompiled header is created before executable is compiled
-			add_dependencies(RBDoom3BFGTests precomp_header_rbdoom3bfg)
-			# make sure precompiled header is deleted after executable is compiled
-			add_dependencies(rm_precomp_header RBDoom3BFGTests)
+			add_dependencies(RBDoom3BFGTests precomp_header_idlib)
 		endif()	
 
 		target_link_libraries(RBDoom3BFGTests ${LIBRARIES} Catch2::Catch2WithMain)
