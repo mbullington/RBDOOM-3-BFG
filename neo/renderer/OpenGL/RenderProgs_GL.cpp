@@ -218,7 +218,6 @@ void idRenderProgManager::LoadShader(shader_t& shader) {
         (BIT(USE_GPU_SKINNING) & shader.shaderFeatures)) {
       hasGPUSkinning = true;
     }
-
     idStr hlslCode(hlslFileBuffer);
     idStr programHLSL =
         StripDeadCode(hlslCode, inFile, compileMacros, shader.builtin);

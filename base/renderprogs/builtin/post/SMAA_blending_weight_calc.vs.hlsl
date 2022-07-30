@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #define SMAA_INCLUDE_VS 1
 #define SMAA_INCLUDE_PS 0
-#include "SMAA.inc.hlsl"
+#include "renderprogs/builtin/post/SMAA.inc.hlsl"
 
 // *INDENT-OFF*
 struct VS_IN 

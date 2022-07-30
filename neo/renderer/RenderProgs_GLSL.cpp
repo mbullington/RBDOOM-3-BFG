@@ -37,9 +37,17 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 
 #include "precompiled.h"
+
 #pragma hdrstop
 
+#include <memory>
+
+#include "Dict.h"
+#include "Lexer.h"
 #include "RenderCommon.h"
+#include "renderer/RenderProgs.h"
+#include "framework/Common.h"
+#include "framework/FileSystem.h"
 
 idCVar r_skipStripDeadCode("r_skipStripDeadCode", "0", CVAR_BOOL,
                            "Skip stripping dead code");
@@ -822,14 +830,29 @@ ConvertCG2GLSL
 idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
                                           rpStage_t stage, idStr& outLayout,
                                           bool vkGLSL, bool hasGPUSkinning,
-                                          vertexLayoutType_t vertexLayout) {
+                                          vertexLayoutType_t vertexLayout,
+                                          bool dump, bool nested,
+                                          idList<idStr>* uniformList,
+                                          idList<idStr>* samplerList) {
   idStr program;
   program.ReAllocate(in.Length() * 2, false);
 
   idList<inOutVariable_t, TAG_RENDERPROG> varsIn;
   idList<inOutVariable_t, TAG_RENDERPROG> varsOut;
-  idList<idStr> uniformList;
-  idList<idStr> samplerList;
+
+  // Free the memory once we're done with it
+
+  std::unique_ptr<idList<idStr>> uniformListFree;
+  if (uniformList == NULL) {
+    uniformList = new idList<idStr>;
+    uniformListFree.reset(uniformList);
+  }
+
+  std::unique_ptr<idList<idStr>> samplerListFree;
+  if (samplerList == NULL) {
+    samplerList = new idList<idStr>;
+    samplerListFree.reset(samplerList);
+  }
 
   idLexer src(LEXFL_NOFATALERRORS);
   src.LoadMemory(in.c_str(), in.Length(), name);
@@ -844,9 +867,70 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
                                      : FRAGMENT_UNIFORM_ARRAY_NAME;
   char newline[128] = {"\n"};
 
+  bool isInIfDirective = false;
+  idStr ifDirectiveStatement("");
+
+  bool toggleGPUSkinInIf = false;
+  idStr toggleGPUSkinStatement("");
+
+  idDict usedUniforms;
+
   idToken token;
   while (src.ReadToken(&token)) {
     // check for uniforms
+
+    // Naive read of directives so we can parse gpu skinning based on it.
+    // Right now this only works for if/endif directives.
+    if (token.linesCrossed > 0 && token.type == TT_PUNCTUATION &&
+        token == "#") {
+      idToken name;
+      src.ReadToken(&name);
+
+      // Bad version of include lol.
+      if (dump && name == "include") {
+        idToken filename;
+        src.ReadToken(&filename);
+
+        if (filename != "<") {
+          idStr filenameIn(filename);
+          idStr filenameOut;
+          filenameOut.Format("renderprogs/vkglsl_dump/%s", filename.c_str());
+          filenameOut.StripFileExtension();
+          filenameOut += ".glsl";
+
+          const char* includeFileBuffer = NULL;
+          int len = fileSystem->ReadFile(filenameIn.c_str(),
+                                         (void**)&includeFileBuffer);
+          if (len < 0) {
+            common->FatalError("Couldn't find include file '%s'",
+                               filenameIn.c_str());
+          }
+
+          idStr includeCode(includeFileBuffer);
+          idStr includeDump = ConvertCG2GLSL(
+              includeCode, filenameIn, stage, outLayout, vkGLSL, hasGPUSkinning,
+              vertexLayout, dump, /* nested */ true, uniformList, samplerList);
+          fileSystem->WriteFile(filenameOut, includeDump.c_str(),
+                                includeDump.Length(), "fs_savepath");
+          src.SkipRestOfLine();
+          continue;
+        }
+      }
+
+      idStr directive;
+      src.ReadRestOfLine(directive);
+
+      if (name == "if") {
+        isInIfDirective = true;
+        ifDirectiveStatement = directive;
+      } else if (name == "endif") {
+        isInIfDirective = false;
+      }
+
+      program += newline;
+      program += va("#%s %s", name.c_str(), directive.c_str());
+      continue;
+    }
 
     // RB: added special case for matrix arrays
     while (token == "uniform" && (src.CheckTokenString("float4") ||
@@ -871,7 +955,7 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
         }
       }
 
-      uniformList.Append(uniform);
+      uniformList->Append(uniform);
 
       src.ReadToken(&token);
     }
@@ -901,7 +985,7 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
         src.ReadToken(&token);
         sampler += token;
 
-        samplerList.Append(sampler);
+        samplerList->Append(sampler);
 
         // strip ': register()' from uniforms
         if (src.CheckTokenString(":")) {
@@ -915,13 +999,13 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
 
       // RB: HACK to add matrices uniform block layer
       if (token == "uniform" && src.PeekTokenString("matrices_ubo")) {
+        // Another hack to make this optional based on if directive.
+        if (isInIfDirective) {
+          toggleGPUSkinInIf = true;
+          toggleGPUSkinStatement = ifDirectiveStatement;
+        }
+
         hasGPUSkinning = true;
-
-        // src.ReadToken( &token );
-
-        // src.SkipRestOfLine();
-        // program += "\nlayout( binding = 1 ) ";
-
         src.SkipRestOfLine();
         continue;
       }
@@ -1111,8 +1195,11 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
 
     // check for uniforms that need to be converted to the array
     bool isUniform = false;
-    for (int i = 0; i < uniformList.Num(); i++) {
-      if (token == uniformList[i]) {
+    for (int i = 0; i < uniformList->Num(); i++) {
+      if (token == (*uniformList)[i]) {
+        // Mark the uniform as used.
+        usedUniforms.SetBool(token.c_str(), true);
+
         program += (token.linesCrossed > 0)
                        ? newline
                        : (token.WhiteSpaceBeforeToken() > 0 ? " " : "");
@@ -1122,12 +1209,12 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
         // arrays I added special check rpShadowMatrices so we can still index
         // the uniforms from the shader
 
-        if (idStr::Cmp(uniformList[i].c_str(), "rpShadowMatrices") == 0) {
+        if (idStr::Cmp((*uniformList)[i].c_str(), "rpShadowMatrices") == 0) {
           if (vkGLSL) {
-            program += va("%s[ ", uniformList[i].c_str());
+            program += va("%s[ ", (*uniformList)[i].c_str());
           } else {
             program += va("%s[/* %s */ %d + ", uniformArrayName,
-                          uniformList[i].c_str(), i);
+                          (*uniformList)[i].c_str(), i);
           }
 
           if (src.ExpectTokenString("[")) {
@@ -1146,10 +1233,10 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
           }
         } else {
           if (vkGLSL) {
-            program += va("%s", uniformList[i].c_str());
+            program += va("%s", (*uniformList)[i].c_str());
           } else {
             program += va("%s[%d /* %s */]", uniformArrayName, i,
-                          uniformList[i].c_str());
+                          (*uniformList)[i].c_str());
           }
         }
 
@@ -1264,118 +1351,182 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
   // RB: tell shader debuggers what shader we look at
   idStr filenameHint = "// filename " + idStr(name) + "\n";
 
-  // RB: changed to allow multiple versions of GLSL
-  if (stage == SHADER_STAGE_VERTEX) {
-    switch (glConfig.driverType) {
-      case GLDRV_OPENGL_MESA: {
-        out.ReAllocate(
-            idStr::Length(vertexInsert_GLSL_ES_3_00) + in.Length() * 2, false);
-        out += filenameHint;
-        out += vertexInsert_GLSL_ES_3_00;
-        break;
-      }
-
-      default: {
-        out.ReAllocate(idStr::Length(vertexInsert) + in.Length() * 2, false);
-        out += filenameHint;
-        out += vertexInsert;
-        break;
-      }
-    }
-  } else {
-    switch (glConfig.driverType) {
-      case GLDRV_OPENGL_MESA: {
-        out.ReAllocate(
-            idStr::Length(fragmentInsert_GLSL_ES_3_00) + in.Length() * 2,
-            false);
-        out += filenameHint;
-        out += fragmentInsert_GLSL_ES_3_00;
-        break;
-      }
-
-      default: {
-        out.ReAllocate(idStr::Length(fragmentInsert) + in.Length() * 2, false);
-        out += filenameHint;
-        out += fragmentInsert;
-        break;
+  // If we're not nested, prune the unused uniforms.
+  if (!nested) {
+    // Go from back to front so we don't mess up the indices.
+    for (int i = uniformList->Num() - 1; i >= 0; i--) {
+      if (!usedUniforms.GetBool((*uniformList)[i].c_str())) {
+        uniformList->RemoveIndex(i);
       }
     }
   }
-  // RB end
 
-  if (uniformList.Num() > 0) {
-    if (vkGLSL) {
-      out += "\n";
-      if (stage == SHADER_STAGE_VERTEX) {
-        out += "layout( binding = 0 ) uniform UBOV {\n";
-      } else {
-        // out += "layout( binding = 1 ) uniform UBOF {\n";
-        out += va("layout( binding = %i ) uniform UBOF {\n",
-                  hasGPUSkinning ? 2 : 1);
-      }
-
-      for (int i = 0; i < uniformList.Num(); i++) {
-        out += "\tvec4 ";
-        out += uniformList[i];
-
-        // TODO fix this ugly hack
-        if (uniformList[i] == "rpShadowMatrices") {
-          out += "[6*4]";
+  // Don't include the preamble when we're dumping.
+  // Eventually, I hope we can get rid of the Cg compiler and inline the
+  // preamble into the shaderc program.
+  if (!dump) {
+    // RB: changed to allow multiple versions of GLSL
+    if (stage == SHADER_STAGE_VERTEX) {
+      switch (glConfig.driverType) {
+        case GLDRV_OPENGL_MESA: {
+          out.ReAllocate(
+              idStr::Length(vertexInsert_GLSL_ES_3_00) + in.Length() * 2,
+              false);
+          out += filenameHint;
+          out += vertexInsert_GLSL_ES_3_00;
+          break;
         }
 
-        out += ";\n";
-      }
-      out += "};\n";
-
-      if (hasGPUSkinning && (stage == SHADER_STAGE_VERTEX)) {
-        out += "\nlayout( binding = 1 ) uniform UBO_MAT {\n";
-        out += "\t vec4 matrices[ 408 ];\n";
-        out += "};\n";
+        default: {
+          out.ReAllocate(idStr::Length(vertexInsert) + in.Length() * 2, false);
+          out += filenameHint;
+          out += vertexInsert;
+          break;
+        }
       }
     } else {
-      int extraSize = 0;
-      for (int i = 0; i < uniformList.Num(); i++) {
-        if (idStr::Cmp(uniformList[i].c_str(), "rpShadowMatrices") == 0) {
-          extraSize += (6 * 4);
+      switch (glConfig.driverType) {
+        case GLDRV_OPENGL_MESA: {
+          out.ReAllocate(
+              idStr::Length(fragmentInsert_GLSL_ES_3_00) + in.Length() * 2,
+              false);
+          out += filenameHint;
+          out += fragmentInsert_GLSL_ES_3_00;
+          break;
+        }
+
+        default: {
+          out.ReAllocate(idStr::Length(fragmentInsert) + in.Length() * 2,
+                         false);
+          out += filenameHint;
+          out += fragmentInsert;
+          break;
         }
       }
-
-      out += va("\nuniform vec4 %s[%d];\n", uniformArrayName,
-                uniformList.Num() + extraSize);
     }
+    // RB end
   }
 
-  // RB: add samplers with layout bindings
-  if (vkGLSL) {
-    int bindingOffset = 1;
+  if (!nested) {
+    if (vkGLSL && hasGPUSkinning && (stage == SHADER_STAGE_VERTEX)) {
+      if (toggleGPUSkinInIf) {
+        out += va("#if %s\n", toggleGPUSkinStatement.c_str());
+      }
 
-    if (hasGPUSkinning) {
-      bindingOffset++;
+      out += "\nlayout( binding = 1 ) uniform UBO_MAT {\n";
+      out += "\t vec4 matrices[ 408 ];\n";
+      out += "};\n";
+
+      if (toggleGPUSkinInIf) {
+        out += va("#endif // %s\n", toggleGPUSkinStatement.c_str());
+      }
     }
 
-    if (uniformList.Num() > 0) {
-      bindingOffset++;
+    if (stage != SHADER_STAGE_VERTEX && toggleGPUSkinInIf) {
+      idLib::FatalError("toggleGPUSkinInIf is only allowed for vertex shaders");
     }
 
-    for (int i = 0; i < samplerList.Num(); i++) {
-      out += va("layout( binding = %i ) uniform %s;\n", i + bindingOffset,
-                samplerList[i].c_str());
+    if (uniformList->Num() > 0) {
+      if (vkGLSL) {
+        idStr layoutStr;
+        for (int i = 0; i < uniformList->Num(); i++) {
+          layoutStr += "\tvec4 ";
+          layoutStr += (*uniformList)[i];
+
+          // TODO fix this ugly hack
+          if ((*uniformList)[i] == "rpShadowMatrices") {
+            layoutStr += "[6*4]";
+          }
+
+          layoutStr += ";\n";
+        }
+        layoutStr += "};\n";
+
+        out += "\n";
+        if (stage == SHADER_STAGE_VERTEX) {
+          out += "layout( binding = 0 ) uniform UBOV {\n";
+          out += layoutStr;
+        } else {
+          // Actually ignore 'hasGPUSkinning' for non-vertex shaders and treat
+          // it as a random variable **when we're dumping**.
+          if (dump) {
+            out += "#if defined(USE_GPU_SKINNING)\n";
+            out += "layout( binding = 2 ) uniform UBOV {\n";
+            out += layoutStr;
+            out += "#else\n";
+            out += "layout( binding = 1 ) uniform UBOV {\n";
+            out += layoutStr;
+            out += "#endif\n";
+          } else {
+            out += va("layout( binding = %i ) uniform UBOF {\n",
+                      hasGPUSkinning ? 2 : 1);
+            out += layoutStr;
+          }
+        }
+      } else {
+        int extraSize = 0;
+        for (int i = 0; i < uniformList->Num(); i++) {
+          if (idStr::Cmp((*uniformList)[i].c_str(), "rpShadowMatrices") == 0) {
+            extraSize += (6 * 4);
+          }
+        }
+
+        out += va("\nuniform vec4 %s[%d];\n", uniformArrayName,
+                  uniformList->Num() + extraSize);
+      }
+    }
+
+    // RB: add samplers with layout bindings
+    if (vkGLSL) {
+      // Again, actually ignore 'hasGPUSkinning' for non-vertex shaders and
+      // treat it as a random variable **when we're dumping**.
+      if (samplerList->Num() > 0 && ((hasGPUSkinning && toggleGPUSkinInIf) ||
+                                     (dump && stage != SHADER_STAGE_VERTEX))) {
+        int bindingOffset = 2;
+        if (uniformList->Num() > 0) {
+          bindingOffset++;
+        }
+        out += va("#if defined(USE_GPU_SKINNING)\n");
+        for (int i = 0; i < samplerList->Num(); i++) {
+          out += va("layout( binding = %i ) uniform %s;\n", i + bindingOffset,
+                    (*samplerList)[i].c_str());
+        }
+        out += va("#else\n");
+        bindingOffset--;
+        for (int i = 0; i < samplerList->Num(); i++) {
+          out += va("layout( binding = %i ) uniform %s;\n", i + bindingOffset,
+                    (*samplerList)[i].c_str());
+        }
+        out += va("#endif // else\n");
+      } else {
+        int bindingOffset = 1;
+        if (hasGPUSkinning) {
+          bindingOffset++;
+        }
+        if (uniformList->Num() > 0) {
+          bindingOffset++;
+        }
+        for (int i = 0; i < samplerList->Num(); i++) {
+          out += va("layout( binding = %i ) uniform %s;\n", i + bindingOffset,
+                    (*samplerList)[i].c_str());
+        }
+      }
     }
   }
 
   out += program;
 
   outLayout += "uniforms [\n";
-  for (int i = 0; i < uniformList.Num(); i++) {
+  for (int i = 0; i < uniformList->Num(); i++) {
     outLayout += "\t";
-    outLayout += uniformList[i];
+    outLayout += (*uniformList)[i];
     outLayout += "\n";
   }
   outLayout += "]\n";
 
   outLayout += "bindings [\n";
 
-  if (uniformList.Num() > 0) {
+  if (uniformList->Num() > 0) {
     outLayout += "\tubo\n";
   }
 
@@ -1383,7 +1534,7 @@ idStr idRenderProgManager::ConvertCG2GLSL(const idStr& in, const char* name,
     outLayout += "\tubo\n";
   }
 
-  for (int i = 0; i < samplerList.Num(); i++) {
+  for (int i = 0; i < samplerList->Num(); i++) {
     outLayout += "\tsampler\n";
   }
   outLayout += "]\n";

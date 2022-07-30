@@ -567,6 +567,8 @@ static int CompileGLSLtoSPIRV(const char* filename, const idStr& dataGLSL,
 
 #endif
 
+#define SHADER_PREPROCESSED_VKGLSL_DUMP 1
+
 /*
 ================================================================================================
 idRenderProgManager::LoadGLSLShader
@@ -578,6 +580,16 @@ void idRenderProgManager::LoadShader(shader_t& shader) {
   idStr outFileGLSL;
   idStr outFileSPIRV;
   idStr outFileLayout;
+#if defined(SHADER_PREPROCESSED_VKGLSL_DUMP)
+  idStr outFileDump;
+  outFileDump.StripFileExtension();
+  outFileDump.Format("renderprogs/vkglsl_dump/%s", shader.name.c_str());
+  if (shader.stage == SHADER_STAGE_FRAGMENT) {
+    outFileDump += ".frag";
+  } else {
+    outFileDump += ".vert";
+  }
+#endif
 
   // RB: replaced backslashes
   inFile.Format("renderprogs/%s", shader.name.c_str());
@@ -667,6 +679,14 @@ void idRenderProgManager::LoadShader(shader_t& shader) {
     programGLSL =
         ConvertCG2GLSL(programHLSL, inFile, shader.stage, programLayout, true,
                        hasGPUSkinning, shader.vertexLayout);
+
+#if defined(SHADER_PREPROCESSED_VKGLSL_DUMP)
+    idStr programDump =
+        ConvertCG2GLSL(hlslCode, inFile, shader.stage, programLayout, true,
+                       hasGPUSkinning, shader.vertexLayout, true);
+    fileSystem->WriteFile(outFileDump, programDump.c_str(),
+                          programDump.Length(), "fs_savepath");
+#endif
 
     fileSystem->WriteFile(outFileHLSL, programHLSL.c_str(),
                           programHLSL.Length(), "fs_savepath");

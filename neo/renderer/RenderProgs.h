@@ -618,7 +618,10 @@ class idRenderProgManager {
                       const idStrList& compileMacros, bool builtin);
   idStr ConvertCG2GLSL(const idStr& in, const char* name, rpStage_t stage,
                        idStr& outLayout, bool vkGLSL, bool hasGPUSkinning,
-                       vertexLayoutType_t vertexLayout);
+                       vertexLayoutType_t vertexLayout, bool dump = false,
+                       bool nested = false,
+                       idList<idStr>* uniformList = nullptr,
+                       idList<idStr>* samplerList = nullptr);
 
   enum {
     BUILTIN_GUI,

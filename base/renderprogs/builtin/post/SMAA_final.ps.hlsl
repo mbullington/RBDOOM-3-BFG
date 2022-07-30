@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #define SMAA_INCLUDE_VS 0
 #define SMAA_INCLUDE_PS 1
-#include "SMAA.inc.hlsl"
+#include "renderprogs/builtin/post/SMAA.inc.hlsl"
 
 // *INDENT-OFF*
 uniform sampler2D samp0		: register(s0);		// _currentColor
