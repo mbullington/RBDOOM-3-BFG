@@ -230,22 +230,6 @@ uintptr_t Sys_CreateThread(xthread_t function, void* parms,
 
 /*
 ========================
-Sys_GetCurrentThreadID
-========================
-*/
-uintptr_t Sys_GetCurrentThreadID() {
-  /*
-   * This cast is safe because pthread_self()
-   * returns a pointer and uintptr_t is
-   * designed to hold a pointer. The compiler
-   * is just too stupid to know. :)
-   *  -- Yamagi
-   */
-  return (uintptr_t)pthread_self();
-}
-
-/*
-========================
 Sys_DestroyThread
 ========================
 */

@@ -178,9 +178,6 @@ enum xthreadPriority {
 
 #define DEFAULT_THREAD_STACK_SIZE (256 * 1024)
 
-// on win32, the threadID is NOT the same as the threadHandle
-uintptr_t Sys_GetCurrentThreadID();
-
 // returns a threadHandle
 uintptr_t Sys_CreateThread(xthread_t function, void* parms,
                            xthreadPriority priority, const char* name,

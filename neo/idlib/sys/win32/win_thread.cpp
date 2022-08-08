@@ -149,13 +149,6 @@ uintptr_t Sys_CreateThread(xthread_t function, void* parms,
 
 /*
 ========================
-Sys_GetCurrentThreadID
-========================
-*/
-uintptr_t Sys_GetCurrentThreadID() { return GetCurrentThreadId(); }
-
-/*
-========================
 Sys_DestroyThread
 ========================
 */
