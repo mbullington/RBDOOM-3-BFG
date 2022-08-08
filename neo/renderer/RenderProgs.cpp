@@ -164,14 +164,14 @@ void idRenderProgManager::Init() {
       {BUILTIN_INTERACTION_AMBIENT, "builtin/lighting/interactionAmbient", "",
        0, false, SHADER_STAGE_DEFAULT, LAYOUT_DRAW_VERT},
       {BUILTIN_INTERACTION_AMBIENT_SKINNED,
-       "builtin/lighting/interactionAmbient_skinned", "", 0, true,
-       SHADER_STAGE_DEFAULT, LAYOUT_DRAW_VERT},
+       "builtin/lighting/interactionAmbient_skinned", "", BIT(USE_GPU_SKINNING),
+       true, SHADER_STAGE_DEFAULT, LAYOUT_DRAW_VERT},
 
       {BUILTIN_INTERACTION_SHADOW_MAPPING_SPOT,
-       "builtin/lighting/interactionSM", "_spot", 0, false,
-       SHADER_STAGE_DEFAULT, LAYOUT_DRAW_VERT},
+       "builtin/lighting/interactionSM", "", 0, false, SHADER_STAGE_DEFAULT,
+       LAYOUT_DRAW_VERT},
       {BUILTIN_INTERACTION_SHADOW_MAPPING_SPOT_SKINNED,
-       "builtin/lighting/interactionSM", "_spot_skinned", BIT(USE_GPU_SKINNING),
+       "builtin/lighting/interactionSM", "_skinned", BIT(USE_GPU_SKINNING),
        true, SHADER_STAGE_DEFAULT, LAYOUT_DRAW_VERT},
 
       {BUILTIN_INTERACTION_SHADOW_MAPPING_POINT,
@@ -204,10 +204,10 @@ void idRenderProgManager::Init() {
        true, SHADER_STAGE_DEFAULT, LAYOUT_DRAW_VERT},
 
       {BUILTIN_PBR_INTERACTION_SHADOW_MAPPING_SPOT,
-       "builtin/lighting/interactionSM", "_spot_PBR", BIT(USE_PBR), false,
+       "builtin/lighting/interactionSM", "_PBR", BIT(USE_PBR), false,
        SHADER_STAGE_DEFAULT, LAYOUT_DRAW_VERT},
       {BUILTIN_PBR_INTERACTION_SHADOW_MAPPING_SPOT_SKINNED,
-       "builtin/lighting/interactionSM", "_spot_skinned_PBR",
+       "builtin/lighting/interactionSM", "_skinned_PBR",
        BIT(USE_GPU_SKINNING) | BIT(USE_PBR), true, SHADER_STAGE_DEFAULT,
        LAYOUT_DRAW_VERT},
 
