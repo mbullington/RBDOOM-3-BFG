@@ -285,9 +285,9 @@ class RenderEnvprobeLocal : public RenderEnvprobe {
   bool archived;  // for demo writing
 
   // derived information
-  // idPlane						lightProject[4];		// old style light
-  // projection where Z and W are flipped and projected lights lightProject[3]
-  // is divided by ( zNear + zFar ) idRenderMatrix
+  // idPlane						lightProject[4];		// old style
+  // light projection where Z and W are flipped and projected lights
+  // lightProject[3] is divided by ( zNear + zFar ) idRenderMatrix
   // baseLightProject;		// global xyz1 to projected light strq
   idRenderMatrix
       inverseBaseProbeProject;  // transforms the zero-to-one cube to exactly
@@ -297,8 +297,8 @@ class RenderEnvprobeLocal : public RenderEnvprobe {
 
   areaReference_t*
       references;  // each area the light is present in will have a lightRef
-  // idInteraction* 			firstInteraction;		// doubly linked
-  // list idInteraction* 			lastInteraction;
+  // idInteraction* 			firstInteraction;		// doubly
+  // linked list idInteraction* 			lastInteraction;
 
   idImage* irradianceImage;  // cubemap image used for diffuse IBL by backend
   idImage* radianceImage;    // cubemap image used for specular IBL by backend
@@ -1146,8 +1146,6 @@ extern idCVar r_useShadowDepthBounds;  // use depth bounds test on individual
 // RB begin
 extern idCVar
     r_useShadowMapping;  // use shadow mapping instead of stencil shadows
-extern idCVar r_useHalfLambertLighting;  // use Half-Lambert lighting instead of
-                                         // classic Lambert
 extern idCVar r_useHDR;
 extern idCVar r_useSeamlessCubeMap;
 // RB end

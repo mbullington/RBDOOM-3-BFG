@@ -207,7 +207,7 @@ static srfTriangles_t* R_CreateInteractionLightTris(
       light->lightShader->LightEffectsBackSides() ||
       shader->ReceivesLightingOnBackSides() || ent->parms.noSelfShadow ||
       ent->parms.noShadow || r_usePBR.GetBool() ||
-      (r_useHalfLambertLighting.GetInteger() && r_useShadowMapping.GetBool())) {
+      r_useShadowMapping.GetBool()) {
     includeBackFaces = true;
   } else {
     includeBackFaces = false;

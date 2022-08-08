@@ -390,7 +390,6 @@ void idRenderProgManager::Init() {
     LoadGLSLProgram(i, vIndex, fIndex);
   }
 
-  r_useHalfLambertLighting.ClearModified();
   r_useHDR.ClearModified();
   r_usePBR.ClearModified();
   r_pbrDebug.ClearModified();

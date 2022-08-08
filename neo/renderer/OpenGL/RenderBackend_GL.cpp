@@ -1454,21 +1454,14 @@ void idRenderBackend::CheckCVars() {
   }
 
   if (r_usePBR.IsModified() || r_useHDR.IsModified() ||
-      r_useHalfLambertLighting.IsModified() || r_pbrDebug.IsModified()) {
+      r_pbrDebug.IsModified()) {
     bool needShaderReload = false;
-
-    if (r_usePBR.GetBool() && r_useHalfLambertLighting.GetBool()) {
-      r_useHalfLambertLighting.SetBool(false);
-
-      needShaderReload = true;
-    }
 
     needShaderReload |= r_useHDR.IsModified();
     needShaderReload |= r_pbrDebug.IsModified();
 
     r_usePBR.ClearModified();
     r_useHDR.ClearModified();
-    r_useHalfLambertLighting.ClearModified();
     r_pbrDebug.ClearModified();
 
     renderProgManager.KillAllShaders();

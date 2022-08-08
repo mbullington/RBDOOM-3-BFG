@@ -61,13 +61,9 @@ void main()
 	localNormal.z = sqrt( abs( dot( localNormal.xy, localNormal.xy ) - 0.25 ) );
 	localNormal = normalize( localNormal );
 	float ldotN = saturate( dot3( localNormal, lightVector ) );
-	#if defined(USE_HALF_LAMBERT)
 	float halfLdotN = dot3( localNormal, lightVector ) * 0.5 + 0.5;
 	halfLdotN *= halfLdotN;
 	float lambert = halfLdotN;
-	#else 
-	float lambert = ldotN;
-	#endif 
 	float specularPower = 10.0;
 	float hDotN = dot3( normalize( vofi_TexCoord6.xyz ), localNormal );
 	vec3 specularContribution = _half3( pow( abs( hDotN ), specularPower ) );

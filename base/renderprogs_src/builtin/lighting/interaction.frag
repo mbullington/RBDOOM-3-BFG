@@ -63,13 +63,7 @@ void main()
 	localNormal.z = sqrt( abs( dot( localNormal.xy, localNormal.xy ) - 0.25 ) );
 	localNormal = normalize( localNormal );
 	float ldotN = saturate( dot3( localNormal, lightVector ) );
-	#if defined(USE_HALF_LAMBERT)
-	float halfLdotN = dot3( localNormal, lightVector ) * 0.5 + 0.5;
-	halfLdotN *= halfLdotN;
-	float lambert = mix( ldotN, halfLdotN, 0.5 );
-	#else 
 	float lambert = ldotN;
-	#endif 
 	vec3 halfAngleVector = normalize( lightVector + viewVector );
 	float hdotN = clamp( dot3( halfAngleVector, localNormal ), 0.0, 1.0 );
 	#if defined( USE_PBR )

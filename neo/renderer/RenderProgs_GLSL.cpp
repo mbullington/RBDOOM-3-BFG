@@ -325,10 +325,6 @@ idRenderProgManager::preprocess_glsl_t idRenderProgManager::PreprocessGLSL(
     src.AddDefine(compileMacros[i]);
   }
 
-  if (r_useHalfLambertLighting.GetBool()) {
-    src.AddDefine("USE_HALF_LAMBERT");
-  }
-
   // TODO(mbullington): Once this is supported in Vulkan, always enable it.
   if (r_useHDR.GetBool()) {
     src.AddDefine("USE_LINEAR_RGB");
