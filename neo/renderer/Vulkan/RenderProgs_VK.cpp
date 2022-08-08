@@ -602,12 +602,6 @@ void idRenderProgManager::LoadShader(shader_t& shader) {
       }
     }
 
-    if (idStr::Icmp(shader.name.c_str(), "heatHaze") == 0 ||
-        idStr::Icmp(shader.name.c_str(), "heatHazeWithMask") == 0 ||
-        idStr::Icmp(shader.name.c_str(), "heatHazeWithMaskAndVertex") == 0) {
-      compileMacros.Append("USE_GPU_SKINNING");
-    }
-
     idStr glslCode(glslFileBuffer);
     auto programGLSL = PreprocessGLSL(glslCode, inFile, shader.stage,
                                       compileMacros, shader.builtin);
