@@ -2708,10 +2708,9 @@ void idRenderBackend::CheckCVars() {
           }
   }
 
-  if( r_useHDR.IsModified() || r_useHalfLambertLighting.IsModified() )
+  if( r_useHDR.IsModified() )
   {
           r_useHDR.ClearModified();
-          r_useHalfLambertLighting.ClearModified();
           renderProgManager.KillAllShaders();
           renderProgManager.LoadAllShaders();
   }
