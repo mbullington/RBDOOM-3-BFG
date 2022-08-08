@@ -155,6 +155,10 @@ class idList {
       new_t* allocator);  // assure the pointer list has the given number of
                           // elements and allocate any new elements
 
+  // For use with for (auto &item : list) syntax;
+  _type_* begin() { return Ptr(); }
+  _type_* end() { return (Ptr() + Num()); }
+
   _type_* Ptr();              // returns a pointer to the list
   const _type_* Ptr() const;  // returns a pointer to the list
   _type_&
@@ -176,12 +180,13 @@ class idList {
   // spot - DOES NOT PRESERVE LIST ORDER
   bool RemoveIndexFast(int index);
   bool Remove(const _type_& obj);  // remove the element
-                                   //	void			Sort( cmp_t *compare = ( cmp_t *
+                                   //	void			Sort( cmp_t
+                                   //*compare = ( cmp_t *
                                    //)&idListSortCompare<_type_, _tag_> );
   void SortWithTemplate(
       const idSort<_type_>& sort = idSort_QuickDefault<_type_>());
-  //	void			SortSubSection( int startIndex, int endIndex, cmp_t
-  //*compare = ( cmp_t * )&idListSortCompare<_type_> );
+  //	void			SortSubSection( int startIndex, int endIndex,
+  // cmp_t *compare = ( cmp_t * )&idListSortCompare<_type_> );
   void Swap(idList& other);                // swap the contents of the lists
   void DeleteContents(bool clear = true);  // delete the contents of the list
 
@@ -1052,7 +1057,7 @@ ID_INLINE void idList<_type_, _tag_>::SortWithTemplate(
 //
 //	cmp_c *vCompare = (cmp_c *)compare;
 //	qsort( ( void * )( &list[startIndex] ), ( size_t )( endIndex -
-//startIndex + 1 ), sizeof( _type_ ), vCompare );
+// startIndex + 1 ), sizeof( _type_ ), vCompare );
 //}
 
 /*
