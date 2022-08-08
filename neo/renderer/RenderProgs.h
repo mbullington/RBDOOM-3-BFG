@@ -614,14 +614,20 @@ class idRenderProgManager {
  private:
   void LoadShader(int index, rpStage_t stage);
 
+  struct preprocess_glsl_t {
+    idStr out;
+    idList<idStr> uniforms;
+    // Can be either "ubo" or "sampler."
+    // Skip GPU skinning binding if used.
+    idList<idStr> bindings;
+  };
+
   idStr StripDeadCode(const idStr& in, const char* name,
                       const idStrList& compileMacros, bool builtin);
-  idStr ConvertCG2GLSL(const idStr& in, const char* name, rpStage_t stage,
-                       idStr& outLayout, bool vkGLSL, bool hasGPUSkinning,
-                       vertexLayoutType_t vertexLayout, bool dump = false,
-                       bool nested = false,
-                       idList<idStr>* uniformList = nullptr,
-                       idList<idStr>* samplerList = nullptr);
+  preprocess_glsl_t PreprocessGLSL(const idStr& in, const char* name,
+                                   rpStage_t stage,
+                                   const idStrList& compileMacros,
+                                   bool builtin);
 
   enum {
     BUILTIN_GUI,
