@@ -325,12 +325,11 @@ idRenderProgManager::preprocess_glsl_t idRenderProgManager::PreprocessGLSL(
     src.AddDefine(compileMacros[i]);
   }
 
-  src.AddDefine("USE_UNIFORM_ARRAYS");
-
   if (r_useHalfLambertLighting.GetBool()) {
     src.AddDefine("USE_HALF_LAMBERT");
   }
 
+  // TODO(mbullington): Once this is supported in Vulkan, always enable it.
   if (r_useHDR.GetBool()) {
     src.AddDefine("USE_LINEAR_RGB");
   }
@@ -339,22 +338,18 @@ idRenderProgManager::preprocess_glsl_t idRenderProgManager::PreprocessGLSL(
     src.AddDefine("DEBUG_PBR");
   }
 
-  // SMAA configuration
-  src.AddDefine("SMAA_GLSL_3");
-  src.AddDefine("SMAA_PRESET_HIGH");
-
   // RB: tell shader debuggers what shader we look at
   idStr out;
   idStr filenameHint = "// filename " + idStr(name) + "\n";
 
   // Add obligatory GLSL preamble.
   if (stage == SHADER_STAGE_VERTEX) {
-    out += vertexInsert;
     out += filenameHint;
+    out += vertexInsert;
   } else {
     out.ReAllocate(idStr::Length(fragmentInsert) + in.Length() * 2, false);
-    out += fragmentInsert;
     out += filenameHint;
+    out += fragmentInsert;
   }
 
   idList<idStr> uniforms;

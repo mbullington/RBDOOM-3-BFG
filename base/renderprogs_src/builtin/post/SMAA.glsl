@@ -1,3 +1,5 @@
+#define SMAA_GLSL_3 1
+#define SMAA_PRESET_HIGH 1
 
 #if defined(SMAA_PRESET_LOW)
 #define SMAA_THRESHOLD 0.15
