@@ -1,3 +1,6 @@
+#pragma static BRIGHTPASS _brightpass
+#pragma static HDR_DEBUG _debug
+
 #include "renderprogs_src/global.glsl"
 
 layout( location = 0 ) in vec3 in_Position;

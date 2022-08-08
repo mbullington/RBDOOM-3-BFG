@@ -1,3 +1,5 @@
+#pragma static USE_GPU_SKINNING _skinned
+
 layout( binding = 2 ) uniform sampler2D samp0;
 
 #include "renderprogs_src/global.glsl"

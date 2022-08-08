@@ -1,3 +1,4 @@
+#pragma static USE_SRGB _sRGB
 
 #if defined(USE_GPU_SKINNING)
 layout( binding = 2 ) uniform UBOV {

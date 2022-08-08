@@ -1,3 +1,6 @@
+#pragma static USE_PBR _PBR
+#pragma static USE_GPU_SKINNING _skinned
+
 #if defined( USE_GPU_SKINNING )
 
 layout( binding = 1 ) uniform UBO_MAT {

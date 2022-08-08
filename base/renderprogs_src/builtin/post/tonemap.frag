@@ -1,3 +1,5 @@
+#pragma static BRIGHTPASS _brightpass
+#pragma static HDR_DEBUG _debug
 
 #if defined(USE_GPU_SKINNING)
 layout( binding = 2 ) uniform UBOV {

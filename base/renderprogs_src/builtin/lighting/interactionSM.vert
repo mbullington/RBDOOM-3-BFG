@@ -1,3 +1,8 @@
+#pragma static LIGHT_POINT _point
+#pragma static LIGHT_PARALLEL _parallel
+#pragma static USE_GPU_SKINNING _skinned
+#pragma static USE_PBR _PBR
+
 #if defined( USE_GPU_SKINNING )
 
 layout( binding = 1 ) uniform UBO_MAT {

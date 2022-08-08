@@ -1,3 +1,5 @@
+#pragma static BRIGHTPASS _write
+
 #include "renderprogs_src/global.glsl"
 
 layout( location = 0 ) in vec3 in_Position;

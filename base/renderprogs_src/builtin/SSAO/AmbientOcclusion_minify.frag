@@ -1,3 +1,4 @@
+#pragma static BRIGHTPASS _mip0
 
 #if defined(USE_GPU_SKINNING)
 layout( binding = 2 ) uniform UBOV {

@@ -1,3 +1,4 @@
+#pragma static USE_GPU_SKINNING _skinned
 
 #if defined(USE_GPU_SKINNING)
 layout( binding = 2 ) uniform UBOV {
@@ -12,6 +13,7 @@ layout( binding = 1 ) uniform UBOV {
 	vec4 rpJitterTexOffset;
 };
 #endif
+
 #if defined(USE_GPU_SKINNING)
 layout( binding = 3 ) uniform sampler2D samp0;
 #else

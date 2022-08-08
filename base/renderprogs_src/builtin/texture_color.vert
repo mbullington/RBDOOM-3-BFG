@@ -1,3 +1,4 @@
+#pragma static USE_SRGB _sRGB
 
 layout( binding = 0 ) uniform UBOV {
 	vec4 rpWindowCoord;
