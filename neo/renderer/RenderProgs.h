@@ -213,29 +213,6 @@ enum rpBinding_t {
   BINDING_TYPE_MAX
 };
 
-#define VERTEX_UNIFORM_ARRAY_NAME "_va_"
-#define FRAGMENT_UNIFORM_ARRAY_NAME "_fa_"
-
-static const int AT_VS_IN = BIT(1);
-static const int AT_VS_OUT = BIT(2);
-static const int AT_PS_IN = BIT(3);
-static const int AT_PS_OUT = BIT(4);
-static const int AT_VS_OUT_RESERVED = BIT(5);
-static const int AT_PS_IN_RESERVED = BIT(6);
-static const int AT_PS_OUT_RESERVED = BIT(7);
-
-struct attribInfo_t {
-  const char* type;
-  const char* name;
-  const char* semantic;
-  const char* glsl;
-  int bind;
-  int flags;
-  int vertexMask;
-};
-
-extern attribInfo_t attribsPC[];
-
 /*
 ================================================================================================
 idRenderProgManager
@@ -604,7 +581,6 @@ class idRenderProgManager {
   void CommitUniforms(uint64 stateBits);
   void CachePipeline(uint64 stateBits);
   int FindGLSLProgram(const char* name, int vIndex, int fIndex);
-  void ZeroUniforms();
 
 #if defined(USE_VULKAN)
   void PrintPipelines();
