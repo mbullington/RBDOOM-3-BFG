@@ -378,11 +378,6 @@ static int CompileGLSLtoSPIRV(const char* filename, const idStr& dataGLSL,
 }
 #else
 
-//#include <glslang/Public/ShaderLang.h>
-//#include <glslang/Include/ResourceLimits.h>
-//#include <SPIRV/GlslangToSpv.h>
-//#include <glslang/StandAlone/DirStackFileIncluder.h>
-
 #include "../../extern/glslang/glslang/Public/ShaderLang.h"
 #include "../../extern/glslang/glslang/Include/ResourceLimits.h"
 #include "../../extern/glslang/SPIRV/GlslangToSpv.h"
@@ -694,10 +689,6 @@ void idRenderProgManager::LoadGLSLProgram(const int programIndex,
   CreateDescriptorSetLayout(shaders[vertexShaderIndex],
                             shaders[fragmentShaderIndex], prog);
 
-  // TODO
-
-#if 1
-  // RB: removed idStr::Icmp( name, "heatHaze.vfp" ) == 0  hack
   for (int i = 0; i < shaders[vertexShaderIndex].parmIndices.Num(); i++) {
     if (shaders[vertexShaderIndex].parmIndices[i] ==
         RENDERPARM_ENABLE_SKINNING) {
@@ -705,7 +696,6 @@ void idRenderProgManager::LoadGLSLProgram(const int programIndex,
       prog.optionalSkinning = true;
     }
   }
-#endif
 }
 
 /*
