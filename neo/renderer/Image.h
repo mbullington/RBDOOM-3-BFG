@@ -308,6 +308,18 @@ class idImage {
 
   void MakeDefault();  // fill with a grid pattern
 
+  struct textureParams_t {
+#if defined(USE_VULKAN)
+    VkFormat internalFormat;
+#else
+    GLuint internalFormat;
+    GLuint dataFormat;
+    GLuint dataType;
+#endif
+  };
+
+  static textureParams_t GetTextureParams(const textureFormat_t format);
+
   const idImageOpts& GetOpts() const { return opts; }
   int GetUploadWidth() const { return opts.width; }
   int GetUploadHeight() const { return opts.height; }

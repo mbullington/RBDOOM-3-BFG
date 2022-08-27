@@ -358,8 +358,8 @@ class idRenderBackend {
   void GL_SelectTexture(int unit);
   //	void				GL_BindTexture( idImage* image );
 
-  //	void				GL_CopyFrameBuffer( idImage* image, int x,
-  //int y, int imageWidth, int imageHeight ); 	void GL_CopyDepthBuffer(
+  //	void				GL_CopyFrameBuffer( idImage* image, int
+  // x, int y, int imageWidth, int imageHeight ); 	void GL_CopyDepthBuffer(
   // idImage* image, int x, int y, int imageWidth, int
   // imageHeight );
 
@@ -487,12 +487,14 @@ class idRenderBackend {
   // RB end
 
  private:
+  // TODO(mbullington): For Vulkan this global state is annoying and bad.
+  Framebuffer* currentFramebuffer;  // RB: for offscreen rendering
+
 #if !defined(USE_VULKAN)
   int currenttmu;
 
   unsigned int currentVertexBuffer;
   unsigned int currentIndexBuffer;
-  Framebuffer* currentFramebuffer;  // RB: for offscreen rendering
 
   vertexLayoutType_t vertexLayout;
 

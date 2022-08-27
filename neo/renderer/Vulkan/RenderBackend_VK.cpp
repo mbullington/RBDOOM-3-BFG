@@ -2823,53 +2823,6 @@ void idRenderBackend::DrawStencilShadowPass(const drawSurf_t* drawSurf,
 /*
 ==============================================================================================
 
-OFFSCREEN RENDERING
-
-==============================================================================================
-*/
-
-void Framebuffer::Init() {
-  // TODO
-}
-
-void Framebuffer::Shutdown() {
-  // TODO
-}
-
-bool Framebuffer::IsDefaultFramebufferActive() {
-  // TODO
-  return true;
-}
-
-Framebuffer* Framebuffer::GetActiveFramebuffer() {
-  // TODO
-  return NULL;
-}
-
-void Framebuffer::Bind() {
-  // TODO
-}
-
-void Framebuffer::Unbind() {
-  // TODO
-}
-
-bool Framebuffer::IsBound() {
-  // TODO
-  return true;
-}
-
-void Framebuffer::Check() {
-  // TODO
-}
-
-void Framebuffer::CheckFramebuffers() {
-  // TODO
-}
-
-/*
-==============================================================================================
-
 IMGUI RENDERING
 
 ==============================================================================================

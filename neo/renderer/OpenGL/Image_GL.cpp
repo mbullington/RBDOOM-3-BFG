@@ -506,6 +506,53 @@ void idImage::SetTexParameters() {
   }
 }
 
+idImage::imageOpts_t idImage::GetOpts(const textureFormat_t format) {
+  switch (format) {
+    case FMT_RGBA8:
+      return {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE};
+    case FMT_XRGB8:
+      return {GL_RGB, GL_RGB, GL_UNSIGNED_BYTE};
+    case FMT_RGB565:
+      return {GL_RGB, GL_RGB, GL_UNSIGNED_SHORT_5_6_5};
+    case FMT_ALPHA:
+      return {GL_R8, GL_RED, GL_UNSIGNED_BYTE};
+    case FMT_L8A8:
+      return {GL_RG8, GL_RG, GL_UNSIGNED_BYTE};
+    case FMT_LUM8:
+      return {GL_R8, GL_RED, GL_UNSIGNED_BYTE};
+    case FMT_INT8:
+      return {GL_R8, GL_RED, GL_UNSIGNED_BYTE};
+    case FMT_DXT1:
+      return {GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_RGBA, GL_UNSIGNED_BYTE};
+    case FMT_DXT5:
+      return {GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_RGBA, GL_UNSIGNED_BYTE};
+    case FMT_DEPTH:
+      return {GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE};
+    case FMT_DEPTH_STENCIL:
+      return {GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8};
+    case FMT_SHADOW_ARRAY:
+      return {GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE};
+    case FMT_RG16F:
+      return {GL_RG16F, GL_RG, GL_HALF_FLOAT};
+    case FMT_RGBA16F:
+      return {GL_RGBA16F, GL_RGBA, GL_HALF_FLOAT};
+    case FMT_RGBA32F:
+      return {GL_RGBA32F, GL_RGBA, GL_UNSIGNED_BYTE};
+    case FMT_R32F:
+      return {GL_R32F, GL_RED, GL_UNSIGNED_BYTE};
+    case FMT_X16:
+      return {GL_INTENSITY16, GL_LUMINANCE, GL_UNSIGNED_SHORT};
+    case FMT_Y16_X16:
+      return {GL_LUMINANCE16_ALPHA16, GL_LUMINANCE_ALPHA, GL_UNSIGNED_SHORT};
+    // Reference:
+    // http://what-when-how.com/Tutorial/topic-615ll9ug/Praise-for-OpenGL-ES-30-Programming-Guide-291.html
+    case FMT_R11G11B10F:
+      return {GL_R11F_G11F_B10F, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV};
+    default:
+      idLib::Error("Unhandled image format %d\n", format);
+  }
+}
+
 /*
 ========================
 idImage::AllocImage
@@ -520,125 +567,10 @@ void idImage::AllocImage() {
   GL_CheckErrors();
   PurgeImage();
 
-  switch (opts.format) {
-    case FMT_RGBA8:
-      internalFormat = GL_RGBA8;
-      dataFormat = GL_RGBA;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_XRGB8:
-      internalFormat = GL_RGB;
-      dataFormat = GL_RGBA;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_RGB565:
-      internalFormat = GL_RGB;
-      dataFormat = GL_RGB;
-      dataType = GL_UNSIGNED_SHORT_5_6_5;
-      break;
-
-    case FMT_ALPHA:
-      internalFormat = GL_R8;
-      dataFormat = GL_RED;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_L8A8:
-      internalFormat = GL_RG8;
-      dataFormat = GL_RG;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_LUM8:
-      internalFormat = GL_R8;
-      dataFormat = GL_RED;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_INT8:
-      internalFormat = GL_R8;
-      dataFormat = GL_RED;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_DXT1:
-      internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-      dataFormat = GL_RGBA;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_DXT5:
-      internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-      dataFormat = GL_RGBA;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_DEPTH:
-      internalFormat = GL_DEPTH_COMPONENT;
-      dataFormat = GL_DEPTH_COMPONENT;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_DEPTH_STENCIL:
-      internalFormat = GL_DEPTH24_STENCIL8;
-      dataFormat = GL_DEPTH_STENCIL;
-      dataType = GL_UNSIGNED_INT_24_8;
-      break;
-
-    case FMT_SHADOW_ARRAY:
-      internalFormat = GL_DEPTH_COMPONENT;
-      dataFormat = GL_DEPTH_COMPONENT;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_RG16F:
-      internalFormat = GL_RG16F;
-      dataFormat = GL_RG;
-      dataType = GL_HALF_FLOAT;
-      break;
-
-    case FMT_RGBA16F:
-      internalFormat = GL_RGBA16F;
-      dataFormat = GL_RGBA;
-      dataType = GL_HALF_FLOAT;
-      break;
-
-    case FMT_RGBA32F:
-      internalFormat = GL_RGBA32F;
-      dataFormat = GL_RGBA;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_R32F:
-      internalFormat = GL_R32F;
-      dataFormat = GL_RED;
-      dataType = GL_UNSIGNED_BYTE;
-      break;
-
-    case FMT_X16:
-      internalFormat = GL_INTENSITY16;
-      dataFormat = GL_LUMINANCE;
-      dataType = GL_UNSIGNED_SHORT;
-      break;
-    case FMT_Y16_X16:
-      internalFormat = GL_LUMINANCE16_ALPHA16;
-      dataFormat = GL_LUMINANCE_ALPHA;
-      dataType = GL_UNSIGNED_SHORT;
-      break;
-
-    // see
-    // http://what-when-how.com/Tutorial/topic-615ll9ug/Praise-for-OpenGL-ES-30-Programming-Guide-291.html
-    case FMT_R11G11B10F:
-      internalFormat = GL_R11F_G11F_B10F;
-      dataFormat = GL_RGB;
-      dataType = GL_UNSIGNED_INT_10F_11F_11F_REV;
-      break;
-
-    default:
-      idLib::Error("Unhandled image format %d in %s\n", opts.format, GetName());
-  }
+  auto opts = GetOpts(opts.format);
+  internalFormat = opts.internalFormat;
+  dataFormat = opts.dataFormat;
+  dataType = opts.dataType;
 
   // if we don't have a rendering context, just return after we
   // have filled in the parms.  We must have the values set, or

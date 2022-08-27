@@ -60,33 +60,34 @@ idList<VkSampler> idImage::samplerGarbage[NUM_FRAME_DATA];
 VK_GetFormatFromTextureFormat
 ====================
 */
-static VkFormat VK_GetFormatFromTextureFormat(const textureFormat_t format) {
+idImage::textureParams_t idImage::GetTextureParams(
+    const textureFormat_t format) {
   switch (format) {
     case FMT_RGBA8:
-      return VK_FORMAT_R8G8B8A8_UNORM;
+      return {VK_FORMAT_R8G8B8A8_UNORM};
     case FMT_XRGB8:
-      return VK_FORMAT_R8G8B8_UNORM;
+      return {VK_FORMAT_R8G8B8_UNORM};
     case FMT_ALPHA:
-      return VK_FORMAT_R8_UNORM;
+      return {VK_FORMAT_R8_UNORM};
     case FMT_L8A8:
-      return VK_FORMAT_R8G8_UNORM;
+      return {VK_FORMAT_R8G8_UNORM};
     case FMT_LUM8:
-      return VK_FORMAT_R8_UNORM;
+      return {VK_FORMAT_R8_UNORM};
     case FMT_INT8:
-      return VK_FORMAT_R8_UNORM;
+      return {VK_FORMAT_R8_UNORM};
     case FMT_DXT1:
-      return VK_FORMAT_BC1_RGB_UNORM_BLOCK;
+      return {VK_FORMAT_BC1_RGB_UNORM_BLOCK};
     case FMT_DXT5:
-      return VK_FORMAT_BC3_UNORM_BLOCK;
+      return {VK_FORMAT_BC3_UNORM_BLOCK};
     case FMT_DEPTH:
     case FMT_DEPTH_STENCIL:
-      return vkcontext.depthFormat;
+      return {vkcontext.depthFormat};
     case FMT_X16:
-      return VK_FORMAT_R16_UNORM;
+      return {VK_FORMAT_R16_UNORM};
     case FMT_Y16_X16:
-      return VK_FORMAT_R16G16_UNORM;
+      return {VK_FORMAT_R16G16_UNORM};
     case FMT_RGB565:
-      return VK_FORMAT_R5G6B5_UNORM_PACK16;
+      return {VK_FORMAT_R5G6B5_UNORM_PACK16};
 
       // RB begin
       // case FMT_ETC1_RGB8_OES,	// 4 bpp
@@ -94,26 +95,27 @@ static VkFormat VK_GetFormatFromTextureFormat(const textureFormat_t format) {
       //	return VK_FORMAT_
 
     case FMT_RG16F:
-      return VK_FORMAT_R16G16_SFLOAT;
+      return {VK_FORMAT_R16G16_SFLOAT};
 
     // we might want to use UNORM instead of SFLOAT
     // however this is intended to be used for the HDR lights buffer which
     // should be allowed to go beyond 1.0
     case FMT_RGBA16F:
-      return VK_FORMAT_R16G16B16A16_SFLOAT;
+      return {VK_FORMAT_R16G16B16A16_SFLOAT};
 
     case FMT_RGBA32F:
-      return VK_FORMAT_R32G32B32A32_SFLOAT;
+      return {VK_FORMAT_R32G32B32A32_SFLOAT};
 
     case FMT_R32F:
-      return VK_FORMAT_R32_SFLOAT;
+      return {VK_FORMAT_R32_SFLOAT};
 
     case FMT_R11G11B10F:
-      return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
+      return {VK_FORMAT_B10G11R11_UFLOAT_PACK32};
       // RB end
 
     default:
-      return VK_FORMAT_UNDEFINED;
+      idLib::Error("Unhandled image format %d\n", format);
+      return {VK_FORMAT_UNDEFINED};
   }
 }
 
@@ -488,7 +490,7 @@ This should not be done during normal game-play, if you can avoid it.
 void idImage::AllocImage() {
   PurgeImage();
 
-  internalFormat = VK_GetFormatFromTextureFormat(opts.format);
+  internalFormat = GetTextureParams(opts.format).internalFormat;
 
   // Create Sampler
   CreateSampler();

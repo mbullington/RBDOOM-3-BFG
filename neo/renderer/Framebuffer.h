@@ -37,6 +37,11 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __FRAMEBUFFER_H__
 #define __FRAMEBUFFER_H__
 
+#include "vulkan/vulkan_core.h"
+#if defined(USE_VULKAN)
+#include <vulkan/vulkan.h>
+#endif
+
 static const int MAX_SHADOWMAP_RESOLUTIONS = 5;
 static const int MAX_BLOOM_BUFFERS = 2;
 static const int MAX_SSAO_BUFFERS = 2;
@@ -72,16 +77,21 @@ class Framebuffer {
   static bool IsDefaultFramebufferActive();
   static Framebuffer* GetActiveFramebuffer();
 
-  void AddColorBuffer(int format);
-  void AddDepthBuffer(int format);
+  void AddColorBuffer(textureFormat_t format);
+  void AddDepthBuffer(textureFormat_t format);
 
   void AttachImage2D(idImage* image, int mipmapLod = 0);
   void AttachImageDepth(idImage* image);
   void AttachImageDepthLayer(idImage* image, int layer);
 
   // check for OpenGL errors
-  void Check();
+  void Commit();
+#if defined(USE_VULKAN)
+  VkFramebuffer GetFramebuffer() const { return frameBuffer; }
+  VkRenderPass GetRenderPass() const { return renderPass; }
+#else
   uint32_t GetFramebuffer() const { return frameBuffer; }
+#endif
 
   int GetWidth() const { return width; }
 
@@ -95,14 +105,28 @@ class Framebuffer {
  private:
   idStr fboName;
 
-  // FBO object
-  uint32_t frameBuffer;
+#if defined(USE_VULKAN)
+  void CreateRenderPass();
+  void CreateFramebuffer();
+#endif
 
+  // FBO object
+#if defined(USE_VULKAN)
+  VkFramebuffer frameBuffer;
+  VkRenderPass renderPass;
+
+  VkImageView colorImageView;
+  VkFormat colorFormat;
+
+  VkImageView depthImageView;
+  VkFormat depthFormat;
+#else
+  uint32_t frameBuffer;
   uint32_t colorBuffer;
   int colorFormat;
-
   uint32_t depthBuffer;
   int depthFormat;
+#endif
 
   int width;
   int height;
