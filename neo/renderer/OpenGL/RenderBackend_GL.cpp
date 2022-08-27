@@ -1437,21 +1437,6 @@ void idRenderBackend::CheckCVars() {
   }
 #endif
   // SRS end
-  if (r_antiAliasing.IsModified()) {
-    switch (r_antiAliasing.GetInteger()) {
-      case ANTI_ALIASING_MSAA_2X:
-      case ANTI_ALIASING_MSAA_4X:
-      case ANTI_ALIASING_MSAA_8X:
-        if (r_antiAliasing.GetInteger() > 0) {
-          glEnable(GL_MULTISAMPLE);
-        }
-        break;
-
-      default:
-        glDisable(GL_MULTISAMPLE);
-        break;
-    }
-  }
 
   if (r_usePBR.IsModified() || r_useHDR.IsModified() ||
       r_pbrDebug.IsModified()) {

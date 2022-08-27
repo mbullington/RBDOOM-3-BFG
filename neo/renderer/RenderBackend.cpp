@@ -4510,14 +4510,7 @@ void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
 
   GL_SelectTexture(0);
 
-#if defined(USE_HDR_MSAA)
-  if (glConfig.multisamples > 0) {
-    globalImages->currentRenderHDRImageNoMSAA->Bind();
-  } else
-#endif
-  {
-    globalImages->currentRenderHDRImage->Bind();
-  }
+  globalImages->currentRenderHDRImage->Bind();
 
   GL_SelectTexture(1);
   globalImages->heatmap7Image->Bind();
@@ -5625,36 +5618,12 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
     renderSystem->GetHeight() * 0.25f, GL_COLOR_BUFFER_BIT, GL_LINEAR );
     */
 
-#if defined(USE_HDR_MSAA)
-    if (glConfig.multisamples > 0) {
-      glBindFramebuffer(GL_READ_FRAMEBUFFER,
-                        globalFramebuffers.hdrFBO->GetFramebuffer());
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
-                        globalFramebuffers.hdrNonMSAAFBO->GetFramebuffer());
-      glBlitFramebuffer(0, 0, renderSystem->GetWidth(),
-                        renderSystem->GetHeight(), 0, 0,
-                        renderSystem->GetWidth(), renderSystem->GetHeight(),
-                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-      // TODO resolve to 1x1
-      glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT,
-                        globalFramebuffers.hdrNonMSAAFBO->GetFramebuffer());
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT,
-                        globalFramebuffers.hdr64FBO->GetFramebuffer());
-      glBlitFramebuffer(0, 0, renderSystem->GetWidth(),
-                        renderSystem->GetHeight(), 0, 0, 64, 64,
-                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    } else
-#endif
-    {
-      glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT,
-                        globalFramebuffers.hdrFBO->GetFramebuffer());
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT,
-                        globalFramebuffers.hdr64FBO->GetFramebuffer());
-      glBlitFramebuffer(0, 0, renderSystem->GetWidth(),
-                        renderSystem->GetHeight(), 0, 0, 64, 64,
-                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    }
+    glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT,
+                      globalFramebuffers.hdrFBO->GetFramebuffer());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT,
+                      globalFramebuffers.hdr64FBO->GetFramebuffer());
+    glBlitFramebuffer(0, 0, renderSystem->GetWidth(), renderSystem->GetHeight(),
+                      0, 0, 64, 64, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     CalculateAutomaticExposure();
 

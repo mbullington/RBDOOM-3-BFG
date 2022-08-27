@@ -37,6 +37,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 
 #include "precompiled.h"
+#include "renderer/RenderSystem.h"
 #pragma hdrstop
 
 #include "vendor/imgui/imgui.h"
@@ -88,11 +89,9 @@ idCVar r_skipAMDWorkarounds("r_skipAMDWorkarounds", "1",
                             "skip workarounds for AMD driver bugs");
 #endif
 // SRS end
-// RB: disabled 16x MSAA
-idCVar r_antiAliasing(
-    "r_antiAliasing", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER,
-    " 0 = None\n 1 = SMAA 1x\n 2 = MSAA 2x\n 3 = MSAA 4x\n 4 = MSAA 8x\n", 0,
-    ANTI_ALIASING_MSAA_8X);
+idCVar r_antiAliasing("r_antiAliasing", "1",
+                      CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER,
+                      " 0 = None\n 1 = SMAA 1x\n", 0, ANTI_ALIASING_SMAA_1X);
 // RB end
 idCVar r_vidMode("r_vidMode", "0", CVAR_ARCHIVE | CVAR_RENDERER | CVAR_INTEGER,
                  "fullscreen video mode number");
@@ -731,22 +730,6 @@ void R_SetNewMode(const bool fullInit) {
         parms.height = modeList[r_vidMode.GetInteger()].height;
         parms.displayHz = modeList[r_vidMode.GetInteger()].displayHz;
       }
-    }
-
-    switch (r_antiAliasing.GetInteger()) {
-      case ANTI_ALIASING_MSAA_2X:
-        parms.multiSamples = 2;
-        break;
-      case ANTI_ALIASING_MSAA_4X:
-        parms.multiSamples = 4;
-        break;
-      case ANTI_ALIASING_MSAA_8X:
-        parms.multiSamples = 8;
-        break;
-
-      default:
-        parms.multiSamples = 0;
-        break;
     }
 
     if (i == 0) {

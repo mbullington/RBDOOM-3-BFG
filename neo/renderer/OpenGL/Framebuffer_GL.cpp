@@ -60,13 +60,8 @@ Framebuffer::Framebuffer(const char* name, int w, int h) {
   depthBuffer = 0;
   depthFormat = 0;
 
-  stencilBuffer = 0;
-  stencilFormat = 0;
-
   width = w;
   height = h;
-
-  msaaSamples = false;
 
   glGenFramebuffers(1, &frameBuffer);
 
@@ -104,43 +99,15 @@ void Framebuffer::Init() {
       new Framebuffer("_hdr", screenWidth, screenHeight);
   globalFramebuffers.hdrFBO->Bind();
 
-#if defined(USE_HDR_MSAA)
-  if (glConfig.multisamples) {
-    globalFramebuffers.hdrFBO->AddColorBuffer(GL_RGBA16F, 0,
-                                              glConfig.multisamples);
-    globalFramebuffers.hdrFBO->AddDepthBuffer(GL_DEPTH24_STENCIL8,
-                                              glConfig.multisamples);
+  globalFramebuffers.hdrFBO->AddColorBuffer(GL_RGBA16F, 0);
+  globalFramebuffers.hdrFBO->AddDepthBuffer(GL_DEPTH24_STENCIL8);
 
-    globalFramebuffers.hdrFBO->AttachImage2D(
-        GL_TEXTURE_2D_MULTISAMPLE, globalImages->currentRenderHDRImage, 0);
-    globalFramebuffers.hdrFBO->AttachImageDepth(
-        GL_TEXTURE_2D_MULTISAMPLE, globalImages->currentDepthImage);
-  } else
-#endif
-  {
-    globalFramebuffers.hdrFBO->AddColorBuffer(GL_RGBA16F, 0);
-    globalFramebuffers.hdrFBO->AddDepthBuffer(GL_DEPTH24_STENCIL8);
-
-    globalFramebuffers.hdrFBO->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->currentRenderHDRImage, 0);
-    globalFramebuffers.hdrFBO->AttachImageDepth(
-        GL_TEXTURE_2D, globalImages->currentDepthImage);
-  }
+  globalFramebuffers.hdrFBO->AttachImage2D(
+      GL_TEXTURE_2D, globalImages->currentRenderHDRImage, 0);
+  globalFramebuffers.hdrFBO->AttachImageDepth(GL_TEXTURE_2D,
+                                              globalImages->currentDepthImage);
 
   globalFramebuffers.hdrFBO->Check();
-
-  // HDR no MSAA
-#if defined(USE_HDR_MSAA)
-  globalFramebuffers.hdrNonMSAAFBO =
-      new Framebuffer("_hdrNoMSAA", screenWidth, screenHeight);
-  globalFramebuffers.hdrNonMSAAFBO->Bind();
-
-  globalFramebuffers.hdrNonMSAAFBO->AddColorBuffer(GL_RGBA16F, 0);
-  globalFramebuffers.hdrNonMSAAFBO->AttachImage2D(
-      GL_TEXTURE_2D, globalImages->currentRenderHDRImageNoMSAA, 0);
-
-  globalFramebuffers.hdrNonMSAAFBO->Check();
-#endif
 
   // HDR CUBEMAP CAPTURE
 
@@ -255,35 +222,12 @@ void Framebuffer::CheckFramebuffers() {
     globalImages->currentRenderHDRImage->Resize(screenWidth, screenHeight);
     globalImages->currentDepthImage->Resize(screenWidth, screenHeight);
 
-#if defined(USE_HDR_MSAA)
-    if (glConfig.multisamples) {
-      globalImages->currentRenderHDRImageNoMSAA->Resize(screenWidth,
-                                                        screenHeight);
-
-      globalFramebuffers.hdrNonMSAAFBO->Bind();
-      globalFramebuffers.hdrNonMSAAFBO->AttachImage2D(
-          GL_TEXTURE_2D, globalImages->currentRenderHDRImageNoMSAA, 0);
-      globalFramebuffers.hdrNonMSAAFBO->Check();
-
-      globalFramebuffers.hdrNonMSAAFBO->width = screenWidth;
-      globalFramebuffers.hdrNonMSAAFBO->height = screenHeight;
-
-      globalFramebuffers.hdrFBO->Bind();
-      globalFramebuffers.hdrFBO->AttachImage2D(
-          GL_TEXTURE_2D_MULTISAMPLE, globalImages->currentRenderHDRImage, 0);
-      globalFramebuffers.hdrFBO->AttachImageDepth(
-          GL_TEXTURE_2D_MULTISAMPLE, globalImages->currentDepthImage);
-      globalFramebuffers.hdrFBO->Check();
-    } else
-#endif
-    {
-      globalFramebuffers.hdrFBO->Bind();
-      globalFramebuffers.hdrFBO->AttachImage2D(
-          GL_TEXTURE_2D, globalImages->currentRenderHDRImage, 0);
-      globalFramebuffers.hdrFBO->AttachImageDepth(
-          GL_TEXTURE_2D, globalImages->currentDepthImage);
-      globalFramebuffers.hdrFBO->Check();
-    }
+    globalFramebuffers.hdrFBO->Bind();
+    globalFramebuffers.hdrFBO->AttachImage2D(
+        GL_TEXTURE_2D, globalImages->currentRenderHDRImage, 0);
+    globalFramebuffers.hdrFBO->AttachImageDepth(
+        GL_TEXTURE_2D, globalImages->currentDepthImage);
+    globalFramebuffers.hdrFBO->Check();
 
     globalFramebuffers.hdrFBO->width = screenWidth;
     globalFramebuffers.hdrFBO->height = screenHeight;
@@ -415,7 +359,7 @@ Framebuffer* Framebuffer::GetActiveFramebuffer() {
   return tr.backend.currentFramebuffer;
 }
 
-void Framebuffer::AddColorBuffer(int format, int index, int multiSamples) {
+void Framebuffer::AddColorBuffer(int format, int index) {
   if (index < 0 || index >= glConfig.maxColorAttachments) {
     common->Warning("Framebuffer::AddColorBuffer( %s ): bad index = %i",
                     fboName.c_str(), index);
@@ -430,15 +374,7 @@ void Framebuffer::AddColorBuffer(int format, int index, int multiSamples) {
   }
 
   glBindRenderbuffer(GL_RENDERBUFFER, colorBuffers[index]);
-
-  if (multiSamples > 0) {
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, multiSamples, format,
-                                     width, height);
-
-    msaaSamples = true;
-  } else {
-    glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
-  }
+  glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
 
   if (notCreatedYet) {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
@@ -448,7 +384,7 @@ void Framebuffer::AddColorBuffer(int format, int index, int multiSamples) {
   GL_CheckErrors();
 }
 
-void Framebuffer::AddDepthBuffer(int format, int multiSamples) {
+void Framebuffer::AddDepthBuffer(int format) {
   depthFormat = format;
 
   bool notCreatedYet = depthBuffer == 0;
@@ -457,46 +393,11 @@ void Framebuffer::AddDepthBuffer(int format, int multiSamples) {
   }
 
   glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-
-  if (multiSamples > 0) {
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, multiSamples, format,
-                                     width, height);
-
-    msaaSamples = true;
-  } else {
-    glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
-  }
+  glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
 
   if (notCreatedYet) {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
                               GL_RENDERBUFFER, depthBuffer);
-  }
-
-  GL_CheckErrors();
-}
-
-void Framebuffer::AddStencilBuffer(int format, int multiSamples) {
-  stencilFormat = format;
-
-  bool notCreatedYet = stencilBuffer == 0;
-  if (notCreatedYet) {
-    glGenRenderbuffers(1, &stencilBuffer);
-  }
-
-  glBindRenderbuffer(GL_RENDERBUFFER, stencilBuffer);
-
-  if (multiSamples > 0) {
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, multiSamples, format,
-                                     width, height);
-
-    msaaSamples = true;
-  } else {
-    glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
-  }
-
-  if (notCreatedYet) {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                              GL_RENDERBUFFER, stencilBuffer);
   }
 
   GL_CheckErrors();

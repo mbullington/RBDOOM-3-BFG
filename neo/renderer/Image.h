@@ -562,9 +562,6 @@ class idImageManager {
   idImage* randomImage256;
   idImage* blueNoiseImage256;
   idImage* currentRenderHDRImage;
-#if defined(USE_HDR_MSAA)
-  idImage* currentRenderHDRImageNoMSAA;
-#endif
   idImage* currentRenderHDRImageQuarter;
   idImage* currentRenderHDRImage64;
   idImage* bloomRenderImage[2];

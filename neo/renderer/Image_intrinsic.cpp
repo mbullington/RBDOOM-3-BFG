@@ -199,32 +199,13 @@ static void R_RGBA8LinearImage(idImage* image) {
 }
 
 static void R_DepthImage(idImage* image) {
-  // RB: NULL data and MSAA support
-#if defined(USE_HDR_MSAA)
-  textureSamples_t msaaSamples = glConfig.multisamples;
-#else
-  int msaaSamples = 0;
-#endif
   image->GenerateImage(NULL, renderSystem->GetWidth(),
                        renderSystem->GetHeight(), TF_NEAREST, TR_CLAMP,
-                       TD_DEPTH_STENCIL);  //, msaaSamples );
-                                           // RB end
+                       TD_DEPTH_STENCIL);
 }
 
 // RB begin
 static void R_HDR_RGBA16FImage_ResNative(idImage* image) {
-  // FIXME
-#if defined(USE_HDR_MSAA)
-  int msaaSamples = glConfig.multisamples;
-#else
-  int msaaSamples = 0;
-#endif
-  image->GenerateImage(NULL, renderSystem->GetWidth(),
-                       renderSystem->GetHeight(), TF_NEAREST, TR_CLAMP,
-                       TD_RGBA16F);  //, msaaSamples );
-}
-
-static void R_HDR_RGBA16FImage_ResNative_NoMSAA(idImage* image) {
   image->GenerateImage(NULL, renderSystem->GetWidth(),
                        renderSystem->GetHeight(), TF_NEAREST, TR_CLAMP,
                        TD_RGBA16F);
@@ -288,15 +269,9 @@ static void R_R8Image_ResNative_Linear(idImage* image) {
 // RB end
 
 static void R_HDR_RGBA8Image_ResNative(idImage* image) {
-  // FIXME
-#if defined(USE_HDR_MSAA)
-  int msaaSamples = glConfig.multisamples;
-#else
-  int msaaSamples = 0;
-#endif
   image->GenerateImage(NULL, renderSystem->GetWidth(),
                        renderSystem->GetHeight(), TF_NEAREST, TR_CLAMP,
-                       TD_LOOKUP_TABLE_RGBA);  //, msaaSamples );
+                       TD_LOOKUP_TABLE_RGBA);
 }
 
 static void R_AlphaNotchImage(idImage* image) {
@@ -936,10 +911,6 @@ void idImageManager::CreateIntrinsicImages() {
 
   currentRenderHDRImage = globalImages->ImageFromFunction(
       "_currentRenderHDR", R_HDR_RGBA16FImage_ResNative);
-#if defined(USE_HDR_MSAA)
-  currentRenderHDRImageNoMSAA = globalImages->ImageFromFunction(
-      "_currentRenderHDRNoMSAA", R_HDR_RGBA16FImage_ResNative_NoMSAA);
-#endif
   currentRenderHDRImageQuarter = globalImages->ImageFromFunction(
       "_currentRenderHDRQuarter", R_HDR_RGBA16FImage_ResQuarter);
   currentRenderHDRImage64 = globalImages->ImageFromFunction(

@@ -320,7 +320,6 @@ bool GLimp_Init(glimpParms_t parms) {
     // RB begin
     glConfig.displayFrequency = 60;
     glConfig.isStereoPixelFormat = parms.stereo;
-    glConfig.multisamples = parms.multiSamples;
 
     glConfig.pixelAspect = 1.0f;  // FIXME: some monitor modes may be distorted
     // should side-by-side stereo modes be consider aspect 0.5?
@@ -529,7 +528,6 @@ bool GLimp_SetScreenParms(glimpParms_t parms) {
   glConfig.nativeScreenWidth = parms.width;
   glConfig.nativeScreenHeight = parms.height;
   glConfig.displayFrequency = parms.displayHz;
-  glConfig.multisamples = parms.multiSamples;
 
   return true;
 }

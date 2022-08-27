@@ -35,6 +35,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 ===========================================================================
 */
 #include "precompiled.h"
+#include "renderer/RenderSystem.h"
 #pragma hdrstop
 #include "../Game_local.h"
 
@@ -560,12 +561,9 @@ void idMenuScreen_Shell_SystemOptions::idMenuDataSource_SystemSettings::
       break;
     }
     case SYSTEM_FIELD_ANTIALIASING: {
-      // RB: disabled 16x MSAA
-      static const int numValues = 5;
-      static const int values[numValues] = {
-          ANTI_ALIASING_NONE, ANTI_ALIASING_SMAA_1X, ANTI_ALIASING_MSAA_2X,
-          ANTI_ALIASING_MSAA_4X, ANTI_ALIASING_MSAA_8X};
-      // RB end
+      static const int numValues = 2;
+      static const int values[numValues] = {ANTI_ALIASING_NONE,
+                                            ANTI_ALIASING_SMAA_1X};
       r_antiAliasing.SetInteger(AdjustOption(r_antiAliasing.GetInteger(),
                                              values, numValues, adjustAmount));
       break;
@@ -679,11 +677,10 @@ idMenuScreen_Shell_SystemOptions::idMenuDataSource_SystemSettings::GetField(
         return "#str_swf_disabled";
       }
 
-      static const int numValues = 5;
-      static const char* values[numValues] = {"None", "SMAA 1X", "MSAA 2X",
-                                              "MSAA 4X", "MSAA 8X"};
+      static const int numValues = 2;
+      static const char* values[numValues] = {"None", "SMAA 1X"};
 
-      compile_time_assert(numValues == (ANTI_ALIASING_MSAA_8X + 1));
+      compile_time_assert(numValues == (ANTI_ALIASING_SMAA_1X + 1));
 
       return values[r_antiAliasing.GetInteger()];
     }
@@ -705,7 +702,7 @@ idMenuScreen_Shell_SystemOptions::idMenuDataSource_SystemSettings::GetField(
 
       // case SYSTEM_FIELD_LODBIAS:
       //	return LinearAdjust( r_lodBias.GetFloat(), -1.0f, 1.0f, 0.0f,
-      //100.0f );
+      // 100.0f );
 
     case SYSTEM_FIELD_SSAO:
       if (r_useSSAO.GetInteger() == 1) {

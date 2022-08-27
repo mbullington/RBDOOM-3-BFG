@@ -108,9 +108,6 @@ enum graphicsDriverType_t {
 enum antiAliasingMode_t {
   ANTI_ALIASING_NONE,
   ANTI_ALIASING_SMAA_1X,
-  ANTI_ALIASING_MSAA_2X,
-  ANTI_ALIASING_MSAA_4X,
-  ANTI_ALIASING_MSAA_8X
 };
 
 // CPU counters and timers

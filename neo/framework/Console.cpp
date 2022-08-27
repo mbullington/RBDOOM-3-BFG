@@ -35,6 +35,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 
 #include "precompiled.h"
+#include "renderer/RenderSystem.h"
 #pragma hdrstop
 #include "ConsoleHistory.h"
 #include "../renderer/ResolutionScale.h"
@@ -385,11 +386,10 @@ float idConsoleLocal::DrawFPS(float y) {
 #endif
 
     extern idCVar r_antiAliasing;
-    static const int aaNumValues = 5;
-    static const char* aaValues[aaNumValues] = {"None", "SMAA 1X", "MSAA 2X",
-                                                "MSAA 4X", "MSAA 8X"};
+    static const int aaNumValues = 2;
+    static const char* aaValues[aaNumValues] = {"None", "SMAA 1X"};
 
-    compile_time_assert(aaNumValues == (ANTI_ALIASING_MSAA_8X + 1));
+    compile_time_assert(aaNumValues == (ANTI_ALIASING_SMAA_1X + 1));
 
     const char* aaMode = aaValues[r_antiAliasing.GetInteger()];
 

@@ -1284,43 +1284,9 @@ static void CreateRenderTargets() {
       VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, 0,
       &fmtProps);
 
-  int samples;
-
-  switch (r_antiAliasing.GetInteger()) {
-    case ANTI_ALIASING_MSAA_2X:
-      samples = 2;
-      break;
-
-    case ANTI_ALIASING_MSAA_4X:
-      samples = 4;
-      break;
-
-    case ANTI_ALIASING_MSAA_8X:
-      samples = 8;
-      break;
-
-    default:
-      samples = 0;
-      break;
-  }
-
-  if (samples >= 16 && (fmtProps.sampleCounts & VK_SAMPLE_COUNT_16_BIT)) {
-    vkcontext.sampleCount = VK_SAMPLE_COUNT_16_BIT;
-  } else if (samples >= 8 && (fmtProps.sampleCounts & VK_SAMPLE_COUNT_8_BIT)) {
-    vkcontext.sampleCount = VK_SAMPLE_COUNT_8_BIT;
-  } else if (samples >= 4 && (fmtProps.sampleCounts & VK_SAMPLE_COUNT_4_BIT)) {
-    vkcontext.sampleCount = VK_SAMPLE_COUNT_4_BIT;
-  } else if (samples >= 2 && (fmtProps.sampleCounts & VK_SAMPLE_COUNT_2_BIT)) {
-    vkcontext.sampleCount = VK_SAMPLE_COUNT_2_BIT;
-  }
-
-#if defined(__APPLE__)
-  // SRS - Disable MSAA for OSX since shaderStorageImageMultisample is disabled
-  // on MoltenVK for now
-  if (samples >= 2) {
-    vkcontext.sampleCount = VK_SAMPLE_COUNT_1_BIT;
-  }
-#endif
+  // Make sure sample count is set to 1.
+  // TODO(mbullington): Is this even needed?
+  vkcontext.sampleCount = VK_SAMPLE_COUNT_1_BIT;
 
   // Select Depth Format
   {
@@ -1350,51 +1316,6 @@ static void CreateRenderTargets() {
   depthOptions.samples = static_cast<textureSamples_t>(vkcontext.sampleCount);
 
   globalImages->ScratchImage("_viewDepth", depthOptions);
-
-  if (vkcontext.sampleCount > VK_SAMPLE_COUNT_1_BIT) {
-    vkcontext.supersampling =
-        vkcontext.physicalDeviceFeatures.sampleRateShading == VK_TRUE;
-
-    VkImageCreateInfo createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    createInfo.imageType = VK_IMAGE_TYPE_2D;
-    createInfo.format = vkcontext.swapchainFormat;
-    createInfo.extent.width = vkcontext.swapchainExtent.width;
-    createInfo.extent.height = vkcontext.swapchainExtent.height;
-    createInfo.extent.depth = 1;
-    createInfo.mipLevels = 1;
-    createInfo.arrayLayers = 1;
-    createInfo.samples = vkcontext.sampleCount;
-    createInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    createInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
-                       VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT |
-                       VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
-    createInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-
-    ID_VK_CHECK(vkCreateImage(vkcontext.device, &createInfo, NULL,
-                              &vkcontext.msaaImage));
-
-    VmaAllocationCreateInfo vmaReq = {};
-    vmaReq.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-
-    ID_VK_CHECK(vmaCreateImage(
-        vmaAllocator, &createInfo, &vmaReq, &vkcontext.msaaImage,
-        &vkcontext.msaaVmaAllocation, &vkcontext.msaaAllocation));
-
-    VkImageViewCreateInfo viewInfo = {};
-    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    viewInfo.format = vkcontext.swapchainFormat;
-    viewInfo.image = vkcontext.msaaImage;
-    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    viewInfo.subresourceRange.baseMipLevel = 0;
-    viewInfo.subresourceRange.levelCount = 1;
-    viewInfo.subresourceRange.baseArrayLayer = 0;
-    viewInfo.subresourceRange.layerCount = 1;
-
-    ID_VK_CHECK(vkCreateImageView(vkcontext.device, &viewInfo, NULL,
-                                  &vkcontext.msaaImageView));
-  }
 }
 
 /*
@@ -1402,17 +1323,7 @@ static void CreateRenderTargets() {
 DestroyRenderTargets
 =============
 */
-static void DestroyRenderTargets() {
-  vkDestroyImageView(vkcontext.device, vkcontext.msaaImageView, NULL);
-
-  vmaDestroyImage(vmaAllocator, vkcontext.msaaImage,
-                  vkcontext.msaaVmaAllocation);
-  vkcontext.msaaAllocation = VmaAllocationInfo();
-  vkcontext.msaaVmaAllocation = NULL;
-
-  vkcontext.msaaImage = VK_NULL_HANDLE;
-  vkcontext.msaaImageView = VK_NULL_HANDLE;
-}
+static void DestroyRenderTargets() {}
 
 /*
 =============
@@ -1422,8 +1333,6 @@ CreateRenderPass
 static void CreateRenderPass() {
   VkAttachmentDescription attachments[3];
   memset(attachments, 0, sizeof(attachments));
-
-  const bool resolve = vkcontext.sampleCount > VK_SAMPLE_COUNT_1_BIT;
 
   VkAttachmentDescription& colorAttachment = attachments[0];
   colorAttachment.format = vkcontext.swapchainFormat;
@@ -1447,38 +1356,23 @@ static void CreateRenderPass() {
   depthAttachment.finalLayout =
       VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-  VkAttachmentDescription& resolveAttachment = attachments[2];
-  resolveAttachment.format = vkcontext.swapchainFormat;
-  resolveAttachment.samples = vkcontext.sampleCount;
-  resolveAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  resolveAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-  resolveAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  resolveAttachment.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
-
   VkAttachmentReference colorRef = {};
-  colorRef.attachment = resolve ? 2 : 0;
+  colorRef.attachment = 0;
   colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
   VkAttachmentReference depthRef = {};
   depthRef.attachment = 1;
   depthRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-  VkAttachmentReference resolveRef = {};
-  resolveRef.attachment = 0;
-  resolveRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
   VkSubpassDescription subpass = {};
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = 1;
   subpass.pColorAttachments = &colorRef;
   subpass.pDepthStencilAttachment = &depthRef;
-  if (resolve) {
-    subpass.pResolveAttachments = &resolveRef;
-  }
 
   VkRenderPassCreateInfo renderPassCreateInfo = {};
   renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-  renderPassCreateInfo.attachmentCount = resolve ? 3 : 2;
+  renderPassCreateInfo.attachmentCount = 2;
   renderPassCreateInfo.pAttachments = attachments;
   renderPassCreateInfo.subpassCount = 1;
   renderPassCreateInfo.pSubpasses = &subpass;
@@ -1506,7 +1400,7 @@ CreateFrameBuffers
 =============
 */
 static void CreateFrameBuffers() {
-  VkImageView attachments[3];
+  VkImageView attachments[2];
 
   // depth attachment is the same
   idImage* depthImg = globalImages->GetImage("_viewDepth");
@@ -1516,15 +1410,10 @@ static void CreateFrameBuffers() {
     attachments[1] = depthImg->GetView();
   }
 
-  const bool resolve = vkcontext.sampleCount > VK_SAMPLE_COUNT_1_BIT;
-  if (resolve) {
-    attachments[2] = vkcontext.msaaImageView;
-  }
-
   VkFramebufferCreateInfo frameBufferCreateInfo = {};
   frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
   frameBufferCreateInfo.renderPass = vkcontext.renderPass;
-  frameBufferCreateInfo.attachmentCount = resolve ? 3 : 2;
+  frameBufferCreateInfo.attachmentCount = 2;
   frameBufferCreateInfo.pAttachments = attachments;
   frameBufferCreateInfo.width = renderSystem->GetWidth();
   frameBufferCreateInfo.height = renderSystem->GetHeight();
@@ -1593,10 +1482,6 @@ static void ClearContext() {
   vkcontext.swapchain = VK_NULL_HANDLE;
   vkcontext.swapchainFormat = VK_FORMAT_UNDEFINED;
   vkcontext.currentSwapIndex = 0;
-  vkcontext.msaaImage = VK_NULL_HANDLE;
-  vkcontext.msaaImageView = VK_NULL_HANDLE;
-  vkcontext.msaaVmaAllocation = NULL;
-  vkcontext.msaaAllocation = VmaAllocationInfo();
   vkcontext.swapchainImages.Zero();
   vkcontext.swapchainViews.Zero();
   vkcontext.frameBuffers.Zero();

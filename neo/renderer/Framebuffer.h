@@ -72,9 +72,8 @@ class Framebuffer {
   static bool IsDefaultFramebufferActive();
   static Framebuffer* GetActiveFramebuffer();
 
-  void AddColorBuffer(int format, int index, int multiSamples = 0);
-  void AddDepthBuffer(int format, int multiSamples = 0);
-  void AddStencilBuffer(int format, int multiSamples = 0);
+  void AddColorBuffer(int format, int index);
+  void AddDepthBuffer(int format);
 
   void AttachImage2D(int target, idImage* image, int index, int mipmapLod = 0);
   void AttachImageDepth(int target, idImage* image);
@@ -87,8 +86,6 @@ class Framebuffer {
   int GetWidth() const { return width; }
 
   int GetHeight() const { return height; }
-
-  bool IsMultiSampled() const { return msaaSamples; }
 
   void Resize(int width_, int height_) {
     width = width_;
@@ -107,13 +104,8 @@ class Framebuffer {
   uint32_t depthBuffer;
   int depthFormat;
 
-  uint32_t stencilBuffer;
-  int stencilFormat;
-
   int width;
   int height;
-
-  bool msaaSamples;
 
   static idList<Framebuffer*> framebuffers;
 };
@@ -121,9 +113,6 @@ class Framebuffer {
 struct globalFramebuffers_t {
   Framebuffer* shadowFBO[MAX_SHADOWMAP_RESOLUTIONS];
   Framebuffer* hdrFBO;
-#if defined(USE_HDR_MSAA)
-  Framebuffer* hdrNonMSAAFBO;
-#endif
   //	Framebuffer*				hdrQuarterFBO;
   Framebuffer* hdr64FBO;
   Framebuffer* envprobeFBO;

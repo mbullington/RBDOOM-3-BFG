@@ -210,30 +210,7 @@ void idImage::CopyFramebuffer(int x, int y, int imageWidth, int imageHeight) {
   glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, imageWidth, imageHeight, 0);
 #else
   if (r_useHDR.GetBool() && globalFramebuffers.hdrFBO->IsBound()) {
-    // if( backEnd.glState.currentFramebuffer != NULL &&
-    // backEnd.glState.currentFramebuffer->IsMultiSampled() )
-
-#if defined(USE_HDR_MSAA)
-    if (globalFramebuffers.hdrFBO->IsMultiSampled()) {
-      glBindFramebuffer(GL_READ_FRAMEBUFFER,
-                        globalFramebuffers.hdrFBO->GetFramebuffer());
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
-                        globalFramebuffers.hdrNonMSAAFBO->GetFramebuffer());
-      glBlitFramebuffer(0, 0, glConfig.nativeScreenWidth,
-                        glConfig.nativeScreenHeight, 0, 0,
-                        glConfig.nativeScreenWidth, glConfig.nativeScreenHeight,
-                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-      globalFramebuffers.hdrNonMSAAFBO->Bind();
-
-      glCopyTexImage2D(target, 0, GL_RGBA16F, x, y, imageWidth, imageHeight, 0);
-
-      globalFramebuffers.hdrFBO->Bind();
-    } else
-#endif
-    {
-      glCopyTexImage2D(target, 0, GL_RGBA16F, x, y, imageWidth, imageHeight, 0);
-    }
+    glCopyTexImage2D(target, 0, GL_RGBA16F, x, y, imageWidth, imageHeight, 0);
   } else {
     glCopyTexImage2D(target, 0, GL_RGBA8, x, y, imageWidth, imageHeight, 0);
   }

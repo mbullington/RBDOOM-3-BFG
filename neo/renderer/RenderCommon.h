@@ -285,8 +285,8 @@ class RenderEnvprobeLocal : public RenderEnvprobe {
   bool archived;  // for demo writing
 
   // derived information
-  // idPlane						lightProject[4];		// old style
-  // light projection where Z and W are flipped and projected lights
+  // idPlane						lightProject[4];		// old
+  // style light projection where Z and W are flipped and projected lights
   // lightProject[3] is divided by ( zNear + zFar ) idRenderMatrix
   // baseLightProject;		// global xyz1 to projected light strq
   idRenderMatrix
@@ -297,8 +297,8 @@ class RenderEnvprobeLocal : public RenderEnvprobe {
 
   areaReference_t*
       references;  // each area the light is present in will have a lightRef
-  // idInteraction* 			firstInteraction;		// doubly
-  // linked list idInteraction* 			lastInteraction;
+  // idInteraction* 			firstInteraction;		//
+  // doubly linked list idInteraction* 			lastInteraction;
 
   idImage* irradianceImage;  // cubemap image used for diffuse IBL by backend
   idImage* radianceImage;    // cubemap image used for specular IBL by backend
@@ -1083,7 +1083,7 @@ extern idCVar r_vidMode;     // video mode number
 extern idCVar
     r_displayRefresh;  // optional display refresh rate option for vid mode
 extern idCVar r_fullscreen;    // 0 = windowed, 1 = full screen
-extern idCVar r_antiAliasing;  // anti aliasing mode, SMAA, TXAA, MSAA etc.
+extern idCVar r_antiAliasing;  // anti aliasing mode, SMAA, etc...
 
 extern idCVar r_znear;  // near Z clip plane
 
