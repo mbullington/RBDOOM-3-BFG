@@ -398,18 +398,6 @@ file(GLOB RENDERER_OPENGL_SOURCES renderer/OpenGL/*.cpp)
 file(GLOB RENDERER_VULKAN_INCLUDES renderer/Vulkan/*.h)
 file(GLOB RENDERER_VULKAN_SOURCES renderer/Vulkan/*.cpp)
 
-file(GLOB SHADERS ../base/renderprogs/*.hlsl ../base/renderprogs/*.inc )
-file(GLOB SHADERS_BUILTIN ../base/renderprogs/builtin/*.hlsl )
-file(GLOB SHADERS_BUILTIN_DEBUG ../base/renderprogs/builtin/debug/*.hlsl )
-file(GLOB SHADERS_BUILTIN_FOG ../base/renderprogs/builtin/fog/*.hlsl )
-file(GLOB SHADERS_BUILTIN_LEGACY ../base/renderprogs/builtin/legacy/*.hlsl )
-file(GLOB SHADERS_BUILTIN_LIGHTING ../base/renderprogs/builtin/lighting/*.hlsl )
-file(GLOB SHADERS_BUILTIN_POST ../base/renderprogs/builtin/post/*.hlsl )
-file(GLOB SHADERS_BUILTIN_SSAO ../base/renderprogs/builtin/SSAO/*.hlsl )
-file(GLOB SHADERS_BUILTIN_SSGI ../base/renderprogs/builtin/SSGI/*.hlsl )
-file(GLOB SHADERS_BUILTIN_VIDEO ../base/renderprogs/builtin/video/*.hlsl )
-file(GLOB SHADERS_BUILTIN_VR ../base/renderprogs/builtin/VR/*.hlsl )
-
 file(GLOB IRRXML_INCLUDES ../vendor/irrxml/src/*.h)
 file(GLOB IRRXML_SOURCES ../vendor/irrxml/src/*.cpp)
 
@@ -771,18 +759,6 @@ set(RBDOOM3_INCLUDES
 			${RENDERER_JOBS_PRELIGHTSHADOWVOLUME_INCLUDES}
 			${RENDERER_JOBS_STATICSHADOWVOLUME_INCLUDES}
 			
-			${SHADERS}
-			${SHADERS_BUILTIN}
-			${SHADERS_BUILTIN_DEBUG}
-			${SHADERS_BUILTIN_FOG}
-			${SHADERS_BUILTIN_LEGACY}
-			${SHADERS_BUILTIN_LIGHTING}
-			${SHADERS_BUILTIN_POST}
-			${SHADERS_BUILTIN_SSAO}
-			${SHADERS_BUILTIN_SSGI}
-			${SHADERS_BUILTIN_VIDEO}
-			${SHADERS_BUILTIN_VR}
-			
 			${RENDERER_SMAA_INCLUDES}
 			${IRRXML_INCLUDES}
 			${FRAMEWORK_IMGUI_INCLUDES}
@@ -962,19 +938,7 @@ if(MSVC)
 		OBJECT_OUTPUTS "precompiled.pch"
 		)
 	endif()
-	
-	set_source_files_properties( ${SHADERS} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_DEBUG} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_FOG} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_LEGACY} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_LIGHTING} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_POST} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_SSAO} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_SSGI} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_VIDEO} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	set_source_files_properties( ${SHADERS_BUILTIN_VR} PROPERTIES VS_TOOL_OVERRIDE "None" )
-	
+		
 	list(APPEND RBDOOM3_SOURCES ${WIN32_RESOURCES})
 	
 	add_executable(RBDoom3BFG WIN32 ${RBDOOM3_INCLUDES} ${RBDOOM3_SOURCES})
