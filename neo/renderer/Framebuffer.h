@@ -72,11 +72,11 @@ class Framebuffer {
   static bool IsDefaultFramebufferActive();
   static Framebuffer* GetActiveFramebuffer();
 
-  void AddColorBuffer(int format, int index);
+  void AddColorBuffer(int format);
   void AddDepthBuffer(int format);
 
-  void AttachImage2D(int target, idImage* image, int index, int mipmapLod = 0);
-  void AttachImageDepth(int target, idImage* image);
+  void AttachImage2D(idImage* image, int mipmapLod = 0);
+  void AttachImageDepth(idImage* image);
   void AttachImageDepthLayer(idImage* image, int layer);
 
   // check for OpenGL errors
@@ -98,7 +98,7 @@ class Framebuffer {
   // FBO object
   uint32_t frameBuffer;
 
-  uint32_t colorBuffers[16];
+  uint32_t colorBuffer;
   int colorFormat;
 
   uint32_t depthBuffer;

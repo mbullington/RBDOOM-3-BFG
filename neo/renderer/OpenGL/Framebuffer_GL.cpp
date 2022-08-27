@@ -54,7 +54,7 @@ Framebuffer::Framebuffer(const char* name, int w, int h) {
 
   frameBuffer = 0;
 
-  memset(colorBuffers, 0, sizeof(colorBuffers));
+  colorBuffer = 0;
   colorFormat = 0;
 
   depthBuffer = 0;
@@ -99,13 +99,11 @@ void Framebuffer::Init() {
       new Framebuffer("_hdr", screenWidth, screenHeight);
   globalFramebuffers.hdrFBO->Bind();
 
-  globalFramebuffers.hdrFBO->AddColorBuffer(GL_RGBA16F, 0);
+  globalFramebuffers.hdrFBO->AddColorBuffer(GL_RGBA16F);
   globalFramebuffers.hdrFBO->AddDepthBuffer(GL_DEPTH24_STENCIL8);
 
-  globalFramebuffers.hdrFBO->AttachImage2D(
-      GL_TEXTURE_2D, globalImages->currentRenderHDRImage, 0);
-  globalFramebuffers.hdrFBO->AttachImageDepth(GL_TEXTURE_2D,
-                                              globalImages->currentDepthImage);
+  globalFramebuffers.hdrFBO->AttachImage2D(globalImages->currentRenderHDRImage);
+  globalFramebuffers.hdrFBO->AttachImageDepth(globalImages->currentDepthImage);
 
   globalFramebuffers.hdrFBO->Check();
 
@@ -115,13 +113,12 @@ void Framebuffer::Init() {
       "_envprobeRender", ENVPROBE_CAPTURE_SIZE, ENVPROBE_CAPTURE_SIZE);
   globalFramebuffers.envprobeFBO->Bind();
 
-  globalFramebuffers.envprobeFBO->AddColorBuffer(GL_RGBA16F, 0);
+  globalFramebuffers.envprobeFBO->AddColorBuffer(GL_RGBA16F);
   globalFramebuffers.envprobeFBO->AddDepthBuffer(GL_DEPTH24_STENCIL8);
 
-  globalFramebuffers.envprobeFBO->AttachImage2D(
-      GL_TEXTURE_2D, globalImages->envprobeHDRImage, 0);
+  globalFramebuffers.envprobeFBO->AttachImage2D(globalImages->envprobeHDRImage);
   globalFramebuffers.envprobeFBO->AttachImageDepth(
-      GL_TEXTURE_2D, globalImages->envprobeDepthImage);
+      globalImages->envprobeDepthImage);
 
   globalFramebuffers.envprobeFBO->Check();
 
@@ -129,9 +126,9 @@ void Framebuffer::Init() {
 
   globalFramebuffers.hdr64FBO = new Framebuffer("_hdr64", 64, 64);
   globalFramebuffers.hdr64FBO->Bind();
-  globalFramebuffers.hdr64FBO->AddColorBuffer(GL_RGBA16F, 0);
+  globalFramebuffers.hdr64FBO->AddColorBuffer(GL_RGBA16F);
   globalFramebuffers.hdr64FBO->AttachImage2D(
-      GL_TEXTURE_2D, globalImages->currentRenderHDRImage64, 0);
+      globalImages->currentRenderHDRImage64);
 
   globalFramebuffers.hdr64FBO->Check();
 
@@ -141,9 +138,9 @@ void Framebuffer::Init() {
     globalFramebuffers.bloomRenderFBO[i] =
         new Framebuffer(va("_bloomRender%i", i), screenWidth, screenHeight);
     globalFramebuffers.bloomRenderFBO[i]->Bind();
-    globalFramebuffers.bloomRenderFBO[i]->AddColorBuffer(GL_RGBA8, 0);
+    globalFramebuffers.bloomRenderFBO[i]->AddColorBuffer(GL_RGBA8);
     globalFramebuffers.bloomRenderFBO[i]->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->bloomRenderImage[i], 0);
+        globalImages->bloomRenderImage[i]);
     globalFramebuffers.bloomRenderFBO[i]->Check();
   }
 
@@ -153,9 +150,9 @@ void Framebuffer::Init() {
     globalFramebuffers.ambientOcclusionFBO[i] =
         new Framebuffer(va("_aoRender%i", i), screenWidth, screenHeight);
     globalFramebuffers.ambientOcclusionFBO[i]->Bind();
-    globalFramebuffers.ambientOcclusionFBO[i]->AddColorBuffer(GL_RGBA8, 0);
+    globalFramebuffers.ambientOcclusionFBO[i]->AddColorBuffer(GL_RGBA8);
     globalFramebuffers.ambientOcclusionFBO[i]->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->ambientOcclusionImage[i], 0);
+        globalImages->ambientOcclusionImage[i]);
     globalFramebuffers.ambientOcclusionFBO[i]->Check();
   }
 
@@ -165,9 +162,9 @@ void Framebuffer::Init() {
     globalFramebuffers.csDepthFBO[i] = new Framebuffer(
         va("_csz%i", i), screenWidth / (1 << i), screenHeight / (1 << i));
     globalFramebuffers.csDepthFBO[i]->Bind();
-    globalFramebuffers.csDepthFBO[i]->AddColorBuffer(GL_R32F, 0);
+    globalFramebuffers.csDepthFBO[i]->AddColorBuffer(GL_R32F);
     globalFramebuffers.csDepthFBO[i]->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->hierarchicalZbufferImage, 0, i);
+        globalImages->hierarchicalZbufferImage, i);
     globalFramebuffers.csDepthFBO[i]->Check();
   }
 
@@ -177,15 +174,15 @@ void Framebuffer::Init() {
       new Framebuffer("_gbuffer", screenWidth, screenHeight);
   globalFramebuffers.geometryBufferFBO->Bind();
 
-  globalFramebuffers.geometryBufferFBO->AddColorBuffer(GL_RGBA16F, 0);
+  globalFramebuffers.geometryBufferFBO->AddColorBuffer(GL_RGBA16F);
   globalFramebuffers.geometryBufferFBO->AddDepthBuffer(GL_DEPTH24_STENCIL8);
 
   // it is ideal to share the depth buffer between the HDR main context and the
   // geometry render target
   globalFramebuffers.geometryBufferFBO->AttachImage2D(
-      GL_TEXTURE_2D, globalImages->currentNormalsImage, 0);
+      globalImages->currentNormalsImage);
   globalFramebuffers.geometryBufferFBO->AttachImageDepth(
-      GL_TEXTURE_2D, globalImages->currentDepthImage);
+      globalImages->currentDepthImage);
 
   globalFramebuffers.geometryBufferFBO->Check();
 
@@ -194,17 +191,15 @@ void Framebuffer::Init() {
   globalFramebuffers.smaaEdgesFBO =
       new Framebuffer("_smaaEdges", screenWidth, screenHeight);
   globalFramebuffers.smaaEdgesFBO->Bind();
-  globalFramebuffers.smaaEdgesFBO->AddColorBuffer(GL_RGBA8, 0);
-  globalFramebuffers.smaaEdgesFBO->AttachImage2D(
-      GL_TEXTURE_2D, globalImages->smaaEdgesImage, 0);
+  globalFramebuffers.smaaEdgesFBO->AddColorBuffer(GL_RGBA8);
+  globalFramebuffers.smaaEdgesFBO->AttachImage2D(globalImages->smaaEdgesImage);
   globalFramebuffers.smaaEdgesFBO->Check();
 
   globalFramebuffers.smaaBlendFBO =
       new Framebuffer("_smaaBlend", screenWidth, screenHeight);
   globalFramebuffers.smaaBlendFBO->Bind();
-  globalFramebuffers.smaaBlendFBO->AddColorBuffer(GL_RGBA8, 0);
-  globalFramebuffers.smaaBlendFBO->AttachImage2D(
-      GL_TEXTURE_2D, globalImages->smaaBlendImage, 0);
+  globalFramebuffers.smaaBlendFBO->AddColorBuffer(GL_RGBA8);
+  globalFramebuffers.smaaBlendFBO->AttachImage2D(globalImages->smaaBlendImage);
   globalFramebuffers.smaaBlendFBO->Check();
 
   Unbind();
@@ -224,9 +219,9 @@ void Framebuffer::CheckFramebuffers() {
 
     globalFramebuffers.hdrFBO->Bind();
     globalFramebuffers.hdrFBO->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->currentRenderHDRImage, 0);
+        globalImages->currentRenderHDRImage);
     globalFramebuffers.hdrFBO->AttachImageDepth(
-        GL_TEXTURE_2D, globalImages->currentDepthImage);
+        globalImages->currentDepthImage);
     globalFramebuffers.hdrFBO->Check();
 
     globalFramebuffers.hdrFBO->width = screenWidth;
@@ -254,7 +249,7 @@ void Framebuffer::CheckFramebuffers() {
 
       globalFramebuffers.bloomRenderFBO[i]->Bind();
       globalFramebuffers.bloomRenderFBO[i]->AttachImage2D(
-          GL_TEXTURE_2D, globalImages->bloomRenderImage[i], 0);
+          globalImages->bloomRenderImage[i]);
       globalFramebuffers.bloomRenderFBO[i]->Check();
     }
 
@@ -268,7 +263,7 @@ void Framebuffer::CheckFramebuffers() {
 
       globalFramebuffers.ambientOcclusionFBO[i]->Bind();
       globalFramebuffers.ambientOcclusionFBO[i]->AttachImage2D(
-          GL_TEXTURE_2D, globalImages->ambientOcclusionImage[i], 0);
+          globalImages->ambientOcclusionImage[i]);
       globalFramebuffers.ambientOcclusionFBO[i]->Check();
     }
 
@@ -282,7 +277,7 @@ void Framebuffer::CheckFramebuffers() {
 
       globalFramebuffers.csDepthFBO[i]->Bind();
       globalFramebuffers.csDepthFBO[i]->AttachImage2D(
-          GL_TEXTURE_2D, globalImages->hierarchicalZbufferImage, 0, i);
+          globalImages->hierarchicalZbufferImage, i);
       globalFramebuffers.csDepthFBO[i]->Check();
     }
 
@@ -295,9 +290,9 @@ void Framebuffer::CheckFramebuffers() {
 
     globalFramebuffers.geometryBufferFBO->Bind();
     globalFramebuffers.geometryBufferFBO->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->currentNormalsImage, 0);
+        globalImages->currentNormalsImage);
     globalFramebuffers.geometryBufferFBO->AttachImageDepth(
-        GL_TEXTURE_2D, globalImages->currentDepthImage);
+        globalImages->currentDepthImage);
     globalFramebuffers.geometryBufferFBO->Check();
 
     // SMAA
@@ -309,7 +304,7 @@ void Framebuffer::CheckFramebuffers() {
 
     globalFramebuffers.smaaEdgesFBO->Bind();
     globalFramebuffers.smaaEdgesFBO->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->smaaEdgesImage, 0);
+        globalImages->smaaEdgesImage);
     globalFramebuffers.smaaEdgesFBO->Check();
 
     globalImages->smaaBlendImage->Resize(screenWidth, screenHeight);
@@ -319,7 +314,7 @@ void Framebuffer::CheckFramebuffers() {
 
     globalFramebuffers.smaaBlendFBO->Bind();
     globalFramebuffers.smaaBlendFBO->AttachImage2D(
-        GL_TEXTURE_2D, globalImages->smaaBlendImage, 0);
+        globalImages->smaaBlendImage);
     globalFramebuffers.smaaBlendFBO->Check();
 
     Unbind();
@@ -359,26 +354,20 @@ Framebuffer* Framebuffer::GetActiveFramebuffer() {
   return tr.backend.currentFramebuffer;
 }
 
-void Framebuffer::AddColorBuffer(int format, int index) {
-  if (index < 0 || index >= glConfig.maxColorAttachments) {
-    common->Warning("Framebuffer::AddColorBuffer( %s ): bad index = %i",
-                    fboName.c_str(), index);
-    return;
-  }
-
+void Framebuffer::AddColorBuffer(int format) {
   colorFormat = format;
 
-  bool notCreatedYet = colorBuffers[index] == 0;
+  bool notCreatedYet = colorBuffer == 0;
   if (notCreatedYet) {
-    glGenRenderbuffers(1, &colorBuffers[index]);
+    glGenRenderbuffers(1, &colorBuffer);
   }
 
-  glBindRenderbuffer(GL_RENDERBUFFER, colorBuffers[index]);
+  glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
   glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
 
   if (notCreatedYet) {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
-                              GL_RENDERBUFFER, colorBuffers[index]);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                              GL_RENDERBUFFER, colorBuffer);
   }
 
   GL_CheckErrors();
@@ -403,37 +392,16 @@ void Framebuffer::AddDepthBuffer(int format) {
   GL_CheckErrors();
 }
 
-void Framebuffer::AttachImage2D(int target, idImage* image, int index,
-                                int mipmapLod) {
-  if ((target != GL_TEXTURE_2D) && (target != GL_TEXTURE_2D_MULTISAMPLE) &&
-      (target < GL_TEXTURE_CUBE_MAP_POSITIVE_X ||
-       target > GL_TEXTURE_CUBE_MAP_NEGATIVE_Z)) {
-    common->Warning("Framebuffer::AttachImage2D( %s ): invalid target",
-                    fboName.c_str());
-    return;
-  }
-
-  if (index < 0 || index >= glConfig.maxColorAttachments) {
-    common->Warning("Framebuffer::AttachImage2D( %s ): bad index = %i",
-                    fboName.c_str(), index);
-    return;
-  }
-
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target,
+void Framebuffer::AttachImage2D(idImage* image, int mipmapLod) {
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          image->texnum, mipmapLod);
 
   image->opts.isRenderTarget = true;
 }
 
-void Framebuffer::AttachImageDepth(int target, idImage* image) {
-  if ((target != GL_TEXTURE_2D) && (target != GL_TEXTURE_2D_MULTISAMPLE)) {
-    common->Warning("Framebuffer::AttachImageDepth( %s ): invalid target",
-                    fboName.c_str());
-    return;
-  }
-
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, target,
-                         image->texnum, 0);
+void Framebuffer::AttachImageDepth(idImage* image) {
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                         GL_TEXTURE_2D, image->texnum, 0);
 
   image->opts.isRenderTarget = true;
 }
