@@ -227,17 +227,6 @@ void Framebuffer::CheckFramebuffers() {
     globalFramebuffers.hdrFBO->width = screenWidth;
     globalFramebuffers.hdrFBO->height = screenHeight;
 
-    // HDR quarter
-    /*
-    globalImages->currentRenderHDRImageQuarter->Resize( screenWidth / 4,
-    screenHeight / 4 );
-
-    globalFramebuffers.hdrQuarterFBO->Bind();
-    globalFramebuffers.hdrQuarterFBO->AttachImage2D( GL_TEXTURE_2D,
-    globalImages->currentRenderHDRImageQuarter, 0 );
-    globalFramebuffers.hdrQuarterFBO->Check();
-    */
-
     // BLOOM
 
     for (int i = 0; i < MAX_BLOOM_BUFFERS; i++) {

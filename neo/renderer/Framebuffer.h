@@ -113,7 +113,6 @@ class Framebuffer {
 struct globalFramebuffers_t {
   Framebuffer* shadowFBO[MAX_SHADOWMAP_RESOLUTIONS];
   Framebuffer* hdrFBO;
-  //	Framebuffer*				hdrQuarterFBO;
   Framebuffer* hdr64FBO;
   Framebuffer* envprobeFBO;
   Framebuffer* bloomRenderFBO[MAX_BLOOM_BUFFERS];

@@ -4585,9 +4585,6 @@ void idRenderBackend::Bloom(const viewDef_t* _viewDef) {
 
   // GL_CheckErrors();
 
-  // Framebuffer::Unbind();
-  // globalFramebuffers.hdrQuarterFBO->Bind();
-
   // FIXME
 #if !defined(USE_VULKAN)
   glClearColor(0, 0, 0, 1);
@@ -5607,15 +5604,6 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
                     viewDef->viewport.y1,
                     viewDef->viewport.x2 + 1 - viewDef->viewport.x1,
                     viewDef->viewport.y2 + 1 - viewDef->viewport.y1 );
-    */
-
-    /*
-    glBindFramebuffer( GL_READ_FRAMEBUFFER,
-    globalFramebuffers.hdrFBO->GetFramebuffer() ); glBindFramebuffer(
-    GL_DRAW_FRAMEBUFFER, globalFramebuffers.hdrQuarterFBO->GetFramebuffer() );
-    glBlitFramebuffer( 0, 0, renderSystem->GetWidth(),
-    renderSystem->GetHeight(), 0, 0, renderSystem->GetWidth() * 0.25f,
-    renderSystem->GetHeight() * 0.25f, GL_COLOR_BUFFER_BIT, GL_LINEAR );
     */
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT,
