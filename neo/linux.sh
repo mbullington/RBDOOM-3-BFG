@@ -1,11 +1,13 @@
-#!/bin/bash
+#!/usr/bin/zsh
 
 cd ..
 rm -rf build
 mkdir build
 cd build
 
-CMAKE_FLAGS=()
+CMAKE_FLAGS=(
+    "-G Ninja"
+)
 
 VULKAN_OR_OPENGL=$((echo "Vulkan" && echo "OpenGL") | fzf)
 if [[ "$VULKAN_OR_OPENGL" == "Vulkan" ]]; then
@@ -30,7 +32,7 @@ echo "$VULKAN_OR_OPENGL $DEBUG_RELEASE_OR_RETAIL $TESTS_OR_NOT"
 echo $CMAKE_FLAGS
 sleep 2
 
-cmake -G Ninja $CMAKE_FLAGS ../neo -Wno-dev
+cmake $CMAKE_FLAGS ../neo -Wno-dev
 
 # Copy compile_commands.json to root of project so VSCode can use it.
 if [[ "$DEBUG_RELEASE_OR_RETAIL" == "Debug" ]]; then

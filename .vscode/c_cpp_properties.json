@@ -10,6 +10,15 @@
       "cppStandard": "c++17",
       "intelliSenseMode": "macos-clang-x64",
       "compileCommands": "${workspaceFolder}/compile_commands.json"
+    },
+    {
+      "name": "Linux",
+      "includePath": ["${workspaceFolder}/**"],
+      "defines": [],
+      "compilerPath": "/usr/bin/clang++",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "compileCommands": "${workspaceFolder}/compile_commands.json"
     }
   ],
   "version": 4
