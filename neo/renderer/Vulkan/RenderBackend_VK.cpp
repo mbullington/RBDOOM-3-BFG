@@ -2104,10 +2104,21 @@ void idRenderBackend::GL_StartFrame() {
   // begin initial render pass
   VkRenderPassBeginInfo renderPassBeginInfo = {};
   renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  renderPassBeginInfo.renderPass = vkcontext.renderPass;
-  renderPassBeginInfo.framebuffer =
-      vkcontext.frameBuffers[vkcontext.currentSwapIndex];
-  renderPassBeginInfo.renderArea.extent = vkcontext.swapchainExtent;
+
+  if (Framebuffer::IsDefaultFramebufferActive()) {
+    renderPassBeginInfo.renderPass = vkcontext.renderPass;
+    renderPassBeginInfo.framebuffer =
+        vkcontext.frameBuffers[vkcontext.currentSwapIndex];
+    renderPassBeginInfo.renderArea.extent = vkcontext.swapchainExtent;
+  } else {
+    Framebuffer* fb = Framebuffer::GetActiveFramebuffer();
+
+    renderPassBeginInfo.renderPass = fb->GetRenderPass();
+    renderPassBeginInfo.framebuffer = fb->GetFramebuffer();
+    renderPassBeginInfo.renderArea.extent = {
+        static_cast<uint32_t>(fb->GetWidth()),
+        static_cast<uint32_t>(fb->GetHeight())};
+  }
 
   vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo,
                        VK_SUBPASS_CONTENTS_INLINE);
