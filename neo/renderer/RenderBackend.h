@@ -488,6 +488,7 @@ class idRenderBackend {
 
  private:
   // TODO(mbullington): For Vulkan this global state is annoying and bad.
+  bool inRenderPass;
   Framebuffer* currentFramebuffer;  // RB: for offscreen rendering
 
 #if !defined(USE_VULKAN)

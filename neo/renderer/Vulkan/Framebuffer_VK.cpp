@@ -74,49 +74,51 @@ Framebuffer::~Framebuffer() {
 void Framebuffer::Shutdown() { framebuffers.DeleteContents(true); }
 
 void Framebuffer::Bind() {
-  if (renderPass == NULL || frameBuffer == NULL) {
-    return;
-  }
-
-  VkCommandBuffer commandBuffer =
-      vkcontext.commandBuffer[vkcontext.frameParity];
-
-  vkCmdEndRenderPass(commandBuffer);
-
   RENDERLOG_PRINTF("Framebuffer::Bind( %s )\n", fboName.c_str());
   tr.backend.currentFramebuffer = this;
 
-  VkRenderPassBeginInfo renderPassBeginInfo = {};
-  renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  renderPassBeginInfo.renderPass = GetRenderPass();
-  renderPassBeginInfo.framebuffer = GetFramebuffer();
-  renderPassBeginInfo.renderArea.extent = {static_cast<uint32_t>(GetWidth()),
-                                           static_cast<uint32_t>(GetHeight())};
+  if (tr.backend.inRenderPass) {
+    VkCommandBuffer commandBuffer =
+        vkcontext.commandBuffer[vkcontext.frameParity];
 
-  vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo,
-                       VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdEndRenderPass(commandBuffer);
+
+    VkRenderPassBeginInfo renderPassBeginInfo = {};
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.renderPass = GetRenderPass();
+    renderPassBeginInfo.framebuffer = GetFramebuffer();
+    renderPassBeginInfo.renderArea.extent = {
+        static_cast<uint32_t>(GetWidth()), static_cast<uint32_t>(GetHeight())};
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo,
+                         VK_SUBPASS_CONTENTS_INLINE);
+  }
 }
 
 bool Framebuffer::IsBound() { return (tr.backend.currentFramebuffer == this); }
 
 void Framebuffer::Unbind() {
-  VkCommandBuffer commandBuffer =
-      vkcontext.commandBuffer[vkcontext.frameParity];
-
-  vkCmdEndRenderPass(commandBuffer);
+  if (Framebuffer::IsDefaultFramebufferActive()) return;
 
   RENDERLOG_PRINTF("Framebuffer::Unbind()\n");
   tr.backend.currentFramebuffer = NULL;
 
-  VkRenderPassBeginInfo renderPassBeginInfo = {};
-  renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  renderPassBeginInfo.renderPass = vkcontext.renderPass;
-  renderPassBeginInfo.framebuffer =
-      vkcontext.frameBuffers[vkcontext.currentSwapIndex];
-  renderPassBeginInfo.renderArea.extent = vkcontext.swapchainExtent;
+  if (tr.backend.inRenderPass) {
+    VkCommandBuffer commandBuffer =
+        vkcontext.commandBuffer[vkcontext.frameParity];
 
-  vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo,
-                       VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdEndRenderPass(commandBuffer);
+
+    VkRenderPassBeginInfo renderPassBeginInfo = {};
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.renderPass = vkcontext.renderPass;
+    renderPassBeginInfo.framebuffer =
+        vkcontext.frameBuffers[vkcontext.currentSwapIndex];
+    renderPassBeginInfo.renderArea.extent = vkcontext.swapchainExtent;
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo,
+                         VK_SUBPASS_CONTENTS_INLINE);
+  }
 }
 
 bool Framebuffer::IsDefaultFramebufferActive() {

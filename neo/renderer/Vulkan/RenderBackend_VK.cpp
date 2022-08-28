@@ -1504,7 +1504,10 @@ static void ClearContext() {
 idRenderBackend::idRenderBackend
 =============
 */
-idRenderBackend::idRenderBackend() { ClearContext(); }
+idRenderBackend::idRenderBackend() {
+  ClearContext();
+  inRenderPass = false;
+}
 
 /*
 =============
@@ -2122,6 +2125,7 @@ void idRenderBackend::GL_StartFrame() {
 
   vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo,
                        VK_SUBPASS_CONTENTS_INLINE);
+  inRenderPass = true;
 }
 
 /*
@@ -2141,6 +2145,7 @@ void idRenderBackend::GL_EndFrame() {
                       vkcontext.queryPools[vkcontext.frameParity], queryIndex);
 
   vkCmdEndRenderPass(commandBuffer);
+  inRenderPass = false;
 
   // Transition our swap image to present.
   // Do this instead of having the renderpass do the transition
@@ -2281,6 +2286,8 @@ void idRenderBackend::GL_SetDefaultState() {
   hdrMaxLuminance = 0;
   hdrTime = 0;
   hdrKey = 0;
+
+  currentFramebuffer = NULL;
 
   GL_State(0, true);
 
