@@ -12,7 +12,7 @@ NINJA_OR_XCODE=$((echo "Ninja" && echo "XCode") | fzf)
 if [[ "$NINJA_OR_XCODE" == "Ninja" ]]; then
     CMAKE_FLAGS+=(-G Ninja)
 else
-    CMAKE_FLAGS+=(-G XCode)
+    CMAKE_FLAGS+=(-G Xcode)
 fi
 
 VULKAN_OR_OPENGL=$((echo "Vulkan" && echo "OpenGL") | fzf)
