@@ -23,9 +23,8 @@
  */
 #include <precompiled.h>
 #include "../CinematicAudio.h"
-#if defined(__APPLE__)
 #include <AL/al.h>
-#endif
+
 #ifndef __CINEMATIC_AUDIO_AL_H__
 #define __CINEMATIC_AUDIO_AL_H__
 

@@ -36,3 +36,6 @@ cmake -G Ninja $CMAKE_FLAGS ../neo -Wno-dev
 if [[ "$DEBUG_RELEASE_OR_RETAIL" == "Debug" ]]; then
     cp compile_commands.json ..
 fi
+
+# Expects a Resources file for dev
+ln -s ../Resources/base ../build/base

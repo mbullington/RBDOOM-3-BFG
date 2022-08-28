@@ -41,6 +41,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #pragma hdrstop
 
 #include <memory>
+#include <functional>
 
 #include "Dict.h"
 #include "Lexer.h"
