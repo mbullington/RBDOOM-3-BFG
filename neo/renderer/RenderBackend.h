@@ -39,6 +39,10 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __RENDERER_BACKEND_H__
 #define __RENDERER_BACKEND_H__
 
+#if defined(USE_VULKAN)
+#include <vulkan/vulkan.h>
+#endif
+
 #include "RenderLog.h"
 
 bool GL_CheckErrors_(const char* filename, int line);
@@ -487,11 +491,14 @@ class idRenderBackend {
   // RB end
 
  private:
+#if defined(USE_VULKAN)
   // TODO(mbullington): For Vulkan this global state is annoying and bad.
   bool inRenderPass;
   Framebuffer* currentFramebuffer;  // RB: for offscreen rendering
+  idList<VkSemaphore> renderPassSemaphores;
 
-#if !defined(USE_VULKAN)
+  VkCommandBuffer GetActiveCommandBuffer();
+#else
   int currenttmu;
 
   unsigned int currentVertexBuffer;

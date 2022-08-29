@@ -4509,7 +4509,6 @@ void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
   GL_Scissor(0, 0, screenWidth, screenHeight);
 
   GL_SelectTexture(0);
-
   globalImages->currentRenderHDRImage->Bind();
 
   GL_SelectTexture(1);
@@ -4522,38 +4521,16 @@ void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
   }
 
   float screenCorrectionParm[4];
-  if (_viewDef->is2Dgui) {
-    screenCorrectionParm[0] = 2.0f;
-    screenCorrectionParm[1] = 1.0f;
-    screenCorrectionParm[2] = 1.0f;
-  } else {
-    if (r_hdrAutoExposure.GetBool()) {
-      float exposureOffset = Lerp(
-          -0.01f, 0.02f, idMath::ClampFloat(0.0, 1.0, r_exposure.GetFloat()));
 
-      screenCorrectionParm[0] = hdrKey + exposureOffset;
-      screenCorrectionParm[1] = hdrAverageLuminance;
-      screenCorrectionParm[2] = hdrMaxLuminance;
-      screenCorrectionParm[3] = exposureOffset;
-      // screenCorrectionParm[3] = Lerp( -1, 5, idMath::ClampFloat( 0.0, 1.0,
-      // r_exposure.GetFloat() ) );
-    } else {
-      // float exposureOffset = ( idMath::ClampFloat( 0.0, 1.0,
-      // r_exposure.GetFloat() ) * 2.0f - 1.0f ) * 0.01f;
+  float exposureOffset =
+      Lerp(-0.01f, 0.02f, idMath::ClampFloat(0.0, 1.0, r_exposure.GetFloat()));
 
-      float exposureOffset = Lerp(
-          -0.01f, 0.01f, idMath::ClampFloat(0.0, 1.0, r_exposure.GetFloat()));
-
-      screenCorrectionParm[0] = 0.015f + exposureOffset;
-      screenCorrectionParm[1] = 0.005f;
-      screenCorrectionParm[2] = 1;
-
-      // RB: this gives a nice exposure curve in Scilab when using
-      // log2( max( 3 + 0..10, 0.001 ) ) as input for exp2
-      // float exposureOffset = r_exposure.GetFloat() * 10.0f;
-      // screenCorrectionParm[3] = exposureOffset;
-    }
-  }
+  screenCorrectionParm[0] = hdrKey + exposureOffset;
+  screenCorrectionParm[1] = hdrAverageLuminance;
+  screenCorrectionParm[2] = hdrMaxLuminance;
+  screenCorrectionParm[3] = exposureOffset;
+  // screenCorrectionParm[3] = Lerp( -1, 5, idMath::ClampFloat( 0.0, 1.0,
+  // r_exposure.GetFloat() ) );
 
   SetFragmentParm(RENDERPARM_SCREENCORRECTIONFACTOR,
                   screenCorrectionParm);  // rpScreenCorrectionFactor
@@ -5286,12 +5263,16 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
   const bool timerQueryAvailable = glConfig.timerQueryAvailable;
   bool drawView3D_timestamps = false;
 
+  bool useHDR = r_useHDR.GetBool();
+
   for (; cmds != NULL; cmds = (const emptyCommand_t*)cmds->next) {
     switch (cmds->commandId) {
       case RC_NOP:
         break;
 
       case RC_DRAW_VIEW_GUI:
+        if (useHDR) Framebuffer::Unbind();
+
         if (drawView3D_timestamps) {
           // SRS - Capture separate timestamps for overlay GUI rendering when
           // RC_DRAW_VIEW_3D timestamps are active
@@ -5315,6 +5296,12 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
         break;
 
       case RC_DRAW_VIEW_3D:
+        if (useHDR) {
+          globalFramebuffers.hdrFBO->Bind();
+        } else {
+          Framebuffer::Unbind();
+        }
+
         drawView3D_timestamps = true;
         DrawView(cmds, 0);
         c_draw3d++;
@@ -5406,16 +5393,6 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
   // well as gui masking
   GL_Clear(false, true, true, STENCIL_SHADOW_TEST_VALUE, 0.0f, 0.0f, 0.0f, 0.0f,
            useHDR);
-
-  if (useHDR) {
-    if (_viewDef->renderView.rdflags & RDF_IRRADIANCE) {
-      globalFramebuffers.envprobeFBO->Bind();
-    } else {
-      globalFramebuffers.hdrFBO->Bind();
-    }
-  } else {
-    Framebuffer::Unbind();
-  }
   // RB end
 
   // GL_CheckErrors();
@@ -5583,50 +5560,20 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
   //-------------------------------------------------
   DBG_RenderDebugTools(drawSurfs, numDrawSurfs);
 
-#if !defined(USE_VULKAN)
-
-// SRS - For OSX OpenGL record the final portion of GPU time while no other
-// elapsed time query is active (after final shader pass and before post
-// processing)
-#if defined(__APPLE__)
-  renderLog.OpenMainBlock(MRB_GPU_TIME);
-#endif
-
   // RB: convert back from HDR to LDR range
-  if (useHDR && !(_viewDef->renderView.rdflags & RDF_IRRADIANCE)) {
-    /*
-    int x = backEnd.viewDef->viewport.x1;
-    int y = backEnd.viewDef->viewport.y1;
-    int	w = backEnd.viewDef->viewport.x2 - backEnd.viewDef->viewport.x1 + 1;
-    int	h = backEnd.viewDef->viewport.y2 - backEnd.viewDef->viewport.y1 + 1;
+  bool isIrradianceCalc = _viewDef->renderView.rdflags & RDF_IRRADIANCE;
+  if (useHDR && !_viewDef->is2Dgui && !(isIrradianceCalc)) {
+    // CalculateAutomaticExposure();
+    hdrKey = r_hdrKey.GetFloat();
+    hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
+    hdrMaxLuminance = 1;
 
-    GL_Viewport( viewDef->viewport.x1,
-                    viewDef->viewport.y1,
-                    viewDef->viewport.x2 + 1 - viewDef->viewport.x1,
-                    viewDef->viewport.y2 + 1 - viewDef->viewport.y1 );
-    */
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT,
-                      globalFramebuffers.hdrFBO->GetFramebuffer());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT,
-                      globalFramebuffers.hdr64FBO->GetFramebuffer());
-    glBlitFramebuffer(0, 0, renderSystem->GetWidth(), renderSystem->GetHeight(),
-                      0, 0, 64, 64, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-    CalculateAutomaticExposure();
-
-    Tonemap(_viewDef);
+    // Tonemap(_viewDef);
   }
 
-  if (!r_skipBloom.GetBool()) {
-    Bloom(_viewDef);
-  }
-
-#if defined(__APPLE__)
-  renderLog.CloseMainBlock();
-#endif
-
-#endif
+  // if (!r_skipBloom.GetBool()) {
+  //   Bloom(_viewDef);
+  // }
 
   renderLog.CloseBlock();
 }

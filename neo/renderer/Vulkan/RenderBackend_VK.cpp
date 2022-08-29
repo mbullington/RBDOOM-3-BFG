@@ -1780,6 +1780,15 @@ BACKEND COMMANDS
 =========================================================================================================
 */
 
+VkCommandBuffer idRenderBackend::GetActiveCommandBuffer() {
+  if (Framebuffer::IsDefaultFramebufferActive()) {
+    return vkcontext.commandBuffer[vkcontext.frameParity];
+  }
+
+  VkCommandBuffer buf = Framebuffer::GetActiveFramebuffer()->GetCommandBuffer();
+  return buf;
+}
+
 /*
 =============
 idRenderBackend::DrawElementsWithCounters
@@ -1859,8 +1868,8 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
   {
     const VkBuffer buffer = indexBuffer->GetAPIObject();
     const VkDeviceSize offset = indexBuffer->GetOffset();
-    vkCmdBindIndexBuffer(vkcontext.commandBuffer[vkcontext.frameParity], buffer,
-                         offset, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(GetActiveCommandBuffer(), buffer, offset,
+                         VK_INDEX_TYPE_UINT16);
   }
 
   /*
@@ -1898,8 +1907,7 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
   {
     const VkBuffer buffer = vertexBuffer->GetAPIObject();
     const VkDeviceSize offset = vertexBuffer->GetOffset();
-    vkCmdBindVertexBuffers(vkcontext.commandBuffer[vkcontext.frameParity], 0, 1,
-                           &buffer, &offset);
+    vkCmdBindVertexBuffers(GetActiveCommandBuffer(), 0, 1, &buffer, &offset);
   }
 
   /*
@@ -1909,9 +1917,8 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
   sizeof( idDrawVert ) );
   */
 
-  vkCmdDrawIndexed(vkcontext.commandBuffer[vkcontext.frameParity],
-                   surf->numIndexes, 1, (indexOffset >> 1),
-                   vertOffset / sizeof(idDrawVert), 0);
+  vkCmdDrawIndexed(GetActiveCommandBuffer(), surf->numIndexes, 1,
+                   (indexOffset >> 1), vertOffset / sizeof(idDrawVert), 0);
 
   // RB: added stats
   pc.c_drawElements++;
@@ -2145,7 +2152,6 @@ void idRenderBackend::GL_EndFrame() {
                       vkcontext.queryPools[vkcontext.frameParity], queryIndex);
 
   vkCmdEndRenderPass(commandBuffer);
-  inRenderPass = false;
 
   // Transition our swap image to present.
   // Do this instead of having the renderpass do the transition
@@ -2180,19 +2186,22 @@ void idRenderBackend::GL_EndFrame() {
   ID_VK_CHECK(vkEndCommandBuffer(commandBuffer))
   vkcontext.commandBufferRecorded[vkcontext.frameParity] = true;
 
-  VkSemaphore* acquire = &vkcontext.acquireSemaphores[vkcontext.frameParity];
+  VkSemaphore acquire = vkcontext.acquireSemaphores[vkcontext.frameParity];
   VkSemaphore* finished =
       &vkcontext.renderCompleteSemaphores[vkcontext.frameParity];
 
   VkPipelineStageFlags dstStageMask =
       VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
+  // Mutate semaphore list.
+  renderPassSemaphores.Insert(acquire, 0);
+
   VkSubmitInfo submitInfo = {};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
   submitInfo.commandBufferCount = 1;
   submitInfo.pCommandBuffers = &vkcontext.commandBuffer[vkcontext.frameParity];
-  submitInfo.waitSemaphoreCount = 1;
-  submitInfo.pWaitSemaphores = acquire;
+  submitInfo.waitSemaphoreCount = renderPassSemaphores.Num();
+  submitInfo.pWaitSemaphores = renderPassSemaphores.Ptr();
   submitInfo.signalSemaphoreCount = 1;
   submitInfo.pSignalSemaphores = finished;
   submitInfo.pWaitDstStageMask = &dstStageMask;
@@ -2200,6 +2209,9 @@ void idRenderBackend::GL_EndFrame() {
   ID_VK_CHECK(
       vkQueueSubmit(vkcontext.graphicsQueue, 1, &submitInfo,
                     vkcontext.commandBufferFences[vkcontext.frameParity]));
+
+  renderPassSemaphores.Clear();
+  inRenderPass = false;
 }
 
 /*
@@ -2288,6 +2300,7 @@ void idRenderBackend::GL_SetDefaultState() {
   hdrKey = 0;
 
   currentFramebuffer = NULL;
+  renderPassSemaphores.Clear();
 
   GL_State(0, true);
 
@@ -2342,8 +2355,7 @@ void idRenderBackend::GL_Scissor(int x /* left*/, int y /* bottom */, int w,
   scissor.extent.width = w;
   scissor.extent.height = h;
 
-  vkCmdSetScissor(vkcontext.commandBuffer[vkcontext.frameParity], 0, 1,
-                  &scissor);
+  vkCmdSetScissor(GetActiveCommandBuffer(), 0, 1, &scissor);
 }
 
 /*
@@ -2361,8 +2373,7 @@ void idRenderBackend::GL_Viewport(int x /* left */, int y /* bottom */, int w,
   viewport.minDepth = 0.0f;
   viewport.maxDepth = 1.0f;
 
-  vkCmdSetViewport(vkcontext.commandBuffer[vkcontext.frameParity], 0, 1,
-                   &viewport);
+  vkCmdSetViewport(GetActiveCommandBuffer(), 0, 1, &viewport);
 }
 
 /*
@@ -2371,8 +2382,7 @@ idRenderBackend::GL_PolygonOffset
 ====================
 */
 void idRenderBackend::GL_PolygonOffset(float scale, float bias) {
-  vkCmdSetDepthBias(vkcontext.commandBuffer[vkcontext.frameParity], bias, 0.0f,
-                    scale);
+  vkCmdSetDepthBias(GetActiveCommandBuffer(), bias, 0.0f, scale);
 
   RENDERLOG_PRINTF("GL_PolygonOffset( scale=%f, bias=%f )\n", scale, bias);
 }
@@ -2391,8 +2401,7 @@ void idRenderBackend::GL_DepthBoundsTest(const float zmin, const float zmax) {
     glStateBits = glStateBits & ~GLS_DEPTH_TEST_MASK;
   } else {
     glStateBits |= GLS_DEPTH_TEST_MASK;
-    vkCmdSetDepthBounds(vkcontext.commandBuffer[vkcontext.frameParity], zmin,
-                        zmax);
+    vkCmdSetDepthBounds(GetActiveCommandBuffer(), zmin, zmax);
   }
 
   RENDERLOG_PRINTF("GL_DepthBoundsTest( zmin=%f, zmax=%f )\n", zmin, zmax);
@@ -2461,8 +2470,8 @@ void idRenderBackend::GL_Clear(bool color, bool depth, bool stencil,
   clearRect.layerCount = 1;
   clearRect.rect.extent = vkcontext.swapchainExtent;
 
-  vkCmdClearAttachments(vkcontext.commandBuffer[vkcontext.frameParity],
-                        numAttachments, attachments, 1, &clearRect);
+  vkCmdClearAttachments(GetActiveCommandBuffer(), numAttachments, attachments,
+                        1, &clearRect);
 
   /*
   int clearFlags = 0;
@@ -2666,8 +2675,8 @@ void idRenderBackend::DrawFlickerBox() {
   clearRect.layerCount = 1;
   clearRect.rect.extent = extent;
 
-  vkCmdClearAttachments(vkcontext.commandBuffer[vkcontext.frameParity], 1,
-                        &attachment, 1, &clearRect);
+  vkCmdClearAttachments(GetActiveCommandBuffer(), 1, &attachment, 1,
+                        &clearRect);
 }
 
 /*
@@ -2797,8 +2806,7 @@ void idRenderBackend::DrawStencilShadowPass(const drawSurf_t* drawSurf,
 
   vkcontext.jointCacheHandle = drawSurf->jointCache;
 
-  VkCommandBuffer commandBuffer =
-      vkcontext.commandBuffer[vkcontext.frameParity];
+  VkCommandBuffer commandBuffer = GetActiveCommandBuffer();
 
   // PrintState( glStateBits, vkcontext.stencilOperations );
   renderProgManager.CommitUniforms(glStateBits);

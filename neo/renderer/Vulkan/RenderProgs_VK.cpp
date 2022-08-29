@@ -1404,12 +1404,15 @@ void idRenderProgManager::CommitUniforms(uint64 stateBits) {
 
   vkUpdateDescriptorSets(vkcontext.device, writeIndex, writes, 0, NULL);
 
-  vkCmdBindDescriptorSets(vkcontext.commandBuffer[vkcontext.frameParity],
-                          VK_PIPELINE_BIND_POINT_GRAPHICS, prog.pipelineLayout,
-                          0, 1, &descSet, 0, NULL);
+  VkCommandBuffer commandBuffer =
+      Framebuffer::IsDefaultFramebufferActive()
+          ? vkcontext.commandBuffer[vkcontext.frameParity]
+          : Framebuffer::GetActiveFramebuffer()->GetCommandBuffer();
 
-  vkCmdBindPipeline(vkcontext.commandBuffer[vkcontext.frameParity],
-                    VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+  vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                          prog.pipelineLayout, 0, 1, &descSet, 0, NULL);
+
+  vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 }
 
 void idRenderProgManager::CachePipeline(uint64 stateBits) {

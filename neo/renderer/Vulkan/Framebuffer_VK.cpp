@@ -52,6 +52,9 @@ Framebuffer::Framebuffer(const char* name, int w, int h) {
   colorImageView = NULL;
   depthImageView = NULL;
 
+  commandBuffer = NULL;
+  semaphore = NULL;
+
   colorFormat = VK_FORMAT_UNDEFINED;
   depthFormat = VK_FORMAT_UNDEFINED;
 
@@ -69,6 +72,12 @@ Framebuffer::~Framebuffer() {
   if (frameBuffer != NULL) {
     vkDestroyFramebuffer(vkcontext.device, frameBuffer, NULL);
   }
+
+  // commandBuffer is collected by the command pool
+
+  if (semaphore != NULL) {
+    vkDestroySemaphore(vkcontext.device, semaphore, NULL);
+  }
 }
 
 void Framebuffer::Shutdown() { framebuffers.DeleteContents(true); }
@@ -78,10 +87,10 @@ void Framebuffer::Bind() {
   tr.backend.currentFramebuffer = this;
 
   if (tr.backend.inRenderPass) {
-    VkCommandBuffer commandBuffer =
-        vkcontext.commandBuffer[vkcontext.frameParity];
-
-    vkCmdEndRenderPass(commandBuffer);
+    // begin command buffer
+    VkCommandBufferBeginInfo commandBufferBeginInfo = {};
+    commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    ID_VK_CHECK(vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo));
 
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -99,25 +108,26 @@ bool Framebuffer::IsBound() { return (tr.backend.currentFramebuffer == this); }
 
 void Framebuffer::Unbind() {
   if (Framebuffer::IsDefaultFramebufferActive()) return;
+  Framebuffer* fb = tr.backend.currentFramebuffer;
 
   RENDERLOG_PRINTF("Framebuffer::Unbind()\n");
   tr.backend.currentFramebuffer = NULL;
 
   if (tr.backend.inRenderPass) {
-    VkCommandBuffer commandBuffer =
-        vkcontext.commandBuffer[vkcontext.frameParity];
+    vkCmdEndRenderPass(fb->commandBuffer);
+    ID_VK_CHECK(vkEndCommandBuffer(fb->commandBuffer))
 
-    vkCmdEndRenderPass(commandBuffer);
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &fb->semaphore;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &fb->commandBuffer;
+    ID_VK_CHECK(
+        vkQueueSubmit(vkcontext.graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE));
 
-    VkRenderPassBeginInfo renderPassBeginInfo = {};
-    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassBeginInfo.renderPass = vkcontext.renderPass;
-    renderPassBeginInfo.framebuffer =
-        vkcontext.frameBuffers[vkcontext.currentSwapIndex];
-    renderPassBeginInfo.renderArea.extent = vkcontext.swapchainExtent;
-
-    vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo,
-                         VK_SUBPASS_CONTENTS_INLINE);
+    // Add semaphore to list for main command buffer.
+    tr.backend.renderPassSemaphores.Append(fb->semaphore);
   }
 }
 
@@ -237,10 +247,32 @@ void Framebuffer::CreateFramebuffer() {
                                   NULL, &frameBuffer));
 }
 
+void Framebuffer::CreateCommandBuffer() {
+  VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
+  commandBufferAllocateInfo.sType =
+      VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  commandBufferAllocateInfo.commandPool = vkcontext.commandPool;
+  commandBufferAllocateInfo.commandBufferCount = 1;
+
+  ID_VK_CHECK(vkAllocateCommandBuffers(
+      vkcontext.device, &commandBufferAllocateInfo, &commandBuffer));
+}
+
+void Framebuffer::CreateSemaphore() {
+  VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+  semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+  ID_VK_CHECK(vkCreateSemaphore(vkcontext.device, &semaphoreCreateInfo, NULL,
+                                &semaphore));
+}
+
 void Framebuffer::Commit() {
   // In commit we'll actually create the framebuffer and renderpass.
   CreateRenderPass();
   CreateFramebuffer();
+  CreateCommandBuffer();
+  CreateSemaphore();
 }
 
 #endif  // #if !defined(USE_VULKAN)

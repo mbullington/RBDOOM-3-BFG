@@ -1,28 +1,15 @@
 #pragma static BRIGHTPASS _brightpass
 #pragma static HDR_DEBUG _debug
 
-#if defined(USE_GPU_SKINNING)
-layout( binding = 2 ) uniform UBOV {
-	vec4 rpScreenCorrectionFactor;
-	vec4 rpWindowCoord;
-	vec4 rpOverbright;
-	vec4 rpJitterTexOffset;
-};
-#else
 layout( binding = 1 ) uniform UBOV {
 	vec4 rpScreenCorrectionFactor;
 	vec4 rpWindowCoord;
 	vec4 rpOverbright;
 	vec4 rpJitterTexOffset;
 };
-#endif
-#if defined(USE_GPU_SKINNING)
-layout( binding = 3 ) uniform sampler2D samp0;
-layout( binding = 4 ) uniform sampler2D samp1;
-#else
+
 layout( binding = 2 ) uniform sampler2D samp0;
 layout( binding = 3 ) uniform sampler2D samp1;
-#endif // else
 
 #include "renderprogs_src/global.glsl"
 

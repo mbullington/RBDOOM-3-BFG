@@ -37,7 +37,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __FRAMEBUFFER_H__
 #define __FRAMEBUFFER_H__
 
-#include "vulkan/vulkan_core.h"
 #if defined(USE_VULKAN)
 #include <vulkan/vulkan.h>
 #endif
@@ -89,6 +88,7 @@ class Framebuffer {
 #if defined(USE_VULKAN)
   VkFramebuffer GetFramebuffer() const { return frameBuffer; }
   VkRenderPass GetRenderPass() const { return renderPass; }
+  VkCommandBuffer GetCommandBuffer() const { return commandBuffer; }
 #else
   uint32_t GetFramebuffer() const { return frameBuffer; }
 #endif
@@ -108,6 +108,8 @@ class Framebuffer {
 #if defined(USE_VULKAN)
   void CreateRenderPass();
   void CreateFramebuffer();
+  void CreateCommandBuffer();
+  void CreateSemaphore();
 #endif
 
   // FBO object
@@ -117,6 +119,9 @@ class Framebuffer {
 
   VkImageView colorImageView;
   VkFormat colorFormat;
+
+  VkCommandBuffer commandBuffer;
+  VkSemaphore semaphore;
 
   VkImageView depthImageView;
   VkFormat depthFormat;
