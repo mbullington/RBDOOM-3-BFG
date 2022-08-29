@@ -139,32 +139,19 @@ Framebuffer* Framebuffer::GetActiveFramebuffer() {
   return tr.backend.currentFramebuffer;
 }
 
-void Framebuffer::AddColorBuffer(textureFormat_t format) {
+void Framebuffer::AddColor(textureFormat_t format, idImage* image,
+                           int mipmapLod) {
+  // TODO: mipmapLod
   auto params = idImage::GetTextureParams(format);
   colorFormat = params.internalFormat;
-}
-
-void Framebuffer::AddDepthBuffer(textureFormat_t format) {
-  auto params = idImage::GetTextureParams(format);
-  depthFormat = params.internalFormat;
-}
-
-void Framebuffer::AttachImage2D(idImage* image, int mipmapLod) {
   colorImageView = image->GetView();
   image->opts.isRenderTarget = true;
 }
 
-void Framebuffer::AttachImageDepth(idImage* image) {
+void Framebuffer::AddDepth(idImage* image) {
+  depthFormat = vkcontext.depthFormat;
   depthImageView = image->GetView();
   image->opts.isRenderTarget = true;
-}
-
-void Framebuffer::AttachImageDepthLayer(idImage* image, int layer) {
-  // TODO
-  //   glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-  //   image->texnum,
-  //                             0, layer);
-  //   image->opts.isRenderTarget = true;
 }
 
 void Framebuffer::CreateRenderPass() {

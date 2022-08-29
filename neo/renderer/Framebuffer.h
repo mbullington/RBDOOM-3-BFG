@@ -76,12 +76,8 @@ class Framebuffer {
   static bool IsDefaultFramebufferActive();
   static Framebuffer* GetActiveFramebuffer();
 
-  void AddColorBuffer(textureFormat_t format);
-  void AddDepthBuffer(textureFormat_t format);
-
-  void AttachImage2D(idImage* image, int mipmapLod = 0);
-  void AttachImageDepth(idImage* image);
-  void AttachImageDepthLayer(idImage* image, int layer);
+  void AddColor(textureFormat_t format, idImage* image, int mipmapLod = 0);
+  void AddDepth(idImage* image);
 
   // check for OpenGL errors
   void Commit();

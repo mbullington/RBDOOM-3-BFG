@@ -201,7 +201,7 @@ static void R_RGBA8LinearImage(idImage* image) {
 static void R_DepthImage(idImage* image) {
   image->GenerateImage(NULL, renderSystem->GetWidth(),
                        renderSystem->GetHeight(), TF_NEAREST, TR_CLAMP,
-                       TD_DEPTH_STENCIL);
+                       TD_DEPTH);
 }
 
 // RB begin
