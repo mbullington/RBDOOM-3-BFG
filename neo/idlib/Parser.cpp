@@ -1406,8 +1406,8 @@ int PC_OperatorPriority(int op) {
 //#define AllocValue()			GetClearedMemory(sizeof(value_t));
 //#define FreeValue(val)		FreeMemory(val)
 //#define AllocOperator(op)		op = (operator_t *)
-//GetClearedMemory(sizeof(operator_t)); #define FreeOperator(op)
-//FreeMemory(op);
+// GetClearedMemory(sizeof(operator_t)); #define FreeOperator(op)
+// FreeMemory(op);
 
 #define MAX_VALUES 64
 #define MAX_OPERATORS 64
@@ -2223,7 +2223,8 @@ idParser::Directive_pragma
 int idParser::Directive_pragma() {
   idToken token;
 
-  idParser::Warning("#pragma directive not supported");
+  // idParser::Warning("#pragma directive not supported");
+  // TODO: Support pragmas
   while (idParser::ReadLine(&token)) {
   }
   return true;
