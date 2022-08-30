@@ -46,6 +46,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "Image.h"
 #include "Font.h"
 #include "Framebuffer.h"
+#include "CommandBuffer.h"
 
 // maximum texture units
 const int MAX_PROG_TEXTURE_PARMS = 16;
@@ -285,8 +286,8 @@ class RenderEnvprobeLocal : public RenderEnvprobe {
   bool archived;  // for demo writing
 
   // derived information
-  // idPlane						lightProject[4];		// old
-  // style light projection where Z and W are flipped and projected lights
+  // idPlane						lightProject[4];		//
+  // old style light projection where Z and W are flipped and projected lights
   // lightProject[3] is divided by ( zNear + zFar ) idRenderMatrix
   // baseLightProject;		// global xyz1 to projected light strq
   idRenderMatrix

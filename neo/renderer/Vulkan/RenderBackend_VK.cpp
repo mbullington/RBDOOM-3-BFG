@@ -1853,7 +1853,8 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
 
   vkcontext.jointCacheHandle = surf->jointCache;
 
-  renderProgManager.CommitUniforms(glStateBits);
+  CommandBuffer commandBuffer = GetActiveCommandBuffer();
+  renderProgManager.CommitUniforms(commandBuffer, glStateBits);
 
   /*
   if( currentIndexBuffer != ( GLintptr )indexBuffer->GetAPIObject() ||
@@ -1868,8 +1869,7 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
   {
     const VkBuffer buffer = indexBuffer->GetAPIObject();
     const VkDeviceSize offset = indexBuffer->GetOffset();
-    vkCmdBindIndexBuffer(GetActiveCommandBuffer(), buffer, offset,
-                         VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, buffer, offset, VK_INDEX_TYPE_UINT16);
   }
 
   /*
@@ -1907,7 +1907,7 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
   {
     const VkBuffer buffer = vertexBuffer->GetAPIObject();
     const VkDeviceSize offset = vertexBuffer->GetOffset();
-    vkCmdBindVertexBuffers(GetActiveCommandBuffer(), 0, 1, &buffer, &offset);
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &buffer, &offset);
   }
 
   /*
@@ -1917,8 +1917,8 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
   sizeof( idDrawVert ) );
   */
 
-  vkCmdDrawIndexed(GetActiveCommandBuffer(), surf->numIndexes, 1,
-                   (indexOffset >> 1), vertOffset / sizeof(idDrawVert), 0);
+  vkCmdDrawIndexed(commandBuffer, surf->numIndexes, 1, (indexOffset >> 1),
+                   vertOffset / sizeof(idDrawVert), 0);
 
   // RB: added stats
   pc.c_drawElements++;
@@ -2809,7 +2809,7 @@ void idRenderBackend::DrawStencilShadowPass(const drawSurf_t* drawSurf,
   VkCommandBuffer commandBuffer = GetActiveCommandBuffer();
 
   // PrintState( glStateBits, vkcontext.stencilOperations );
-  renderProgManager.CommitUniforms(glStateBits);
+  renderProgManager.CommitUniforms(commandBuffer, glStateBits);
 
   {
     const VkBuffer buffer = indexBuffer->GetAPIObject();
@@ -2839,7 +2839,7 @@ void idRenderBackend::DrawStencilShadowPass(const drawSurf_t* drawSurf,
     GL_State((glStateBits & ~GLS_STENCIL_OP_BITS) | stencil);
 
     // PrintState( glStateBits, vkcontext.stencilOperations );
-    renderProgManager.CommitUniforms(glStateBits);
+    renderProgManager.CommitUniforms(commandBuffer, glStateBits);
 
     vkCmdDrawIndexed(commandBuffer, drawSurf->numIndexes, 1, (indexOffset >> 1),
                      baseVertex, 0);

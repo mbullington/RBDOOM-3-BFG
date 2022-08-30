@@ -139,9 +139,7 @@ Framebuffer* Framebuffer::GetActiveFramebuffer() {
   return tr.backend.currentFramebuffer;
 }
 
-void Framebuffer::AddColor(textureFormat_t format, idImage* image,
-                           int mipmapLod) {
-  // TODO: mipmapLod
+void Framebuffer::AddColor(textureFormat_t format, idImage* image) {
   auto params = idImage::GetTextureParams(format);
   colorFormat = params.internalFormat;
   colorImageView = image->GetView();

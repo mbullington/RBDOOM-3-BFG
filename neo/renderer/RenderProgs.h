@@ -578,7 +578,7 @@ class idRenderProgManager {
   const char* GetGLSLParmName(int rp) const;
 
   void SetUniformValue(const renderParm_t rp, const float* value);
-  void CommitUniforms(uint64 stateBits);
+  void CommitUniforms(CommandBuffer commandBuffer, uint64 stateBits);
   void CachePipeline(uint64 stateBits);
   int FindGLSLProgram(const char* name, int vIndex, int fIndex);
 

@@ -1238,55 +1238,8 @@ VkPipeline idRenderProgManager::renderProg_t::GetPipeline(
 idRenderProgManager::CommitUnforms
 ================================================================================================
 */
-void idRenderProgManager::CommitUniforms(uint64 stateBits) {
-#if 0
-	const int progID = current;
-	const renderProg_t& prog = renderProgs[progID];
-
-	//GL_CheckErrors();
-
-	ALIGNTYPE16 idVec4 localVectors[RENDERPARM_TOTAL];
-
-	auto commitarray = [&]( idVec4( &vectors )[ RENDERPARM_TOTAL ] , shader_t& shader )
-	{
-		const int numUniforms = shader.uniforms.Num();
-		if( shader.uniformArray != -1 && numUniforms > 0 )
-		{
-			int totalUniforms = 0;
-			for( int i = 0; i < numUniforms; ++i )
-			{
-				// RB: HACK rpShadowMatrices[6 * 4]
-				if( shader.uniforms[i] == RENDERPARM_SHADOW_MATRIX_0_X )
-				{
-					for( int j = 0; j < ( 6 * 4 ); j++ )
-					{
-						vectors[i + j] = uniforms[ shader.uniforms[i] + j];
-						totalUniforms++;
-					}
-
-				}
-				else
-				{
-					vectors[i] = uniforms[ shader.uniforms[i] ];
-					totalUniforms++;
-				}
-			}
-			glUniform4fv( shader.uniformArray, totalUniforms, localVectors->ToFloatPtr() );
-		}
-	};
-
-	if( prog.vertexShaderIndex >= 0 )
-	{
-		commitarray( localVectors, shaders[ prog.vertexShaderIndex ] );
-	}
-
-	if( prog.fragmentShaderIndex >= 0 )
-	{
-		commitarray( localVectors, shaders[ prog.fragmentShaderIndex ] );
-	}
-
-#endif
-
+void idRenderProgManager::CommitUniforms(VkCommandBuffer commandBuffer,
+                                         uint64 stateBits) {
   renderProg_t& prog = renderProgs[current];
 
   VkPipeline pipeline =
@@ -1403,12 +1356,6 @@ void idRenderProgManager::CommitUniforms(uint64 stateBits) {
   }
 
   vkUpdateDescriptorSets(vkcontext.device, writeIndex, writes, 0, NULL);
-
-  VkCommandBuffer commandBuffer =
-      Framebuffer::IsDefaultFramebufferActive()
-          ? vkcontext.commandBuffer[vkcontext.frameParity]
-          : Framebuffer::GetActiveFramebuffer()->GetCommandBuffer();
-
   vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                           prog.pipelineLayout, 0, 1, &descSet, 0, NULL);
 
