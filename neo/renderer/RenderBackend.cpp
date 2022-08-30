@@ -4511,9 +4511,6 @@ void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
   GL_SelectTexture(0);
   globalImages->currentRenderHDRImage->Bind();
 
-  GL_SelectTexture(1);
-  globalImages->heatmap7Image->Bind();
-
   if (r_hdrDebug.GetBool()) {
     renderProgManager.BindShader_HDRDebug();
   } else {
@@ -5568,7 +5565,7 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
     hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
     hdrMaxLuminance = 1;
 
-    // Tonemap(_viewDef);
+    Tonemap(_viewDef);
   }
 
   // if (!r_skipBloom.GetBool()) {
