@@ -34,7 +34,7 @@ float PhotoLuma( vec3 c )
 }
 vec3 sRGBToLinearRGB( vec3 c )
 {
-	#if defined( USE_LINEAR_RGB ) && !defined( USE_SRGB )
+	#if !defined( USE_SRGB )
 	c = clamp( c, 0.0, 1.0 );
 	return Linear3( c );
 	#else 
@@ -43,7 +43,7 @@ vec3 sRGBToLinearRGB( vec3 c )
 }
 vec4 sRGBAToLinearRGBA( vec4 c )
 {
-	#if defined( USE_LINEAR_RGB ) && !defined( USE_SRGB )
+	#if !defined( USE_SRGB )
 	c = clamp( c, 0.0, 1.0 );
 	return vec4( Linear1( c.r ), Linear1( c.g ), Linear1( c.b ), Linear1( c.a ) );
 	#else 
@@ -52,7 +52,7 @@ vec4 sRGBAToLinearRGBA( vec4 c )
 }
 vec3 LinearRGBToSRGB( vec3 c )
 {
-	#if defined( USE_LINEAR_RGB ) && !defined( USE_SRGB )
+	#if !defined( USE_SRGB )
 	c = clamp( c, 0.0, 1.0 );
 	return Srgb3( c );
 	#else 
@@ -61,7 +61,7 @@ vec3 LinearRGBToSRGB( vec3 c )
 }
 vec4 LinearRGBToSRGB( vec4 c )
 {
-	#if defined( USE_LINEAR_RGB ) && !defined( USE_SRGB )
+	#if !defined( USE_SRGB )
 	c = clamp( c, 0.0, 1.0 );
 	return vec4( Srgb1( c.r ), Srgb1( c.g ), Srgb1( c.b ), c.a );
 	#else 

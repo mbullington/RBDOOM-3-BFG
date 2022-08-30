@@ -30,9 +30,7 @@ layout( location = 0 ) out vec4 fo_FragColor;
 void main()
 {
 	vec4 c = texture( samp0, vofi_TexCoord0 ) * texture( samp1, vofi_TexCoord1 ) * rpColor;
-	#if defined( USE_LINEAR_RGB )
 	c = clamp( c, 0.0, 1.0 );
 	c = vec4( Linear1( c.r ), Linear1( c.g ), Linear1( c.b ), Linear1( c.a ) );
-	#endif 
 	fo_FragColor = c;
 }

@@ -326,11 +326,6 @@ idRenderProgManager::preprocess_glsl_t idRenderProgManager::PreprocessGLSL(
     src.AddDefine(compileMacros[i]);
   }
 
-  // TODO(mbullington): Once this is supported in Vulkan, always enable it.
-  if (r_useHDR.GetBool()) {
-    src.AddDefine("USE_LINEAR_RGB");
-  }
-
   if (r_pbrDebug.GetBool()) {
     src.AddDefine("DEBUG_PBR");
   }
