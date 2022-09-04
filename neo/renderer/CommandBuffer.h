@@ -50,10 +50,25 @@ namespace id {
 using std::nullopt;
 using std::optional;
 
+enum commandBufferOptions_t {
+  CMD_BUF_OPT_NONE = 0,
+  // This flag is needed for CommandBuffer to create a Fence object on Vulkan.
+  // This is used for CPU synchronization, but may unnecessary for the majority
+  // of CommandBuffers.
+  CMD_BUF_OPT_CREATE_FENCE = BIT(1),
+  // This flag is needed to allow multiple Begin() calls on the same frame.
+  //
+  // This is disabled by default because it's largely a footgun, as it
+  // overwrites
+  // the previous command buffer contents.
+  CMD_BUF_OPT_ALLOW_MULTIPLE_RECORDS_PER_FRAME = BIT(2),
+};
+
 class CommandBuffer {
  public:
   CommandBuffer(optional<CommandBuffer **> dependencies = nullopt,
-                short numDependencies = 0);
+                short numDependencies = 0,
+                commandBufferOptions_t opts = CMD_BUF_OPT_NONE);
   virtual ~CommandBuffer();
 
   void Bind(Framebuffer *frameBuffer);
@@ -75,6 +90,11 @@ class CommandBuffer {
  private:
   bool isRecording;
   bool isBound;
+
+  int frameParity;
+
+  bool shouldCreateFence;
+  bool shouldAllowMultipleRecordsPerFrame;
 
   bool waitOnSwapAcquire;
 

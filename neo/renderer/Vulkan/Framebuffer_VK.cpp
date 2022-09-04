@@ -60,8 +60,8 @@ Framebuffer::~Framebuffer() {
   vulkanDeletionQueue_t& deletionQueue =
       vkcontext.deletionQueue[vkcontext.frameParity];
 
-  deletionQueue.renderPasses.Append(renderPass);
-  deletionQueue.framebuffers.Append(frameBuffer);
+  if (renderPass) deletionQueue.renderPasses.Append(renderPass);
+  if (frameBuffer) deletionQueue.framebuffers.Append(frameBuffer);
 }
 
 void Framebuffer::Update(textureFormat_t format, idImage* image,

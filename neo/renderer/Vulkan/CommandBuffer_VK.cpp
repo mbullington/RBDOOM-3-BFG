@@ -48,9 +48,16 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 namespace id {
 
 CommandBuffer::CommandBuffer(optional<CommandBuffer **> dependencies,
-                             short numDependencies) {
+                             short numDependencies,
+                             commandBufferOptions_t opts) {
   isRecording = false;
   isBound = false;
+
+  frameParity = -1;
+
+  shouldCreateFence = opts & CMD_BUF_OPT_CREATE_FENCE;
+  shouldAllowMultipleRecordsPerFrame =
+      opts & CMD_BUF_OPT_ALLOW_MULTIPLE_RECORDS_PER_FRAME;
 
   waitOnSwapAcquire = false;
   if (numDependencies > 0) {
@@ -82,12 +89,14 @@ CommandBuffer::CommandBuffer(optional<CommandBuffer **> dependencies,
   }
 
   // Create the fence.
-  {
+  if (shouldCreateFence) {
     VkFenceCreateInfo info = {
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
     };
 
     vkCreateFence(vkcontext.device, &info, NULL, &fence);
+  } else {
+    fence = NULL;
   }
 }
 
@@ -101,9 +110,9 @@ CommandBuffer::~CommandBuffer() {
   vulkanDeletionQueue_t &deletionQueue =
       vkcontext.deletionQueue[vkcontext.frameParity];
 
-  deletionQueue.commandBuffers.Append(handle);
-  deletionQueue.semaphores.Append(semaphore);
-  deletionQueue.fences.Append(fence);
+  if (handle) deletionQueue.commandBuffers.Append(handle);
+  if (semaphore) deletionQueue.semaphores.Append(semaphore);
+  if (fence) deletionQueue.fences.Append(fence);
 }
 
 void CommandBuffer::Bind(id::Framebuffer *frameBuffer) {
@@ -158,6 +167,12 @@ void CommandBuffer::Unbind() {
 void CommandBuffer::Begin() {
   if (isRecording) {
     common->Warning("CommandBuffer::Begin: Already recording");
+    return;
+  }
+
+  if (frameParity == vkcontext.frameParity &&
+      !shouldAllowMultipleRecordsPerFrame) {
+    common->FatalError("CommandBuffer::Begin: Already recorded this frame");
     return;
   }
 
@@ -230,6 +245,9 @@ void CommandBuffer::Submit(optional<CommandBuffer **> dependencies,
 
   ID_VK_CHECK(
       vkQueueSubmit(vkcontext.graphicsQueue, 1, &submitInfo, this->fence));
+
+  // Reset our internal flag here.
+  frameParity = -1;
 }
 
 }  // namespace id

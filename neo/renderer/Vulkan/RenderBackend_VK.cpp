@@ -1573,7 +1573,8 @@ void idRenderBackend::Init() {
   idLib::Printf("Creating command buffer...\n");
   {
     for (int i = 0; i < NUM_FRAME_DATA; ++i) {
-      swapSubmitCommandBuffers[i] = new CommandBuffer();
+      swapSubmitCommandBuffers[i] =
+          new CommandBuffer(std::nullopt, 0, id::CMD_BUF_OPT_CREATE_FENCE);
     }
   }
 

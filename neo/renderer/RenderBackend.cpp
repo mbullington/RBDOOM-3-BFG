@@ -4915,6 +4915,10 @@ smp extensions, or asyncronously by another thread.
 ====================
 */
 void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
+  if (cmds->commandId == RC_NOP && !cmds->next) {
+    return;
+  }
+
   // r_debugRenderToTexture
   int c_draw3d = 0;
   int c_draw2d = 0;
@@ -4931,13 +4935,11 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
   Framebuffer* swapChain = GL_StartFrame();
 
   CommandBuffer hdrCommandBuffer;
-
-  CommandBuffer* dependencies = &hdrCommandBuffer;
-  CommandBuffer commandBuffer(&dependencies, 1);
-
-  if (cmds->commandId == RC_NOP && !cmds->next) {
-    return;
-  }
+  CommandBuffer commandBuffer(
+      (CommandBuffer*[]){
+          &hdrCommandBuffer,
+      },
+      1);
 
   if (renderSystem->GetStereo3DMode() != STEREO3D_OFF) {
     StereoRenderExecuteBackEndCommands(cmds);
