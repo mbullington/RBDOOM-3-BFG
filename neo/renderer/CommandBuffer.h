@@ -3,6 +3,7 @@
 
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 2014-2016 Robert Beckebans
+Copyright (C) 2022 Michael Bullington
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
 Source Code").
@@ -36,9 +37,54 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #pragma once
 
+#include <optional>
+
+#include "RenderFwd.h"
+
 #if defined(USE_VULKAN)
 #include <vulkan/vulkan.h>
-
-// TODO(mbullington): Do we want a struct for this?
-typedef VkCommandBuffer CommandBuffer;
 #endif
+
+namespace id {
+
+using std::nullopt;
+using std::optional;
+
+class CommandBuffer {
+ public:
+  CommandBuffer(optional<CommandBuffer **> dependencies = nullopt,
+                short numDependencies = 0);
+  virtual ~CommandBuffer();
+
+  void Bind(Framebuffer *frameBuffer);
+  void Unbind();
+
+  void Begin();
+  void End();
+  void MakeActive();
+
+  void Submit(optional<CommandBuffer **> dependencies = nullopt,
+              short numDependencies = 0);
+
+#if defined(USE_VULKAN)
+  VkCommandBuffer GetHandle() const { return handle; }
+  VkSemaphore GetSemaphore() const { return semaphore; }
+  VkFence GetFence() const { return fence; }
+#endif
+
+ private:
+  bool isRecording;
+  bool isBound;
+
+  bool waitOnSwapAcquire;
+
+  idList<CommandBuffer *> dependencies;
+
+#if defined(USE_VULKAN)
+  VkCommandBuffer handle;
+  VkSemaphore semaphore;
+  VkFence fence;
+#endif
+};
+
+}  // namespace id

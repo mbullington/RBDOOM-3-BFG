@@ -268,11 +268,13 @@ enum imageFileType_t {
 };
 
 #include "BinaryImage.h"
+#include "RenderFwd.h"
 
 #define MAX_IMAGE_NAME 256
 
 class idImage {
-  friend class Framebuffer;
+  friend class id::Framebuffer;
+  friend class id::CommandBuffer;
 
  public:
   idImage(const char* name);

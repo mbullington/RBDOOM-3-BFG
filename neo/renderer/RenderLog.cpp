@@ -35,6 +35,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 ===========================================================================
 */
 #include "RenderCommon.h"
+#include "renderer/CommandBuffer.h"
 #pragma hdrstop
 
 /*
@@ -117,6 +118,11 @@ void PC_BeginNamedEvent(const char* szName, const idVec4& color) {
   }
 
 #if defined(USE_VULKAN)
+  id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  if (!cmd) {
+    common->Warning("PC_BeginNamedEvent: no current command buffer");
+    return;
+  }
 
   // start an annotated group of calls under the this name
   // SRS - Prefer VK_EXT_debug_utils over
@@ -130,8 +136,7 @@ void PC_BeginNamedEvent(const char* szName, const idVec4& color) {
     label.color[2] = color.z;
     label.color[3] = color.w;
 
-    qvkCmdBeginDebugUtilsLabelEXT(
-        vkcontext.commandBuffer[vkcontext.frameParity], &label);
+    qvkCmdBeginDebugUtilsLabelEXT(cmd->GetHandle(), &label);
   } else if (vkcontext.debugMarkerSupportAvailable) {
     VkDebugMarkerMarkerInfoEXT label = {};
     label.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
@@ -141,8 +146,7 @@ void PC_BeginNamedEvent(const char* szName, const idVec4& color) {
     label.color[2] = color.z;
     label.color[3] = color.w;
 
-    qvkCmdDebugMarkerBeginEXT(vkcontext.commandBuffer[vkcontext.frameParity],
-                              &label);
+    qvkCmdDebugMarkerBeginEXT(cmd->GetHandle(), &label);
   }
 #else
   // RB: colors are not supported in OpenGL
@@ -203,12 +207,18 @@ void PC_EndNamedEvent() {
   }
 
 #if defined(USE_VULKAN)
+  id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  if (!cmd) {
+    common->Warning("PC_EndNamedEvent: no current command buffer");
+    return;
+  }
+
   // SRS - Prefer VK_EXT_debug_utils over
   // VK_EXT_debug_marker/VK_EXT_debug_report (deprecated by VK_EXT_debug_utils)
   if (vkcontext.debugUtilsSupportAvailable) {
-    qvkCmdEndDebugUtilsLabelEXT(vkcontext.commandBuffer[vkcontext.frameParity]);
+    qvkCmdEndDebugUtilsLabelEXT(cmd->GetHandle());
   } else if (vkcontext.debugMarkerSupportAvailable) {
-    qvkCmdDebugMarkerEndEXT(vkcontext.commandBuffer[vkcontext.frameParity]);
+    qvkCmdDebugMarkerEndEXT(cmd->GetHandle());
   }
 #else
   // only do this if RBDOOM-3-BFG was started by RenderDoc or some similar tool
@@ -313,19 +323,23 @@ void idRenderLog::OpenMainBlock(renderLogMainBlock_t block) {
     mainBlock = block;
 
 #if defined(USE_VULKAN)
+    id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+    if (!cmd) {
+      common->Warning("idRenderLog::OpenMainBlock: no current command buffer");
+      return;
+    }
+
     if (vkcontext.queryIndex[vkcontext.frameParity] >=
         (NUM_TIMESTAMP_QUERIES - 1)) {
       return;
     }
 
-    VkCommandBuffer commandBuffer =
-        vkcontext.commandBuffer[vkcontext.frameParity];
     VkQueryPool queryPool = vkcontext.queryPools[vkcontext.frameParity];
 
     uint32 queryIndex =
         vkcontext.queryAssignedIndex[vkcontext.frameParity][mainBlock * 2 + 0] =
             vkcontext.queryIndex[vkcontext.frameParity]++;
-    vkCmdWriteTimestamp(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+    vkCmdWriteTimestamp(cmd->GetHandle(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                         queryPool, queryIndex);
 
 #elif defined(__APPLE__)
@@ -378,19 +392,23 @@ void idRenderLog::CloseMainBlock() {
   // for all platforms
   if (glConfig.timerQueryAvailable) {
 #if defined(USE_VULKAN)
+    id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+    if (!cmd) {
+      common->Warning("idRenderLog::CloseMainBlock: no current command buffer");
+      return;
+    }
+
     if (vkcontext.queryIndex[vkcontext.frameParity] >=
         (NUM_TIMESTAMP_QUERIES - 1)) {
       return;
     }
 
-    VkCommandBuffer commandBuffer =
-        vkcontext.commandBuffer[vkcontext.frameParity];
     VkQueryPool queryPool = vkcontext.queryPools[vkcontext.frameParity];
 
     uint32 queryIndex =
         vkcontext.queryAssignedIndex[vkcontext.frameParity][mainBlock * 2 + 1] =
             vkcontext.queryIndex[vkcontext.frameParity]++;
-    vkCmdWriteTimestamp(commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+    vkCmdWriteTimestamp(cmd->GetHandle(), VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
                         queryPool, queryIndex);
 
 #elif defined(__APPLE__)

@@ -136,16 +136,7 @@ const char* vertexInsert = {
 #endif
     "#pragma shader_stage( vertex )\n"
     "#extension GL_ARB_separate_shader_objects : enable\n"
-    //"#define PC\n"
-    "\n"
-    //"float saturate( float v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    //"vec2 saturate( vec2 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    //"vec3 saturate( vec3 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    //"vec4 saturate( vec4 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    //"vec4 tex2Dlod( sampler2D sampler, vec4 texcoord ) { return textureLod(
-    // sampler, texcoord.xy, texcoord.w ); }\n"
-    //"\n"
-};
+    "\n"};
 
 const char* fragmentInsert = {
 // SRS - OSX OpenGL only supports up to GLSL 4.1, but current RenderProgs
@@ -157,7 +148,6 @@ const char* fragmentInsert = {
 #endif
     "#pragma shader_stage( fragment )\n"
     "#extension GL_ARB_separate_shader_objects : enable\n"
-    //"#define PC\n"
     "\n"
     "void clip( float v ) { if ( v < 0.0 ) { discard; } }\n"
     "void clip( vec2 v ) { if ( any( lessThan( v, vec2( 0.0 ) ) ) ) { discard; "
@@ -171,143 +161,7 @@ const char* fragmentInsert = {
     "vec2 saturate( vec2 v ) { return clamp( v, 0.0, 1.0 ); }\n"
     "vec3 saturate( vec3 v ) { return clamp( v, 0.0, 1.0 ); }\n"
     "vec4 saturate( vec4 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "\n"
-    //"vec4 tex2D( sampler2D sampler, vec2 texcoord ) { return texture( sampler,
-    // texcoord.xy ); }\n" "vec4 tex2D( sampler2DShadow sampler, vec3 texcoord )
-    //{ return vec4( texture( sampler, texcoord.xyz ) ); }\n"
-    //"\n"
-    //"vec4 tex2D( sampler2D sampler, vec2 texcoord, vec2 dx, vec2 dy ) { return
-    // textureGrad( sampler, texcoord.xy, dx, dy ); }\n" "vec4 tex2D(
-    // sampler2DShadow sampler, vec3 texcoord, vec2 dx, vec2 dy ) { return vec4(
-    // textureGrad( sampler, texcoord.xyz, dx, dy ) ); }\n"
-    //"\n"
-    //"vec4 texCUBE( samplerCube sampler, vec3 texcoord ) { return texture(
-    // sampler, texcoord.xyz ); }\n" "vec4 texCUBE( samplerCubeShadow sampler,
-    // vec4 texcoord ) { return vec4( texture( sampler, texcoord.xyzw ) ); }\n"
-    //"\n"
-    //"vec4 tex1Dproj( sampler1D sampler, vec2 texcoord ) { return textureProj(
-    // sampler, texcoord ); }\n" "vec4 tex2Dproj( sampler2D sampler, vec3
-    // texcoord ) { return textureProj( sampler, texcoord ); }\n" "vec4
-    // tex3Dproj( sampler3D sampler, vec4 texcoord ) { return textureProj(
-    // sampler, texcoord ); }\n"
-    //"\n"
-    //"vec4 tex1Dbias( sampler1D sampler, vec4 texcoord ) { return texture(
-    // sampler, texcoord.x, texcoord.w ); }\n" "vec4 tex2Dbias( sampler2D
-    // sampler, vec4 texcoord ) { return texture( sampler, texcoord.xy,
-    // texcoord.w ); }\n" "vec4 tex3Dbias( sampler3D sampler, vec4 texcoord ) {
-    // return texture( sampler, texcoord.xyz, texcoord.w ); }\n" "vec4
-    // texCUBEbias( samplerCube sampler, vec4 texcoord ) { return texture(
-    // sampler, texcoord.xyz, texcoord.w ); }\n"
-    //"\n"
-    //"vec4 tex1Dlod( sampler1D sampler, vec4 texcoord ) { return textureLod(
-    // sampler, texcoord.x, texcoord.w ); }\n" "vec4 tex2Dlod( sampler2D
-    // sampler, vec4 texcoord ) { return textureLod( sampler, texcoord.xy,
-    // texcoord.w );
-    //}\n" "vec4 tex3Dlod( sampler3D sampler, vec4 texcoord ) { return
-    // textureLod( sampler, texcoord.xyz, texcoord.w ); }\n" "vec4 texCUBElod(
-    // samplerCube sampler, vec4 texcoord ) { return textureLod( sampler,
-    // texcoord.xyz, texcoord.w ); }\n"
-    //"\n"
-};
-
-// RB begin
-const char* vertexInsert_GLSL_ES_3_00 = {
-    "#version 300 es\n"
-    "#define PC\n"
-    "precision mediump float;\n"
-
-    //"#extension GL_ARB_gpu_shader5 : enable\n"
-    "\n"
-    "float saturate( float v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "vec2 saturate( vec2 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "vec3 saturate( vec3 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "vec4 saturate( vec4 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    //"vec4 tex2Dlod( sampler2D sampler, vec4 texcoord ) { return textureLod(
-    // sampler, texcoord.xy, texcoord.w ); }\n"
     "\n"};
-
-const char* fragmentInsert_GLSL_ES_3_00 = {
-    "#version 300 es\n"
-    "#define PC\n"
-    "precision mediump float;\n"
-    "precision lowp sampler2D;\n"
-    "precision lowp sampler2DShadow;\n"
-    "precision lowp sampler2DArray;\n"
-    "precision lowp sampler2DArrayShadow;\n"
-    "precision lowp samplerCube;\n"
-    "precision lowp samplerCubeShadow;\n"
-    "precision lowp sampler3D;\n"
-    "\n"
-    "void clip( float v ) { if ( v < 0.0 ) { discard; } }\n"
-    "void clip( vec2 v ) { if ( any( lessThan( v, vec2( 0.0 ) ) ) ) { discard; "
-    "} }\n"
-    "void clip( vec3 v ) { if ( any( lessThan( v, vec3( 0.0 ) ) ) ) { discard; "
-    "} }\n"
-    "void clip( vec4 v ) { if ( any( lessThan( v, vec4( 0.0 ) ) ) ) { discard; "
-    "} }\n"
-    "\n"
-    "float saturate( float v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "vec2 saturate( vec2 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "vec3 saturate( vec3 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "vec4 saturate( vec4 v ) { return clamp( v, 0.0, 1.0 ); }\n"
-    "\n"
-    "vec4 tex2D( sampler2D sampler, vec2 texcoord ) { return texture( sampler, "
-    "texcoord.xy ); }\n"
-    "vec4 tex2D( sampler2DShadow sampler, vec3 texcoord ) { return vec4( "
-    "texture( sampler, texcoord.xyz ) ); }\n"
-    "\n"
-    "vec4 tex2D( sampler2D sampler, vec2 texcoord, vec2 dx, vec2 dy ) { return "
-    "textureGrad( sampler, texcoord.xy, dx, dy ); }\n"
-    "vec4 tex2D( sampler2DShadow sampler, vec3 texcoord, vec2 dx, vec2 dy ) { "
-    "return vec4( textureGrad( sampler, texcoord.xyz, dx, dy ) ); }\n"
-    "\n"
-    "vec4 texCUBE( samplerCube sampler, vec3 texcoord ) { return texture( "
-    "sampler, texcoord.xyz ); }\n"
-    "vec4 texCUBE( samplerCubeShadow sampler, vec4 texcoord ) { return vec4( "
-    "texture( sampler, texcoord.xyzw ) ); }\n"
-    "\n"
-    //"vec4 tex1Dproj( sampler1D sampler, vec2 texcoord ) { return textureProj(
-    // sampler, texcoord ); }\n"
-    "vec4 tex2Dproj( sampler2D sampler, vec3 texcoord ) { return textureProj( "
-    "sampler, texcoord ); }\n"
-    "vec4 tex3Dproj( sampler3D sampler, vec4 texcoord ) { return textureProj( "
-    "sampler, texcoord ); }\n"
-    "\n"
-    //"vec4 tex1Dbias( sampler1D sampler, vec4 texcoord ) { return texture(
-    // sampler, texcoord.x, texcoord.w ); }\n"
-    "vec4 tex2Dbias( sampler2D sampler, vec4 texcoord ) { return texture( "
-    "sampler, texcoord.xy, texcoord.w ); }\n"
-    "vec4 tex3Dbias( sampler3D sampler, vec4 texcoord ) { return texture( "
-    "sampler, texcoord.xyz, texcoord.w ); }\n"
-    "vec4 texCUBEbias( samplerCube sampler, vec4 texcoord ) { return texture( "
-    "sampler, texcoord.xyz, texcoord.w ); }\n"
-    "\n"
-    //"vec4 tex1Dlod( sampler1D sampler, vec4 texcoord ) { return textureLod(
-    // sampler, texcoord.x, texcoord.w ); }\n"
-    "vec4 tex2Dlod( sampler2D sampler, vec4 texcoord ) { return textureLod( "
-    "sampler, texcoord.xy, texcoord.w ); }\n"
-    "vec4 tex3Dlod( sampler3D sampler, vec4 texcoord ) { return textureLod( "
-    "sampler, texcoord.xyz, texcoord.w ); }\n"
-    "vec4 texCUBElod( samplerCube sampler, vec4 texcoord ) { return "
-    "textureLod( sampler, texcoord.xyz, texcoord.w ); }\n"
-    "\n"};
-// RB end
-
-struct builtinConversion_t {
-  const char* nameCG;
-  const char* nameGLSL;
-} builtinConversion[] = {
-    {"frac", "fract"}, {"lerp", "mix"}, {"rsqrt", "inversesqrt"},
-    {"ddx", "dFdx"},   {"ddy", "dFdy"},
-
-    {NULL, NULL}};
-
-struct inOutVariable_t {
-  idStr type;
-  idStr nameCg;
-  idStr nameGLSL;
-  bool declareInOut;
-};
 
 #define SHADER_DEBUG_WRITE_TO_SAVEPATH 1
 

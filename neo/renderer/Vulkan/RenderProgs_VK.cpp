@@ -1238,7 +1238,7 @@ VkPipeline idRenderProgManager::renderProg_t::GetPipeline(
 idRenderProgManager::CommitUnforms
 ================================================================================================
 */
-void idRenderProgManager::CommitUniforms(VkCommandBuffer commandBuffer,
+void idRenderProgManager::CommitUniforms(const id::CommandBuffer* commandBuffer,
                                          uint64 stateBits) {
   renderProg_t& prog = renderProgs[current];
 
@@ -1356,10 +1356,12 @@ void idRenderProgManager::CommitUniforms(VkCommandBuffer commandBuffer,
   }
 
   vkUpdateDescriptorSets(vkcontext.device, writeIndex, writes, 0, NULL);
-  vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                          prog.pipelineLayout, 0, 1, &descSet, 0, NULL);
+  vkCmdBindDescriptorSets(commandBuffer->GetHandle(),
+                          VK_PIPELINE_BIND_POINT_GRAPHICS, prog.pipelineLayout,
+                          0, 1, &descSet, 0, NULL);
 
-  vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+  vkCmdBindPipeline(commandBuffer->GetHandle(), VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipeline);
 }
 
 void idRenderProgManager::CachePipeline(uint64 stateBits) {

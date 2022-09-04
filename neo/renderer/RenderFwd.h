@@ -2,8 +2,9 @@
 ===========================================================================
 
 Doom 3 BFG Edition GPL Source Code
-Copyright (C) 2014-2016 Robert Beckebans
-Copyright (C) 2022 Michael Bullington
+Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
+Copyright (C) 2016-2017 Dustin Land
+Copyright (C) 2017-2020 Robert Beckebans
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
 Source Code").
@@ -37,61 +38,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #pragma once
 
-#include "RenderFwd.h"
-
-#if defined(USE_VULKAN)
-#include <vulkan/vulkan.h>
-#endif
-
 namespace id {
-
-class Framebuffer {
-  friend class CommandBuffer;
-
- public:
-  Framebuffer(int width, int height);
-  virtual ~Framebuffer();
-
-  static void Init();
-  static void Shutdown();
-  static void CheckFramebuffers();
-
-  void Update(textureFormat_t format, idImage* image,
-              idImage* depthImage = NULL);
-#if defined(USE_VULKAN)
-  void VkUpdate(VkFramebuffer frameBuffer, VkRenderPass renderPass,
-                bool isSwapImage = false) {
-    this->frameBuffer = frameBuffer;
-    this->renderPass = renderPass;
-    this->isSwapImage = isSwapImage;
-  }
-#endif
-
-  int GetWidth() const { return width; }
-  int GetHeight() const { return height; }
-
-  void Resize(int width_, int height_) {
-    width = width_;
-    height = height_;
-  }
-
- private:
-  // FBO object
-#if defined(USE_VULKAN)
-  VkFramebuffer frameBuffer;
-  VkRenderPass renderPass;
-#endif
-
-  int width;
-  int height;
-
-  bool isSwapImage;
-};
-
-struct globalFramebuffers_t {
-  Framebuffer* hdrFBO;
-};
-
-extern globalFramebuffers_t globalFramebuffers;
-
+class Framebuffer;
+class CommandBuffer;
 }  // namespace id

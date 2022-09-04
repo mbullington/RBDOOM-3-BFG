@@ -2093,9 +2093,7 @@ idRenderBackend::AmbientPass
 ==================
 */
 void idRenderBackend::AmbientPass(const drawSurf_t* const* drawSurfs,
-                                  int numDrawSurfs, bool fillGbuffer) {
-  Framebuffer* previousFramebuffer = Framebuffer::GetActiveFramebuffer();
-
+                                  int numDrawSurfs) {
   if (numDrawSurfs == 0) {
     return;
   }
@@ -2113,21 +2111,7 @@ void idRenderBackend::AmbientPass(const drawSurf_t* const* drawSurfs,
     return;
   }
 
-#if defined(USE_VULKAN)
-  if (fillGbuffer) {
-    return;
-  }
-#endif
-
-  /*
-  if( !fillGbuffer )
-  {
-          // clear gbuffer
-          GL_Clear( true, false, false, 0, 0.0f, 0.0f, 0.0f, 1.0f, false );
-  }
-  */
-
-  if (!fillGbuffer && r_useSSAO.GetBool() && r_ssaoDebug.GetBool()) {
+  if (r_useSSAO.GetBool() && r_ssaoDebug.GetBool()) {
     GL_State(GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO | GLS_DEPTHMASK |
              GLS_DEPTHFUNC_ALWAYS);
 
@@ -2162,16 +2146,8 @@ void idRenderBackend::AmbientPass(const drawSurf_t* const* drawSurfs,
     return;
   }
 
-  renderLog.OpenMainBlock(fillGbuffer ? MRB_FILL_GEOMETRY_BUFFER
-                                      : MRB_AMBIENT_PASS);
-  renderLog.OpenBlock(
-      fillGbuffer ? "Fill_GeometryBuffer" : "Render_AmbientPass", colorBlue);
-
-  if (fillGbuffer) {
-    globalFramebuffers.geometryBufferFBO->Bind();
-
-    GL_Clear(true, false, false, 0, 0.0f, 0.0f, 0.0f, 1.0f, false);
-  }
+  renderLog.OpenMainBlock(MRB_AMBIENT_PASS);
+  renderLog.OpenBlock("Render_AmbientPass", colorBlue);
 
   // RB: not needed
   // GL_StartDepthPass( backEnd.viewDef->scissor );
@@ -2241,7 +2217,7 @@ void idRenderBackend::AmbientPass(const drawSurf_t* const* drawSurfs,
   renderProgManager.SetRenderParm(RENDERPARM_AMBIENT_COLOR,
                                   ambientColor.ToFloatPtr());
 
-  bool useIBL = r_usePBR.GetBool() && !fillGbuffer;
+  bool useIBL = r_usePBR.GetBool();
 
   // setup renderparms assuming we will be drawing trivial surfaces first
   RB_SetupForFastPathInteractions(diffuseColor, specularColor);
@@ -2281,24 +2257,13 @@ void idRenderBackend::AmbientPass(const drawSurf_t* const* drawSurfs,
     // }
     // else
     {
-      if (fillGbuffer) {
-        // TODO support PBR textures and store roughness in the alpha channel
+      // TODO support PBR textures
 
-        // fill geometry buffer with normal/roughness information
-        if (drawSurf->jointCache) {
-          renderProgManager.BindShader_SmallGeometryBufferSkinned();
-        } else {
-          renderProgManager.BindShader_SmallGeometryBuffer();
-        }
+      // draw Quake 4 style ambient
+      if (drawSurf->jointCache) {
+        renderProgManager.BindShader_AmbientLightingSkinned();
       } else {
-        // TODO support PBR textures
-
-        // draw Quake 4 style ambient
-        if (drawSurf->jointCache) {
-          renderProgManager.BindShader_AmbientLightingSkinned();
-        } else {
-          renderProgManager.BindShader_AmbientLighting();
-        }
+        renderProgManager.BindShader_AmbientLighting();
       }
     }
 
@@ -2530,15 +2495,6 @@ void idRenderBackend::AmbientPass(const drawSurf_t* const* drawSurfs,
   SetFragmentParm(RENDERPARM_ALPHA_TEST, vec4_zero.ToFloatPtr());
 
   GL_SelectTexture(0);
-
-  if (fillGbuffer) {
-    // go back to main render target
-    if (previousFramebuffer != NULL) {
-      previousFramebuffer->Bind();
-    } else {
-      Framebuffer::Unbind();
-    }
-  }
 
   renderProgManager.Unbind();
 
@@ -3461,8 +3417,6 @@ void idRenderBackend::DrawInteractions(const viewDef_t* _viewDef) {
   const bool useLightDepthBounds =
       r_useLightDepthBounds.GetBool() && !r_useShadowMapping.GetBool();
 
-  Framebuffer* previousFramebuffer = Framebuffer::GetActiveFramebuffer();
-
   //
   // for each light, perform shadowing and adding
   //
@@ -3514,12 +3468,6 @@ void idRenderBackend::DrawInteractions(const viewDef_t* _viewDef) {
         ShadowMapPass(vLight->globalShadows, vLight, side);
       }
 
-      // go back to main render target
-      if (previousFramebuffer != NULL) {
-        previousFramebuffer->Bind();
-      } else {
-        Framebuffer::Unbind();
-      }
       renderProgManager.Unbind();
 
       GL_State(GLS_DEFAULT);
@@ -4358,133 +4306,6 @@ void idRenderBackend::FogAllLights() {
   renderLog.CloseMainBlock();
 }
 
-// RB begin
-void idRenderBackend::CalculateAutomaticExposure() {
-  int i;
-  static float image[64 * 64 * 4];
-  float curTime;
-  float deltaTime;
-  float luminance;
-  float avgLuminance;
-  float maxLuminance;
-  double sum;
-  const idVec3 LUMINANCE_SRGB(
-      0.2125f, 0.7154f,
-      0.0721f);  // be careful wether this should be linear RGB or sRGB
-  idVec4 color;
-  float newAdaptation;
-  float newMaximum;
-
-  if (!r_hdrAutoExposure.GetBool()) {
-    // no dynamic exposure
-
-    hdrKey = r_hdrKey.GetFloat();
-    hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
-    hdrMaxLuminance = 1;
-  } else {
-    curTime = Sys_Milliseconds() / 1000.0f;
-
-    // calculate the average scene luminance
-    globalFramebuffers.hdr64FBO->Bind();
-
-    // FIXME
-#if !defined(USE_VULKAN)
-    // read back the contents
-    glReadPixels(0, 0, 64, 64, GL_RGBA, GL_FLOAT, image);
-#endif
-
-    sum = 0.0f;
-    maxLuminance = 0.0f;
-    for (i = 0; i < (64 * 64); i += 4) {
-      color[0] = image[i * 4 + 0];
-      color[1] = image[i * 4 + 1];
-      color[2] = image[i * 4 + 2];
-      color[3] = image[i * 4 + 3];
-
-      luminance = (color.x * LUMINANCE_SRGB.x + color.y * LUMINANCE_SRGB.y +
-                   color.z * LUMINANCE_SRGB.z) +
-                  0.0001f;
-      if (luminance > maxLuminance) {
-        maxLuminance = luminance;
-      }
-
-      float logLuminance = log(luminance + 1);
-      // if( logLuminance > 0 )
-      { sum += luminance; }
-    }
-#if 0
-		sum /= ( 64.0f * 64.0f );
-		avgLuminance = exp( sum );
-#else
-    avgLuminance = sum / (64.0f * 64.0f);
-#endif
-
-    // the user's adapted luminance level is simulated by closing the gap
-    // between adapted luminance and current luminance by 2% every frame, based
-    // on a 30 fps rate. This is not an accurate model of human adaptation,
-    // which can take longer than half an hour.
-    if (hdrTime > curTime) {
-      hdrTime = curTime;
-    }
-
-    deltaTime = curTime - hdrTime;
-
-    // if(r_hdrMaxLuminance->value)
-    {
-      hdrAverageLuminance =
-          idMath::ClampFloat(r_hdrMinLuminance.GetFloat(),
-                             r_hdrMaxLuminance.GetFloat(), hdrAverageLuminance);
-      avgLuminance =
-          idMath::ClampFloat(r_hdrMinLuminance.GetFloat(),
-                             r_hdrMaxLuminance.GetFloat(), avgLuminance);
-
-      hdrMaxLuminance =
-          idMath::ClampFloat(r_hdrMinLuminance.GetFloat(),
-                             r_hdrMaxLuminance.GetFloat(), hdrMaxLuminance);
-      maxLuminance =
-          idMath::ClampFloat(r_hdrMinLuminance.GetFloat(),
-                             r_hdrMaxLuminance.GetFloat(), maxLuminance);
-    }
-
-    newAdaptation =
-        hdrAverageLuminance + (avgLuminance - hdrAverageLuminance) *
-                                  (1.0f - powf(0.98f, 30.0f * deltaTime));
-    newMaximum = hdrMaxLuminance + (maxLuminance - hdrMaxLuminance) *
-                                       (1.0f - powf(0.98f, 30.0f * deltaTime));
-
-    if (!IsNAN(newAdaptation) && !IsNAN(newMaximum)) {
-#if 1
-      hdrAverageLuminance = newAdaptation;
-      hdrMaxLuminance = newMaximum;
-#else
-      hdrAverageLuminance = avgLuminance;
-      hdrMaxLuminance = maxLuminance;
-#endif
-    }
-
-    hdrTime = curTime;
-
-    // calculate HDR image key
-#if 0
-		// RB: this never worked :/
-		if( r_hdrAutoExposure.GetBool() )
-		{
-			// calculation from: Perceptual Effects in Real-time Tone Mapping - Krawczyk et al.
-			hdrKey = 1.03 - ( 2.0 / ( 2.0 + ( hdrAverageLuminance + 1.0f ) ) );
-		}
-		else
-#endif
-    { hdrKey = r_hdrKey.GetFloat(); }
-  }
-
-  if (r_hdrDebug.GetBool()) {
-    idLib::Printf("HDR luminance avg = %f, max = %f, key = %f\n",
-                  hdrAverageLuminance, hdrMaxLuminance, hdrKey);
-  }
-
-  // GL_CheckErrors();
-}
-
 void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
   RENDERLOG_PRINTF(
       "---------- RB_Tonemap( avg = %f, max = %f, key = %f, is2Dgui = %i ) "
@@ -4495,8 +4316,6 @@ void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
   // const idScreenRect& viewport = cmd->viewDef->viewport;
   // globalImages->currentRenderImage->CopyFramebuffer( viewport.x1,
   // viewport.y1, viewport.GetWidth(), viewport.GetHeight() );
-
-  Framebuffer::Unbind();
 
   GL_State(GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO | GLS_DEPTHMASK |
            GLS_DEPTHFUNC_ALWAYS | GLS_CULL_TWOSIDED);
@@ -4539,136 +4358,6 @@ void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
   renderProgManager.Unbind();
 
   GL_State(GLS_DEFAULT);
-}
-
-void idRenderBackend::Bloom(const viewDef_t* _viewDef) {
-  if (_viewDef->is2Dgui || !r_useHDR.GetBool() ||
-      (_viewDef->renderView.rdflags & RDF_IRRADIANCE)) {
-    return;
-  }
-
-  renderLog.OpenMainBlock(MRB_BLOOM);
-  renderLog.OpenBlock("Render_Bloom", colorBlue);
-
-  RENDERLOG_PRINTF(
-      "---------- RB_Bloom( avg = %f, max = %f, key = %f ) ----------\n",
-      hdrAverageLuminance, hdrMaxLuminance, hdrKey);
-
-  // BRIGHTPASS
-  renderLog.OpenBlock("Brightpass");
-
-  // GL_CheckErrors();
-
-  // FIXME
-#if !defined(USE_VULKAN)
-  glClearColor(0, 0, 0, 1);
-//	glClear( GL_COLOR_BUFFER_BIT );
-#endif
-
-  GL_State(/*GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO |*/ GLS_DEPTHMASK |
-           GLS_DEPTHFUNC_ALWAYS | GLS_CULL_TWOSIDED);
-
-  int screenWidth = renderSystem->GetWidth();
-  int screenHeight = renderSystem->GetHeight();
-
-  // set the window clipping
-  GL_Viewport(0, 0, screenWidth / 4, screenHeight / 4);
-  GL_Scissor(0, 0, screenWidth / 4, screenHeight / 4);
-
-  globalFramebuffers.bloomRenderFBO[0]->Bind();
-
-  GL_SelectTexture(0);
-
-  if (r_useHDR.GetBool()) {
-    globalImages->currentRenderHDRImage->Bind();
-
-    renderProgManager.BindShader_Brightpass();
-  } else {
-    int x = viewDef->viewport.x1;
-    int y = viewDef->viewport.y1;
-    int w = viewDef->viewport.x2 - viewDef->viewport.x1 + 1;
-    int h = viewDef->viewport.y2 - viewDef->viewport.y1 + 1;
-
-    RENDERLOG_PRINTF("Resolve to %i x %i buffer\n", w, h);
-
-    // resolve the screen
-    globalImages->currentRenderImage->CopyFramebuffer(x, y, w, h);
-
-    renderProgManager.BindShader_Brightpass();
-  }
-
-  float screenCorrectionParm[4];
-  screenCorrectionParm[0] = hdrKey;
-  screenCorrectionParm[1] = hdrAverageLuminance;
-  screenCorrectionParm[2] = hdrMaxLuminance;
-  screenCorrectionParm[3] = 1.0f;
-  SetFragmentParm(RENDERPARM_SCREENCORRECTIONFACTOR,
-                  screenCorrectionParm);  // rpScreenCorrectionFactor
-
-  float overbright[4];
-  if (r_useHDR.GetBool()) {
-    if (r_hdrAutoExposure.GetBool()) {
-      overbright[0] = r_hdrContrastDynamicThreshold.GetFloat();
-    } else {
-      overbright[0] = r_hdrContrastStaticThreshold.GetFloat();
-    }
-    overbright[1] = r_hdrContrastOffset.GetFloat();
-    overbright[2] = 0;
-    overbright[3] = 0;
-  } else {
-    overbright[0] = r_ldrContrastThreshold.GetFloat();
-    overbright[1] = r_ldrContrastOffset.GetFloat();
-    overbright[2] = 0;
-    overbright[3] = 0;
-  }
-  SetFragmentParm(RENDERPARM_OVERBRIGHT, overbright);  // rpOverbright
-
-  // Draw
-  DrawElementsWithCounters(&unitSquareSurface);
-
-  renderLog.CloseBlock();  // Brightpass
-
-  renderLog.OpenBlock("Bloom Ping Pong");
-
-  // BLOOM PING PONG rendering
-  renderProgManager.BindShader_HDRGlareChromatic();
-
-  int j;
-  for (j = 0; j < r_hdrGlarePasses.GetInteger(); j++) {
-    globalFramebuffers.bloomRenderFBO[(j + 1) % 2]->Bind();
-
-    // FIXME
-#if !defined(USE_VULKAN)
-    glClear(GL_COLOR_BUFFER_BIT);
-#endif
-
-    globalImages->bloomRenderImage[j % 2]->Bind();
-
-    DrawElementsWithCounters(&unitSquareSurface);
-  }
-
-  // add filtered glare back to main context
-  Framebuffer::Unbind();
-
-  ResetViewportAndScissorToDefaultCamera(_viewDef);
-
-  GL_State(GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE | GLS_DEPTHMASK |
-           GLS_DEPTHFUNC_ALWAYS);
-
-  renderProgManager.BindShader_Screen();
-
-  globalImages->bloomRenderImage[(j + 1) % 2]->Bind();
-
-  DrawElementsWithCounters(&unitSquareSurface);
-
-  renderLog.CloseBlock();  // Bloom Ping Pong
-
-  renderProgManager.Unbind();
-
-  GL_State(GLS_DEFAULT);
-
-  renderLog.CloseBlock();      // Render_Bloom
-  renderLog.CloseMainBlock();  // MRB_BLOOM
 }
 
 void idRenderBackend::DrawScreenSpaceAmbientOcclusion(const viewDef_t* _viewDef,
@@ -5238,7 +4927,13 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
   ResizeImages();
 
   renderLog.StartFrame();
-  GL_StartFrame();
+
+  Framebuffer* swapChain = GL_StartFrame();
+
+  CommandBuffer hdrCommandBuffer;
+
+  CommandBuffer* dependencies = &hdrCommandBuffer;
+  CommandBuffer commandBuffer(&dependencies, 1);
 
   if (cmds->commandId == RC_NOP && !cmds->next) {
     return;
@@ -5262,14 +4957,39 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
 
   bool useHDR = r_useHDR.GetBool();
 
+  hdrCommandBuffer.Begin();
+  hdrCommandBuffer.Bind(id::globalFramebuffers.hdrFBO);
+
+  commandBuffer.Begin();
+  commandBuffer.Bind(swapChain);
+
   for (; cmds != NULL; cmds = (const emptyCommand_t*)cmds->next) {
     switch (cmds->commandId) {
       case RC_NOP:
         break;
 
-      case RC_DRAW_VIEW_GUI:
-        if (useHDR) Framebuffer::Unbind();
+      case RC_DRAW_VIEW_3D:
+        hdrCommandBuffer.MakeActive();
 
+        drawView3D_timestamps = true;
+        DrawView(cmds, 0);
+        c_draw3d++;
+
+        commandBuffer.MakeActive();
+
+        // Do tonemapping.
+        {
+          hdrKey = r_hdrKey.GetFloat();
+          hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
+          hdrMaxLuminance = 1;
+
+          Tonemap(((const drawSurfsCommand_t*)cmds)->viewDef);
+        }
+
+        break;
+
+      case RC_DRAW_VIEW_GUI:
+        commandBuffer.MakeActive();
         if (drawView3D_timestamps) {
           // SRS - Capture separate timestamps for overlay GUI rendering when
           // RC_DRAW_VIEW_3D timestamps are active
@@ -5290,19 +5010,6 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
           DrawView(cmds, 0);
         }
         c_draw2d++;
-        break;
-
-      case RC_DRAW_VIEW_3D:
-        if (useHDR) {
-          globalFramebuffers.hdrFBO->Bind();
-        } else {
-          Framebuffer::Unbind();
-        }
-
-        drawView3D_timestamps = true;
-        DrawView(cmds, 0);
-        c_draw3d++;
-        break;
 
       case RC_SET_BUFFER:
         SetBuffer(cmds);
@@ -5314,11 +5021,15 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
         c_copyRenders++;
         break;
 
-      case RC_POST_PROCESS: {
-        // apply optional post processing
-        PostProcess(cmds);
+      case RC_POST_PROCESS:
         break;
-      }
+
+        // TODO(mbullington)
+        // case RC_POST_PROCESS: {
+        //   // apply optional post processing
+        //   PostProcess(cmds);
+        //   break;
+        // }
 
       default:
         common->Error("RB_ExecuteBackEndCommands: bad commandId");
@@ -5328,7 +5039,9 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
 
   DrawFlickerBox();
 
-  GL_EndFrame();
+  hdrCommandBuffer.Submit();
+  commandBuffer.Submit();
+  GL_EndFrame(&commandBuffer);
 
   // stop rendering on this thread
   uint64 backEndFinishTime = Sys_Microseconds();
@@ -5443,7 +5156,7 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
   //
   // fill the geometric buffer with normals and roughness
   //-------------------------------------------------
-  AmbientPass(drawSurfs, numDrawSurfs, true);
+  // AmbientPass(drawSurfs, numDrawSurfs, true);
 
   //-------------------------------------------------
   // build hierarchical depth buffer and SSAO render target
@@ -5453,7 +5166,7 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
   //-------------------------------------------------
   // render static lighting and consider SSAO results
   //-------------------------------------------------
-  AmbientPass(drawSurfs, numDrawSurfs, false);
+  AmbientPass(drawSurfs, numDrawSurfs);
 
   //-------------------------------------------------
   // main light renderer
@@ -5558,15 +5271,14 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
   DBG_RenderDebugTools(drawSurfs, numDrawSurfs);
 
   // RB: convert back from HDR to LDR range
-  bool isIrradianceCalc = _viewDef->renderView.rdflags & RDF_IRRADIANCE;
-  if (useHDR && !_viewDef->is2Dgui && !(isIrradianceCalc)) {
-    // CalculateAutomaticExposure();
-    hdrKey = r_hdrKey.GetFloat();
-    hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
-    hdrMaxLuminance = 1;
+  // bool isIrradianceCalc = _viewDef->renderView.rdflags & RDF_IRRADIANCE;
+  // if (useHDR && !_viewDef->is2Dgui && !(isIrradianceCalc)) {
+  //   hdrKey = r_hdrKey.GetFloat();
+  //   hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
+  //   hdrMaxLuminance = 1;
 
-    Tonemap(_viewDef);
-  }
+  //   Tonemap(_viewDef);
+  // }
 
   // if (!r_skipBloom.GetBool()) {
   //   Bloom(_viewDef);

@@ -38,6 +38,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __RENDERPROGS_H__
 #define __RENDERPROGS_H__
 
+#include "RenderFwd.h"
+
 static const int PC_ATTRIB_INDEX_VERTEX = 0;
 static const int PC_ATTRIB_INDEX_NORMAL = 2;
 static const int PC_ATTRIB_INDEX_COLOR = 3;
@@ -578,7 +580,7 @@ class idRenderProgManager {
   const char* GetGLSLParmName(int rp) const;
 
   void SetUniformValue(const renderParm_t rp, const float* value);
-  void CommitUniforms(CommandBuffer commandBuffer, uint64 stateBits);
+  void CommitUniforms(const id::CommandBuffer* commandBuffer, uint64 stateBits);
   void CachePipeline(uint64 stateBits);
   int FindGLSLProgram(const char* name, int vIndex, int fIndex);
 

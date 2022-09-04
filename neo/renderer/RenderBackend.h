@@ -39,11 +39,20 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __RENDERER_BACKEND_H__
 #define __RENDERER_BACKEND_H__
 
+#include <vulkan/vulkan_core.h>
+#include "renderer/CommandBuffer.h"
+#include "renderer/Framebuffer.h"
 #if defined(USE_VULKAN)
 #include <vulkan/vulkan.h>
 #endif
 
+#include <memory>
+
+#include "RenderFwd.h"
 #include "RenderLog.h"
+
+using id::CommandBuffer;
+using id::Framebuffer;
 
 bool GL_CheckErrors_(const char* filename, int line);
 #if 1  // !defined(RETAIL)
@@ -135,6 +144,14 @@ struct gpuInfo_t {
   idList<VkExtensionProperties> extensionProps;
 };
 
+struct vulkanDeletionQueue_t {
+  idList<VkCommandBuffer> commandBuffers;
+  idList<VkSemaphore> semaphores;
+  idList<VkFence> fences;
+  idList<VkFramebuffer> framebuffers;
+  idList<VkRenderPass> renderPasses;
+};
+
 struct vulkanContext_t {
   // Eric: If on linux, use this to pass SDL_Window pointer to the SDL_Vulkan_*
   // methods not in sdl_vkimp.cpp file.
@@ -178,9 +195,10 @@ struct vulkanContext_t {
   idList<gpuInfo_t> gpus;
 
   VkCommandPool commandPool;
-  idArray<VkCommandBuffer, NUM_FRAME_DATA> commandBuffer;
-  idArray<VkFence, NUM_FRAME_DATA> commandBufferFences;
-  idArray<bool, NUM_FRAME_DATA> commandBufferRecorded;
+  id::CommandBuffer* currentCommandBuffer;
+
+  // These are stored in memory so they're not destroyed until the next swap.
+  idArray<vulkanDeletionQueue_t, NUM_FRAME_DATA> deletionQueue;
 
   VkSurfaceKHR surface;
   VkPresentModeKHR presentMode;
@@ -198,9 +216,7 @@ struct vulkanContext_t {
   idArray<VkImage, NUM_FRAME_DATA> swapchainImages;
   idArray<VkImageView, NUM_FRAME_DATA> swapchainViews;
 
-  idArray<VkFramebuffer, NUM_FRAME_DATA> frameBuffers;
   idArray<VkSemaphore, NUM_FRAME_DATA> acquireSemaphores;
-  idArray<VkSemaphore, NUM_FRAME_DATA> renderCompleteSemaphores;
 
   int currentImageParm;
   idArray<idImage*, MAX_IMAGE_PARMS> imageParms;
@@ -248,6 +264,7 @@ struct ImDrawData;
 
 class idRenderBackend {
   friend class Framebuffer;
+  friend class CommandBuffer;
 
  public:
   idRenderBackend();
@@ -320,8 +337,7 @@ class idRenderBackend {
                           bool useLightDepthBounds);
 
   // RB
-  void AmbientPass(const drawSurf_t* const* drawSurfs, int numDrawSurfs,
-                   bool fillGbuffer);
+  void AmbientPass(const drawSurf_t* const* drawSurfs, int numDrawSurfs);
   void ShadowMapPass(const drawSurf_t* drawSurfs, const viewLight_t* vLight,
                      int side);
 
@@ -331,8 +347,6 @@ class idRenderBackend {
 
   // RB: HDR stuff
 
-  // TODO optimize and replace with compute shader
-  void CalculateAutomaticExposure();
   void Tonemap(const viewDef_t* viewDef);
   void Bloom(const viewDef_t* viewDef);
 
@@ -345,8 +359,8 @@ class idRenderBackend {
   void PostProcess(const void* data);
 
  private:
-  void GL_StartFrame();
-  void GL_EndFrame();
+  id::Framebuffer* GL_StartFrame();
+  void GL_EndFrame(CommandBuffer* lastCommandBuffer);
 
  public:
   uint64 GL_GetCurrentState() const;
@@ -493,11 +507,15 @@ class idRenderBackend {
  private:
 #if defined(USE_VULKAN)
   // TODO(mbullington): For Vulkan this global state is annoying and bad.
+  // Eventually needs a mutex.
   bool inRenderPass;
-  Framebuffer* currentFramebuffer;  // RB: for offscreen rendering
-  idList<VkSemaphore> renderPassSemaphores;
 
-  VkCommandBuffer GetActiveCommandBuffer();
+  idArray<id::Framebuffer*, NUM_FRAME_DATA> swapFrameBuffers;
+  idArray<id::CommandBuffer*, NUM_FRAME_DATA> swapSubmitCommandBuffers;
+  bool swapRecorded[3];
+
+  void CreateFrameBuffers();
+  void DestroyFrameBuffers();
 #else
   int currenttmu;
 

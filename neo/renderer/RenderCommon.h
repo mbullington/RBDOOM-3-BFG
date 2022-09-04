@@ -103,6 +103,19 @@ struct viewEntity_t;
 struct viewLight_t;
 struct viewEnvprobe_t;
 
+static const int MAX_SHADOWMAP_RESOLUTIONS = 5;
+static const int MAX_BLOOM_BUFFERS = 2;
+static const int MAX_SSAO_BUFFERS = 2;
+static const int MAX_HIERARCHICAL_ZBUFFERS =
+    6;  // native resolution + 5 MIP LEVELS
+
+static const int ENVPROBE_CAPTURE_SIZE = 256;
+static const int RADIANCE_OCTAHEDRON_SIZE = 512;
+static const int IRRADIANCE_OCTAHEDRON_SIZE = 30 + 2;
+
+static int shadowMapResolutions[MAX_SHADOWMAP_RESOLUTIONS] = {2048, 1024, 512,
+                                                              512, 256};
+
 // drawSurf_t structures command the back end to render surfaces
 // a given srfTriangles_t may be used with multiple viewEntity_t,
 // as when viewed in a subview or multiple viewport render, or
@@ -286,9 +299,9 @@ class RenderEnvprobeLocal : public RenderEnvprobe {
   bool archived;  // for demo writing
 
   // derived information
-  // idPlane						lightProject[4];		//
-  // old style light projection where Z and W are flipped and projected lights
-  // lightProject[3] is divided by ( zNear + zFar ) idRenderMatrix
+  // idPlane						lightProject[4];
+  // // old style light projection where Z and W are flipped and projected
+  // lights lightProject[3] is divided by ( zNear + zFar ) idRenderMatrix
   // baseLightProject;		// global xyz1 to projected light strq
   idRenderMatrix
       inverseBaseProbeProject;  // transforms the zero-to-one cube to exactly
@@ -703,8 +716,6 @@ struct viewDef_t {
   idImage* irradianceImage;    // cubemap image used for diffuse IBL by backend
   idImage* radianceImages[3];  // cubemap image used for specular IBL by backend
   idVec4 radianceImageBlends;  // blending weights
-
-  Framebuffer* targetRender;  // The framebuffer to render to
 };
 
 // complex light / surface interactions are broken up into multiple passes of a
