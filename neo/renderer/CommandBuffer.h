@@ -54,8 +54,8 @@ using std::optional;
 enum commandBufferOptions_t {
   CMD_BUF_OPT_NONE = 0,
   // This flag is needed for CommandBuffer to create a Fence object on Vulkan.
-  // This is used for CPU synchronization, but may unnecessary for the majority
-  // of CommandBuffers.
+  // This is used for CPU synchronization, but may unnecessary for the
+  // majority of CommandBuffers.
   CMD_BUF_OPT_CREATE_FENCE = BIT(1),
   // This flag is needed to allow multiple Begin() calls on the same frame.
   //
@@ -63,9 +63,13 @@ enum commandBufferOptions_t {
   // overwrites
   // the previous command buffer contents.
   CMD_BUF_OPT_ALLOW_MULTIPLE_RECORDS_PER_FRAME = BIT(2),
+  // This flag will force the CommandBuffer to wait on the swapchain acquire.
+  CMD_BUF_OPT_WAIT_ON_SWAP_ACQUIRE = BIT(3),
 };
 
 class CommandBuffer {
+  friend class idRenderBackend;
+
  public:
   CommandBuffer(optional<CommandBuffer **> dependencies = nullopt,
                 short numDependencies = 0,
@@ -79,8 +83,7 @@ class CommandBuffer {
   void End();
   void MakeActive();
 
-  void Submit(optional<CommandBuffer **> dependencies = nullopt,
-              short numDependencies = 0);
+  void Submit();
 
 #if defined(USE_VULKAN)
   VkCommandBuffer GetHandle() const { return handle; }
@@ -97,8 +100,7 @@ class CommandBuffer {
 
   bool shouldCreateFence;
   bool shouldAllowMultipleRecordsPerFrame;
-
-  bool waitOnSwapAcquire;
+  bool shouldWaitOnSwapAcquire;
 
   idList<CommandBuffer *> dependencies;
 

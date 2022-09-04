@@ -58,8 +58,8 @@ CommandBuffer::CommandBuffer(optional<CommandBuffer **> dependencies,
   shouldCreateFence = opts & CMD_BUF_OPT_CREATE_FENCE;
   shouldAllowMultipleRecordsPerFrame =
       opts & CMD_BUF_OPT_ALLOW_MULTIPLE_RECORDS_PER_FRAME;
+  shouldWaitOnSwapAcquire = opts & CMD_BUF_OPT_WAIT_ON_SWAP_ACQUIRE;
 
-  waitOnSwapAcquire = false;
   if (numDependencies > 0) {
     this->dependencies.Append(*dependencies, numDependencies);
   }
@@ -127,7 +127,7 @@ void CommandBuffer::Bind(id::Framebuffer *frameBuffer) {
   isBound = true;
 
   // Make sure regardless of Unbind, this remains true.
-  if (frameBuffer->isSwapImage) waitOnSwapAcquire = true;
+  if (frameBuffer->isSwapImage) shouldWaitOnSwapAcquire = true;
 
   VkRenderPassBeginInfo info = {};
   info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -200,6 +200,9 @@ void CommandBuffer::End() {
   }
 
   isRecording = false;
+  if (vkcontext.currentCommandBuffer == this) {
+    vkcontext.currentCommandBuffer = NULL;
+  }
 
   assert(handle);
   ID_VK_CHECK(vkEndCommandBuffer(handle));
@@ -207,22 +210,22 @@ void CommandBuffer::End() {
 
 void CommandBuffer::MakeActive() { vkcontext.currentCommandBuffer = this; }
 
-void CommandBuffer::Submit(optional<CommandBuffer **> dependencies,
-                           short numDependencies) {
+void CommandBuffer::Submit() {
   if (isRecording) {
     End();
   }
 
   idList<VkSemaphore> waitSemaphores;
-  waitSemaphores.Resize(this->dependencies.Num() + numDependencies);
-  for (auto &dependency : this->dependencies) {
+  waitSemaphores.Resize(this->dependencies.Num() +
+                        vkcontext.globalCommandBufferDependencies.Num());
+  for (auto &dependency : dependencies) {
     waitSemaphores.Append(dependency->semaphore);
   }
-  for (short i = 0; i < numDependencies; i++) {
-    waitSemaphores.Append((*dependencies)[i]->semaphore);
+  for (auto &dependency : vkcontext.globalCommandBufferDependencies) {
+    waitSemaphores.Append(dependency->semaphore);
   }
 
-  if (waitOnSwapAcquire) {
+  if (shouldWaitOnSwapAcquire) {
     if (!tr.backend.inRenderPass) {
       common->Error("CommandBuffer::Submit: Waiting on swap acquire %s",
                     "but not in a render pass");
@@ -232,8 +235,9 @@ void CommandBuffer::Submit(optional<CommandBuffer **> dependencies,
     }
   }
 
-  VkPipelineStageFlags dstStageMask =
-      VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+  // TODO(mbullington): For now, just have all commands wait until the
+  // semaphores are ready.
+  VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
 
   VkSubmitInfo submitInfo = {};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

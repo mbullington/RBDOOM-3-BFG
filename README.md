@@ -21,10 +21,11 @@ For discussions join the id Tech 4 Discord: https://discord.gg/Q3E9rUFnnP , #rbd
 
 This is mostly a playground for me to try out new libraries, techniques, and learn C++ concepts with more depth.
 
-Therefore, I might switch things out for fun with little / no functional difference. Also, since I'm one person who has way too many interests, I may take the axe to things to make the codebase simpler for me, or just leave them for later (like Windows support).
+Therefore, I might switch things out for fun with little / no functional difference. Also for the sake of time, I may take the axe to things to make the codebase simpler for me, or just leave them for later (like Windows support + MSYS).
 
 I may also try to optimize DOOM 3 and improve the experience on the platforms I have available:
 - x86_64 macOS
+- x86_64 Arch Linux w/ AMD 6800XT
 - SteamOS under Wayland (Steam Deck)
 
 That means my fork is also unsupported, and you should use [RBDOOM-3-BFG](https://github.com/RobertBeckebans/RBDOOM-3-BFG) in most cases.

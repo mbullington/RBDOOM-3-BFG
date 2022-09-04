@@ -229,6 +229,12 @@ struct vulkanContext_t {
       queryAssignedIndex;
   idArray<idArray<uint64, NUM_TIMESTAMP_QUERIES>, NUM_FRAME_DATA> queryResults;
   idArray<VkQueryPool, NUM_FRAME_DATA> queryPools;
+
+  // This is a list of dependencies added on Submit for the current frame.
+  //
+  // This API is not thread-safe (or wise) and should only be used by the
+  // render backend.
+  idList<CommandBuffer*> globalCommandBufferDependencies;
 };
 
 extern vulkanContext_t vkcontext;
@@ -506,12 +512,12 @@ class idRenderBackend {
 
  private:
 #if defined(USE_VULKAN)
-  // TODO(mbullington): For Vulkan this global state is annoying and bad.
-  // Eventually needs a mutex.
   bool inRenderPass;
 
   idArray<id::Framebuffer*, NUM_FRAME_DATA> swapFrameBuffers;
   idArray<id::CommandBuffer*, NUM_FRAME_DATA> swapSubmitCommandBuffers;
+  idArray<id::CommandBuffer*, NUM_FRAME_DATA> resetQueryCommandBuffers;
+
   bool swapRecorded[3];
 
   void CreateFrameBuffers();

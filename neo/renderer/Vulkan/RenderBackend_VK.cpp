@@ -37,6 +37,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 
 #include "precompiled.h"
+#include "renderer/CommandBuffer.h"
 #pragma hdrstop
 
 // VK_EXT_debug_marker
@@ -1477,6 +1478,7 @@ static void ClearContext() {
     }
   }
   vkcontext.queryPools.Zero();
+  vkcontext.globalCommandBufferDependencies.Clear();
 }
 
 /*
@@ -1494,6 +1496,7 @@ idRenderBackend::idRenderBackend() {
 
   swapFrameBuffers.Zero();
   swapSubmitCommandBuffers.Zero();
+  resetQueryCommandBuffers.Zero();
 }
 
 /*
@@ -1575,6 +1578,7 @@ void idRenderBackend::Init() {
     for (int i = 0; i < NUM_FRAME_DATA; ++i) {
       swapSubmitCommandBuffers[i] =
           new CommandBuffer(std::nullopt, 0, id::CMD_BUF_OPT_CREATE_FENCE);
+      resetQueryCommandBuffers[i] = new CommandBuffer();
     }
   }
 
@@ -1986,115 +1990,116 @@ id::Framebuffer* idRenderBackend::GL_StartFrame() {
   // reset descriptor pool
   renderProgManager.StartFrame();
 
-  //   // fetch GPU timer queries of last frame
-  //   VkQueryPool queryPool = vkcontext.queryPools[vkcontext.frameParity];
-  //   idArray<uint64, NUM_TIMESTAMP_QUERIES>& results =
-  //       vkcontext.queryResults[vkcontext.frameParity];
-  //   idArray<uint32, MRB_TOTAL_QUERIES>& assignedIndex =
-  //       vkcontext.queryAssignedIndex[vkcontext.frameParity];
+  // fetch GPU timer queries of last frame
+  VkQueryPool queryPool = vkcontext.queryPools[vkcontext.frameParity];
+  idArray<uint64, NUM_TIMESTAMP_QUERIES>& results =
+      vkcontext.queryResults[vkcontext.frameParity];
+  idArray<uint32, MRB_TOTAL_QUERIES>& assignedIndex =
+      vkcontext.queryAssignedIndex[vkcontext.frameParity];
 
-  //   if (assignedIndex[MRB_GPU_TIME + 1] > 0) {
-  //     int lastValidQuery = assignedIndex[MRB_GPU_TIME + 1];
-  //     int numQueries = lastValidQuery + 1;
+  if (assignedIndex[MRB_GPU_TIME + 1] > 0) {
+    int lastValidQuery = assignedIndex[MRB_GPU_TIME + 1];
+    int numQueries = lastValidQuery + 1;
 
-  //     if (numQueries <= NUM_TIMESTAMP_QUERIES) {
-  //       vkGetQueryPoolResults(vkcontext.device, queryPool, MRB_GPU_TIME,
-  //                             numQueries, results.ByteSize(), results.Ptr(),
-  //                             sizeof(uint64),
-  //                             VK_QUERY_RESULT_64_BIT |
-  //                             VK_QUERY_RESULT_WAIT_BIT);
-  // #if defined(__APPLE__)
-  //       // SRS - When using Metal-derived timestamps on OSX, update
-  //       // timestampPeriod every frame based on ongoing calibration within
-  //       // MoltenVK Only need to do this for non-Apple GPUs, for Apple GPUs
-  //       // timestampPeriod = 1 and ongoing calibration within MoltenVK is
-  //       skipped if (vkcontext.gpu->props.vendorID != 0x106B) {
-  //         vkGetPhysicalDeviceProperties(vkcontext.gpu->device,
-  //                                       &vkcontext.gpu->props);
-  //       }
-  // #endif
-  //       const uint64 gpuStart = results[assignedIndex[MRB_GPU_TIME * 2 + 0]];
-  //       const uint64 gpuEnd = results[assignedIndex[MRB_GPU_TIME * 2 + 1]];
-  //       const uint64 tick =
-  //           (1000 * 1000 * 1000) /
-  //           vkcontext.gpu->props.limits.timestampPeriod;
-  //       pc.gpuMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
+    if (numQueries <= NUM_TIMESTAMP_QUERIES) {
+      vkGetQueryPoolResults(vkcontext.device, queryPool, MRB_GPU_TIME,
+                            numQueries, results.ByteSize(), results.Ptr(),
+                            sizeof(uint64),
+                            VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);
+#if defined(__APPLE__)
+      // SRS - When using Metal-derived timestamps on OSX, update
+      // timestampPeriod every frame based on ongoing calibration within
+      // MoltenVK Only need to do this for non-Apple GPUs, for Apple GPUs
+      // timestampPeriod = 1 and ongoing calibration within MoltenVK is
+      skipped if (vkcontext.gpu->props.vendorID != 0x106B) {
+        vkGetPhysicalDeviceProperties(vkcontext.gpu->device,
+                                      &vkcontext.gpu->props);
+      }
+#endif
+      const uint64 gpuStart = results[assignedIndex[MRB_GPU_TIME * 2 + 0]];
+      const uint64 gpuEnd = results[assignedIndex[MRB_GPU_TIME * 2 + 1]];
+      const uint64 tick =
+          (1000 * 1000 * 1000) / vkcontext.gpu->props.limits.timestampPeriod;
+      pc.gpuMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
 
-  //       if (assignedIndex[MRB_FILL_DEPTH_BUFFER * 2 + 1] > 0) {
-  //         const uint64 gpuStart =
-  //             results[assignedIndex[MRB_FILL_DEPTH_BUFFER * 2 + 0]];
-  //         const uint64 gpuEnd =
-  //             results[assignedIndex[MRB_FILL_DEPTH_BUFFER * 2 + 1]];
-  //         pc.gpuDepthMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
-  //       }
+      if (assignedIndex[MRB_FILL_DEPTH_BUFFER * 2 + 1] > 0) {
+        const uint64 gpuStart =
+            results[assignedIndex[MRB_FILL_DEPTH_BUFFER * 2 + 0]];
+        const uint64 gpuEnd =
+            results[assignedIndex[MRB_FILL_DEPTH_BUFFER * 2 + 1]];
+        pc.gpuDepthMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
+      }
 
-  //       if (assignedIndex[MRB_SSAO_PASS * 2 + 1] > 0) {
-  //         const uint64 gpuStart = results[assignedIndex[MRB_SSAO_PASS * 2 +
-  //         0]]; const uint64 gpuEnd = results[assignedIndex[MRB_SSAO_PASS * 2
-  //         + 1]]; pc.gpuScreenSpaceAmbientOcclusionMicroSec =
-  //             ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
-  //       }
+      if (assignedIndex[MRB_SSAO_PASS * 2 + 1] > 0) {
+        const uint64 gpuStart = results[assignedIndex[MRB_SSAO_PASS * 2 + 0]];
+        const uint64 gpuEnd = results[assignedIndex[MRB_SSAO_PASS * 2 + 1]];
+        pc.gpuScreenSpaceAmbientOcclusionMicroSec =
+            ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
+      }
 
-  //       if (assignedIndex[MRB_AMBIENT_PASS * 2 + 1] > 0) {
-  //         const uint64 gpuStart =
-  //             results[assignedIndex[MRB_AMBIENT_PASS * 2 + 0]];
-  //         const uint64 gpuEnd = results[assignedIndex[MRB_AMBIENT_PASS * 2 +
-  //         1]]; pc.gpuAmbientPassMicroSec = ((gpuEnd - gpuStart) * 1000 *
-  //         1000) / tick;
-  //       }
+      if (assignedIndex[MRB_AMBIENT_PASS * 2 + 1] > 0) {
+        const uint64 gpuStart =
+            results[assignedIndex[MRB_AMBIENT_PASS * 2 + 0]];
+        const uint64 gpuEnd = results[assignedIndex[MRB_AMBIENT_PASS * 2 + 1]];
+        pc.gpuAmbientPassMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
+      }
 
-  //       if (assignedIndex[MRB_DRAW_INTERACTIONS * 2 + 1] > 0) {
-  //         const uint64 gpuStart =
-  //             results[assignedIndex[MRB_DRAW_INTERACTIONS * 2 + 0]];
-  //         const uint64 gpuEnd =
-  //             results[assignedIndex[MRB_DRAW_INTERACTIONS * 2 + 1]];
-  //         pc.gpuInteractionsMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) /
-  //         tick;
-  //       }
+      if (assignedIndex[MRB_DRAW_INTERACTIONS * 2 + 1] > 0) {
+        const uint64 gpuStart =
+            results[assignedIndex[MRB_DRAW_INTERACTIONS * 2 + 0]];
+        const uint64 gpuEnd =
+            results[assignedIndex[MRB_DRAW_INTERACTIONS * 2 + 1]];
+        pc.gpuInteractionsMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
+      }
 
-  //       if (assignedIndex[MRB_DRAW_SHADER_PASSES * 2 + 1] > 0) {
-  //         const uint64 gpuStart =
-  //             results[assignedIndex[MRB_DRAW_SHADER_PASSES * 2 + 0]];
-  //         const uint64 gpuEnd =
-  //             results[assignedIndex[MRB_DRAW_SHADER_PASSES * 2 + 1]];
-  //         pc.gpuShaderPassMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) /
-  //         tick;
-  //       }
+      if (assignedIndex[MRB_DRAW_SHADER_PASSES * 2 + 1] > 0) {
+        const uint64 gpuStart =
+            results[assignedIndex[MRB_DRAW_SHADER_PASSES * 2 + 0]];
+        const uint64 gpuEnd =
+            results[assignedIndex[MRB_DRAW_SHADER_PASSES * 2 + 1]];
+        pc.gpuShaderPassMicroSec = ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
+      }
 
-  //       if (assignedIndex[MRB_POSTPROCESS * 2 + 1] > 0) {
-  //         const uint64 gpuStart = results[assignedIndex[MRB_POSTPROCESS * 2 +
-  //         0]]; const uint64 gpuEnd = results[assignedIndex[MRB_POSTPROCESS *
-  //         2 + 1]]; pc.gpuPostProcessingMicroSec =
-  //             ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
-  //       }
-  //     }
-  //   }
+      if (assignedIndex[MRB_POSTPROCESS * 2 + 1] > 0) {
+        const uint64 gpuStart = results[assignedIndex[MRB_POSTPROCESS * 2 + 0]];
+        const uint64 gpuEnd = results[assignedIndex[MRB_POSTPROCESS * 2 + 1]];
+        pc.gpuPostProcessingMicroSec =
+            ((gpuEnd - gpuStart) * 1000 * 1000) / tick;
+      }
+    }
+  }
 
   // reset query indices for current frame
   vkcontext.queryIndex[vkcontext.frameParity] = 0;
-
   for (int i = 0; i < MRB_TOTAL_QUERIES; i++) {
     vkcontext.queryAssignedIndex[vkcontext.frameParity][i] = 0;
   }
 
-  // VkCommandBuffer cmd = vkcontext.cmd[vkcontext.frameParity];
-
-  // // begin command buffer
-  // VkCommandBufferBeginInfo cmdBeginInfo = {};
-  // cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-  // ID_VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
-
-  // // reset timer queries
-  // vkCmdResetQueryPool(cmd, queryPool, 0, NUM_TIMESTAMP_QUERIES);
-
-  // uint32 queryIndex =
-  //     vkcontext
-  //         .queryAssignedIndex[vkcontext.frameParity][MRB_GPU_TIME * 2 + 0] =
-  //         vkcontext.queryIndex[vkcontext.frameParity]++;
-  // vkCmdWriteTimestamp(cmd, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, queryPool,
-  //                     queryIndex);
-
+  vkcontext.globalCommandBufferDependencies.Clear();
   inRenderPass = true;
+
+  // We need to create a command buffer to reset the query pool.
+  CommandBuffer* cmd = resetQueryCommandBuffers[vkcontext.frameParity];
+  // vkcontext.globalCommandBufferDependencies.Append(cmd);
+
+  cmd->Begin();
+  cmd->MakeActive();
+
+  uint32 queryIndex =
+      vkcontext
+          .queryAssignedIndex[vkcontext.frameParity][MRB_GPU_TIME * 2 + 0] =
+          vkcontext.queryIndex[vkcontext.frameParity]++;
+
+  vkCmdResetQueryPool(cmd->GetHandle(), queryPool, queryIndex,
+                      NUM_TIMESTAMP_QUERIES);
+
+  vkCmdWriteTimestamp(cmd->GetHandle(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                      queryPool, queryIndex);
+
+  cmd->End();
+  cmd->Submit();
+
+  // Return the swap framebuffer.
   return swapFrameBuffers[vkcontext.currentSwapIndex];
 }
 
@@ -2125,13 +2130,25 @@ void idRenderBackend::GL_EndFrame(CommandBuffer* lastCommandBuffer) {
 
   CommandBuffer* cmd = swapSubmitCommandBuffers[vkcontext.frameParity];
   cmd->Begin();
+  cmd->MakeActive();
 
   vkCmdPipelineBarrier(
       cmd->GetHandle(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
       VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, NULL, 0, NULL, 1, &barrier);
 
+  uint32 queryIndex =
+      vkcontext
+          .queryAssignedIndex[vkcontext.frameParity][MRB_GPU_TIME * 2 + 1] =
+          vkcontext.queryIndex[vkcontext.frameParity]++;
+  vkCmdWriteTimestamp(cmd->GetHandle(), VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                      vkcontext.queryPools[vkcontext.frameParity], queryIndex);
+
   cmd->End();
-  cmd->Submit(&lastCommandBuffer, 1);
+
+  // Clear the query reset from GL_StartFrame.
+  vkcontext.globalCommandBufferDependencies.Clear();
+  vkcontext.globalCommandBufferDependencies.Append(lastCommandBuffer);
+  cmd->Submit();
 
   swapRecorded[vkcontext.frameParity] = true;
   inRenderPass = false;
