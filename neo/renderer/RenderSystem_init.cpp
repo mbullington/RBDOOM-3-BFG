@@ -553,8 +553,6 @@ idCVar r_shadowMapSunDepthBiasScale(
     "r_shadowMapSunDepthBiasScale", "0.999991", CVAR_RENDERER | CVAR_FLOAT,
     "shadowmap bias to fight shadow acne for cascaded shadow mapping with "
     "parallel lights");
-idCVar r_useHDR("r_useHDR", "1", CVAR_RENDERER | CVAR_STATIC | CVAR_BOOL,
-                "Use high dynamic range rendering: temporarily can be changed");
 idCVar r_hdrAutoExposure("r_hdrAutoExposure", "0", CVAR_RENDERER | CVAR_BOOL,
                          "EXPENSIVE: enables adapative HDR tone mapping "
                          "otherwise the exposure is derived by r_exposure");

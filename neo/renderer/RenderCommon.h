@@ -1158,7 +1158,6 @@ extern idCVar r_useShadowDepthBounds;  // use depth bounds test on individual
 // RB begin
 extern idCVar
     r_useShadowMapping;  // use shadow mapping instead of stencil shadows
-extern idCVar r_useHDR;
 extern idCVar r_useSeamlessCubeMap;
 // RB end
 

@@ -2380,7 +2380,7 @@ idRenderBackend::GL_Clear
 */
 void idRenderBackend::GL_Clear(bool color, bool depth, bool stencil,
                                byte stencilValue, float r, float g, float b,
-                               float a, bool clearHDR) {
+                               float a) {
   const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
 
   RENDERLOG_PRINTF(
@@ -2444,21 +2444,6 @@ void idRenderBackend::GL_Clear(bool color, bool depth, bool stencil,
           clearFlags |= GL_STENCIL_BUFFER_BIT;
   }
   glClear( clearFlags );
-
-  // RB begin
-  if( r_useHDR.GetBool() && clearHDR && globalFramebuffers.hdrFBO != NULL )
-  {
-          bool isDefaultFramebufferActive =
-  Framebuffer::IsDefaultFramebufferActive();
-
-          globalFramebuffers.hdrFBO->Bind();
-          glClear( clearFlags );
-
-          if( isDefaultFramebufferActive )
-          {
-                  Framebuffer::Unbind();
-          }
-  }
   */
 }
 
@@ -2572,13 +2557,6 @@ void idRenderBackend::CheckCVars() {
                           glDisable( GL_MULTISAMPLE );
                           break;
           }
-  }
-
-  if( r_useHDR.IsModified() )
-  {
-          r_useHDR.ClearModified();
-          renderProgManager.KillAllShaders();
-          renderProgManager.LoadAllShaders();
   }
   */
 }

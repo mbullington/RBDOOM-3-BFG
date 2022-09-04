@@ -383,7 +383,7 @@ class idRenderBackend {
 
   // RB: HDR parm
   void GL_Clear(bool color, bool depth, bool stencil, byte stencilValue,
-                float r, float g, float b, float a, bool clearHDR = true);
+                float r, float g, float b, float a);
 
   void GL_DepthBoundsTest(const float zmin, const float zmax);
   void GL_PolygonOffset(float scale, float bias);

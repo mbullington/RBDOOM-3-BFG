@@ -2205,7 +2205,7 @@ void idRenderBackend::AmbientPass(const drawSurf_t* const* drawSurfs,
     float ambientBoost = 1.0f;
     if (!r_usePBR.GetBool()) {
       ambientBoost += r_useSSAO.GetBool() ? 0.2f : 0.0f;
-      ambientBoost *= r_useHDR.GetBool() ? 1.1f : 1.0f;
+      ambientBoost *= 1.1f;  // I guess this is an HDR thing?
     }
 
     ambientColor.x = r_forceAmbient.GetFloat() * ambientBoost;
@@ -2711,8 +2711,8 @@ void idRenderBackend::StencilSelectLight(const viewLight_t* vLight) {
                STENCIL_SHADOW_MASK_VALUE));  // make sure stencil mask passes
                                              // for the clear
 
-  GL_Clear(false, false, true, 0, 0.0f, 0.0f, 0.0f, 0.0f,
-           false);  // clear to 0 for stencil select
+  GL_Clear(false, false, true, 0, 0.0f, 0.0f, 0.0f,
+           0.0f);  // clear to 0 for stencil select
 
   // set the depthbounds
   GL_DepthBoundsTest(vLight->scissorRect.zmin, vLight->scissorRect.zmax);
@@ -3524,7 +3524,7 @@ void idRenderBackend::DrawInteractions(const viewDef_t* _viewDef) {
           }
           GL_State(GLS_DEFAULT);  // make sure stencil mask passes for the clear
           GL_Clear(false, false, true, STENCIL_SHADOW_TEST_VALUE, 0.0f, 0.0f,
-                   0.0f, 0.0f, false);
+                   0.0f, 0.0f);
         }
       }
 
@@ -4957,8 +4957,6 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
   const bool timerQueryAvailable = glConfig.timerQueryAvailable;
   bool drawView3D_timestamps = false;
 
-  bool useHDR = r_useHDR.GetBool();
-
   hdrCommandBuffer.Begin();
   hdrCommandBuffer.Bind(id::globalFramebuffers.hdrFBO);
 
@@ -5098,14 +5096,10 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
 
   // GL_CheckErrors();
 
-  // RB begin
-  bool useHDR = r_useHDR.GetBool() && !_viewDef->is2Dgui;
-
   // Clear the depth buffer and clear the stencil to 128 for stencil shadows as
   // well as gui masking
-  GL_Clear(false, true, true, STENCIL_SHADOW_TEST_VALUE, 0.0f, 0.0f, 0.0f, 0.0f,
-           useHDR);
-  // RB end
+  GL_Clear(false, true, true, STENCIL_SHADOW_TEST_VALUE, 0.0f, 0.0f, 0.0f,
+           0.0f);
 
   // GL_CheckErrors();
 
@@ -5179,13 +5173,14 @@ void idRenderBackend::DrawViewInternal(const viewDef_t* _viewDef,
   // capture the depth for the motion blur before rendering any post process
   // surfaces that may contribute to the depth
   //-------------------------------------------------
-  if ((r_motionBlur.GetInteger() > 0 || r_useSSAO.GetBool() ||
-       r_useSSGI.GetBool()) &&
-      !r_useHDR.GetBool()) {
-    const idScreenRect& viewport = viewDef->viewport;
-    globalImages->currentDepthImage->CopyDepthbuffer(
-        viewport.x1, viewport.y1, viewport.GetWidth(), viewport.GetHeight());
-  }
+  // TODO(mbullington): Doesn't work with HDR?
+  // if ((r_motionBlur.GetInteger() > 0 || r_useSSAO.GetBool() ||
+  //      r_useSSGI.GetBool()) &&
+  //     !r_useHDR.GetBool()) {
+  //   const idScreenRect& viewport = viewDef->viewport;
+  //   globalImages->currentDepthImage->CopyDepthbuffer(
+  //       viewport.x1, viewport.y1, viewport.GetWidth(), viewport.GetHeight());
+  // }
 
   //-------------------------------------------------
   // darken the scene using the screen space ambient occlusion
