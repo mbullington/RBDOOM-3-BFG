@@ -1183,7 +1183,11 @@ static VkPipeline CreateGraphicsPipeline(vertexLayoutType_t vertexLayoutType,
   VkGraphicsPipelineCreateInfo createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
   createInfo.layout = pipelineLayout;
-  createInfo.renderPass = vkcontext.renderPass;
+
+  createInfo.renderPass =
+      vkcontext.currentCommandBuffer->GetFramebufferRenderPass();
+  assert(createInfo.renderPass != VK_NULL_HANDLE);
+
   createInfo.pVertexInputState = &vertexInputState;
   createInfo.pInputAssemblyState = &assemblyInputState;
   createInfo.pRasterizationState = &rasterizationState;

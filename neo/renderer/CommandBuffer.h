@@ -37,6 +37,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #pragma once
 
+#include <vulkan/vulkan_core.h>
 #include <optional>
 
 #include "RenderFwd.h"
@@ -85,6 +86,7 @@ class CommandBuffer {
   VkCommandBuffer GetHandle() const { return handle; }
   VkSemaphore GetSemaphore() const { return semaphore; }
   VkFence GetFence() const { return fence; }
+  VkRenderPass GetFramebufferRenderPass();
 #endif
 
  private:
@@ -99,6 +101,10 @@ class CommandBuffer {
   bool waitOnSwapAcquire;
 
   idList<CommandBuffer *> dependencies;
+
+  // TODO: Just steal the appropriate Vulkan objects from the Framebuffer
+  // and use reference counting.
+  Framebuffer *frameBuffer;
 
 #if defined(USE_VULKAN)
   VkCommandBuffer handle;

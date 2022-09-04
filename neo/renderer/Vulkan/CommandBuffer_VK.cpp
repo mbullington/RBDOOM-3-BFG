@@ -138,6 +138,7 @@ void CommandBuffer::Bind(id::Framebuffer *frameBuffer) {
 
   assert(handle);
   vkCmdBeginRenderPass(handle, &info, VK_SUBPASS_CONTENTS_INLINE);
+  this->frameBuffer = frameBuffer;
 
   // Set the scissor.
   {
@@ -162,6 +163,7 @@ void CommandBuffer::Unbind() {
   isBound = false;
 
   vkCmdEndRenderPass(handle);
+  frameBuffer = NULL;
 }
 
 void CommandBuffer::Begin() {
@@ -248,6 +250,14 @@ void CommandBuffer::Submit(optional<CommandBuffer **> dependencies,
 
   // Reset our internal flag here.
   frameParity = -1;
+}
+
+VkRenderPass CommandBuffer::GetFramebufferRenderPass() {
+  if (frameBuffer == NULL) {
+    return VK_NULL_HANDLE;
+  }
+
+  return frameBuffer->renderPass;
 }
 
 }  // namespace id

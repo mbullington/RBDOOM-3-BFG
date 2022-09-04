@@ -208,7 +208,7 @@ static void R_DepthImage(idImage* image) {
 static void R_HDR_RGBA16FImage_ResNative(idImage* image) {
   image->GenerateImage(NULL, renderSystem->GetWidth(),
                        renderSystem->GetHeight(), TF_NEAREST, TR_CLAMP,
-                       TD_RGBA16F);
+                       TD_RGBA16F, SAMPLE_1, CF_2D, true);
 }
 
 static void R_HDR_RGBA16FImage_ResQuarter(idImage* image) {

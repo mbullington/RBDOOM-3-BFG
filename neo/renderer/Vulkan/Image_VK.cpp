@@ -501,6 +501,9 @@ void idImage::AllocImage() {
   } else {
     usageFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
   }
+  if (opts.isRenderTarget) {
+    usageFlags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  }
 
   // Create Image
   VkImageCreateInfo imageCreateInfo = {};
