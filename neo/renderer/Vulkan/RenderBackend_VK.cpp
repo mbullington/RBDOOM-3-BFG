@@ -2166,27 +2166,34 @@ void idRenderBackend::GL_BlockingSwapBuffers() {
 
   // Clean out the deletion queue.
   {
-    vulkanDeletionQueue_t* queue =
-        &vkcontext.deletionQueue[vkcontext.frameParity];
+    vulkanDeletionQueue_t& queue =
+        vkcontext.deletionQueue[vkcontext.frameParity];
 
     // Start with the command buffer, work our way down to the attachments.
-    for (auto& it : queue->commandBuffers) {
-      vkFreeCommandBuffers(vkcontext.device, vkcontext.commandPool, 1, &it);
-    }
-    for (auto& it : queue->renderPasses) {
+    vkFreeCommandBuffers(vkcontext.device, vkcontext.commandPool,
+                         queue.commandBuffers.Num(),
+                         queue.commandBuffers.Ptr());
+    queue.commandBuffers.Clear();
+
+    for (auto& it : queue.renderPasses) {
       vkDestroyRenderPass(vkcontext.device, it, NULL);
     }
+    queue.renderPasses.Clear();
 
-    for (auto& it : queue->semaphores) {
+    for (auto& it : queue.semaphores) {
       vkDestroySemaphore(vkcontext.device, it, NULL);
     }
-    for (auto& it : queue->fences) {
+    queue.semaphores.Clear();
+
+    for (auto& it : queue.fences) {
       vkDestroyFence(vkcontext.device, it, NULL);
     }
+    queue.fences.Clear();
 
-    for (auto& it : queue->framebuffers) {
+    for (auto& it : queue.framebuffers) {
       vkDestroyFramebuffer(vkcontext.device, it, NULL);
     }
+    queue.framebuffers.Clear();
   }
 
   VkPresentInfoKHR presentInfo = {};

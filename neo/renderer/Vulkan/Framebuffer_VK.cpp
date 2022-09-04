@@ -51,13 +51,17 @@ Framebuffer::Framebuffer(int w, int h) {
 }
 
 Framebuffer::~Framebuffer() {
-  if (renderPass != NULL) {
-    vkDestroyRenderPass(vkcontext.device, renderPass, NULL);
-  }
+  // When we're done with these resources, we can add them to the Vulkan
+  // deletion queue.
+  //
+  // Deletion happens at the end of the frame.
+  // TODO(mbullington): What happens here with dependencies? Should we reference
+  // count?
+  vulkanDeletionQueue_t& deletionQueue =
+      vkcontext.deletionQueue[vkcontext.frameParity];
 
-  if (frameBuffer != NULL) {
-    vkDestroyFramebuffer(vkcontext.device, frameBuffer, NULL);
-  }
+  deletionQueue.renderPasses.Append(renderPass);
+  deletionQueue.framebuffers.Append(frameBuffer);
 }
 
 void Framebuffer::Update(textureFormat_t format, idImage* image,

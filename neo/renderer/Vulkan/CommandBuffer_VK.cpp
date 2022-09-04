@@ -92,18 +92,18 @@ CommandBuffer::CommandBuffer(optional<CommandBuffer **> dependencies,
 }
 
 CommandBuffer::~CommandBuffer() {
-  if (this->handle != NULL) {
-    vkFreeCommandBuffers(vkcontext.device, vkcontext.commandPool, 1,
-                         &this->handle);
-  }
+  // When we're done with these resources, we can add them to the Vulkan
+  // deletion queue.
+  //
+  // Deletion happens at the end of the frame.
+  // TODO(mbullington): What happens here with dependencies? Should we reference
+  // count?
+  vulkanDeletionQueue_t &deletionQueue =
+      vkcontext.deletionQueue[vkcontext.frameParity];
 
-  if (this->semaphore != NULL) {
-    vkDestroySemaphore(vkcontext.device, this->semaphore, NULL);
-  }
-
-  if (this->fence != NULL) {
-    vkDestroyFence(vkcontext.device, this->fence, NULL);
-  }
+  deletionQueue.commandBuffers.Append(handle);
+  deletionQueue.semaphores.Append(semaphore);
+  deletionQueue.fences.Append(fence);
 }
 
 void CommandBuffer::Bind(id::Framebuffer *frameBuffer) {
