@@ -163,9 +163,10 @@ class idList {
   const _type_* Ptr() const;  // returns a pointer to the list
   _type_&
   Alloc();  // returns reference to a new data element at the end of the list
-  int Append(const _type_& obj);     // append element
-  int Append(const idList& other);   // append list
-  int AddUnique(const _type_& obj);  // add unique element
+  int Append(const _type_& obj);            // append element
+  int Append(const idList& other);          // append list
+  int Append(const _type_* objs, int num);  // append array of elements
+  int AddUnique(const _type_& obj);         // add unique element
   int Insert(const _type_& obj,
              int index = 0);  // insert the element at the given index
   int FindIndex(
@@ -440,7 +441,7 @@ ID_INLINE void idList<_type_, _tag_>::Condense() {
 idList<_type_,_tag_>::Resize
 
 Allocates memory for the amount of elements requested while keeping the contents
-intact. Contents are copied using their = operator so that data is correnctly
+intact. Contents are copied using their = operator so that data is correctly
 instantiated.
 ================
 */
@@ -471,7 +472,7 @@ ID_INLINE void idList<_type_, _tag_>::Resize(int newsize) {
 idList<_type_,_tag_>::Resize
 
 Allocates memory for the amount of elements requested while keeping the contents
-intact. Contents are copied using their = operator so that data is correnctly
+intact. Contents are copied using their = operator so that data is correctly
 instantiated.
 ================
 */
@@ -796,6 +797,29 @@ ID_INLINE int idList<_type_, _tag_>::Append(
   }
 
   int n = other.Num();
+  for (int i = 0; i < n; i++) {
+    Append(other[i]);
+  }
+
+  return Num();
+}
+
+/*
+================
+idList<_type_,_tag_>::Append
+
+adds the other array to this one
+
+Returns the size of the new combined list
+================
+*/
+template <typename _type_, memTag_t _tag_>
+ID_INLINE int idList<_type_, _tag_>::Append(const _type_* other, int n) {
+  int newNum = Num() + n;
+  if (newNum > Size()) {
+    Resize(newNum);
+  }
+
   for (int i = 0; i < n; i++) {
     Append(other[i]);
   }
