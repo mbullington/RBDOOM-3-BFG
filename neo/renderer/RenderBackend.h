@@ -229,12 +229,6 @@ struct vulkanContext_t {
       queryAssignedIndex;
   idArray<idArray<uint64, NUM_TIMESTAMP_QUERIES>, NUM_FRAME_DATA> queryResults;
   idArray<VkQueryPool, NUM_FRAME_DATA> queryPools;
-
-  // This is a list of dependencies added on Submit for the current frame.
-  //
-  // This API is not thread-safe (or wise) and should only be used by the
-  // render backend.
-  idList<CommandBuffer*> globalCommandBufferDependencies;
 };
 
 extern vulkanContext_t vkcontext;

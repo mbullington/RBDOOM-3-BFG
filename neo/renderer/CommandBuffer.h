@@ -38,7 +38,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #pragma once
 
 #include <vulkan/vulkan_core.h>
-#include <optional>
 
 #include "RenderFwd.h"
 
@@ -47,9 +46,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #endif
 
 namespace id {
-
-using std::nullopt;
-using std::optional;
 
 enum commandBufferOptions_t {
   CMD_BUF_OPT_NONE = 0,
@@ -69,8 +65,8 @@ class CommandBuffer {
   friend class idRenderBackend;
 
  public:
-  CommandBuffer(optional<CommandBuffer **> dependencies = nullopt,
-                short numDependencies = 0, uint8_t opts = CMD_BUF_OPT_NONE);
+  CommandBuffer(CommandBuffer **dependencies = NULL, size_t numDependencies = 0,
+                uint8_t opts = CMD_BUF_OPT_NONE);
   virtual ~CommandBuffer();
 
   void Bind(Framebuffer *frameBuffer);
@@ -80,6 +76,7 @@ class CommandBuffer {
   void End();
   void MakeActive();
 
+  void SetDependencies(CommandBuffer **dependencies, short numDependencies);
   void Submit();
 
 #if defined(USE_VULKAN)

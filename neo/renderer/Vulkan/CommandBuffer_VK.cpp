@@ -39,28 +39,24 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #pragma hdrstop
 
 #include <vulkan/vulkan.h>
-#include <optional>
-#include <memory>
 
 #include "../RenderCommon.h"
 #include "../CommandBuffer.h"
 
 namespace id {
 
-CommandBuffer::CommandBuffer(optional<CommandBuffer **> dependencies,
-                             short numDependencies, uint8_t opts) {
+CommandBuffer::CommandBuffer(CommandBuffer **dependencies,
+                             size_t numDependencies, uint8_t opts) {
   isRecording = false;
   isBound = false;
+
+  SetDependencies(dependencies, numDependencies);
 
   frameParity = -1;
   waitOnSwapAcquire = false;
 
   shouldCreateFence = opts & CMD_BUF_OPT_CREATE_FENCE;
   shouldSkipSemaphore = opts & CMD_BUF_OPT_SKIP_SEMAPHORE;
-
-  if (numDependencies > 0) {
-    this->dependencies.Append(*dependencies, numDependencies);
-  }
 
   assert(vkcontext.device);
   assert(vkcontext.commandPool);
@@ -209,18 +205,20 @@ void CommandBuffer::End() {
 
 void CommandBuffer::MakeActive() { vkcontext.currentCommandBuffer = this; }
 
+void CommandBuffer::SetDependencies(CommandBuffer **dependencies,
+                                    short numDependencies) {
+  this->dependencies.Clear();
+  this->dependencies.Append(dependencies, numDependencies);
+}
+
 void CommandBuffer::Submit() {
   if (isRecording) {
     End();
   }
 
   idList<VkSemaphore> waitSemaphores;
-  waitSemaphores.Resize(this->dependencies.Num() +
-                        vkcontext.globalCommandBufferDependencies.Num());
+  waitSemaphores.Resize(this->dependencies.Num());
   for (auto &dependency : dependencies) {
-    waitSemaphores.Append(dependency->semaphore);
-  }
-  for (auto &dependency : vkcontext.globalCommandBufferDependencies) {
     waitSemaphores.Append(dependency->semaphore);
   }
 

@@ -1478,7 +1478,6 @@ static void ClearContext() {
     }
   }
   vkcontext.queryPools.Zero();
-  vkcontext.globalCommandBufferDependencies.Clear();
 }
 
 /*
@@ -1577,9 +1576,9 @@ void idRenderBackend::Init() {
   {
     for (int i = 0; i < NUM_FRAME_DATA; ++i) {
       resetQueryCommandBuffers[i] =
-          new CommandBuffer(std::nullopt, 0, id::CMD_BUF_OPT_SKIP_SEMAPHORE);
+          new CommandBuffer(NULL, 0, id::CMD_BUF_OPT_SKIP_SEMAPHORE);
       swapSubmitCommandBuffers[i] =
-          new CommandBuffer(std::nullopt, 0, id::CMD_BUF_OPT_CREATE_FENCE);
+          new CommandBuffer(NULL, 0, id::CMD_BUF_OPT_CREATE_FENCE);
     }
   }
 
@@ -2076,13 +2075,10 @@ id::Framebuffer* idRenderBackend::GL_StartFrame() {
     vkcontext.queryAssignedIndex[vkcontext.frameParity][i] = 0;
   }
 
-  vkcontext.globalCommandBufferDependencies.Clear();
   inRenderPass = true;
 
   // We need to create a command buffer to reset the query pool.
   CommandBuffer* cmd = resetQueryCommandBuffers[vkcontext.frameParity];
-  // vkcontext.globalCommandBufferDependencies.Append(cmd);
-
   cmd->Begin();
   cmd->MakeActive();
 
@@ -2147,8 +2143,7 @@ void idRenderBackend::GL_EndFrame(CommandBuffer* lastCommandBuffer) {
   cmd->End();
 
   // Clear the query reset from GL_StartFrame.
-  vkcontext.globalCommandBufferDependencies.Clear();
-  vkcontext.globalCommandBufferDependencies.Append(lastCommandBuffer);
+  cmd->SetDependencies(&lastCommandBuffer, 1);
   cmd->Submit();
 
   swapRecorded[vkcontext.frameParity] = true;
