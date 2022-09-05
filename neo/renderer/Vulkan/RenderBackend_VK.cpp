@@ -1183,6 +1183,17 @@ static void CreateCommandPool() {
 
   ID_VK_CHECK(vkCreateCommandPool(vkcontext.device, &commandPoolCreateInfo,
                                   NULL, &vkcontext.commandPool));
+
+  for (int i = 0; i < NUM_FRAME_DATA; ++i) {
+    VkCommandPoolCreateInfo commandPoolCreateInfo = {};
+    commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    commandPoolCreateInfo.flags =
+        VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    commandPoolCreateInfo.queueFamilyIndex = vkcontext.graphicsFamilyIdx;
+
+    ID_VK_CHECK(vkCreateCommandPool(vkcontext.device, &commandPoolCreateInfo,
+                                    NULL, &vkcontext.swapCommandPools[i]));
+  }
 }
 
 /*
@@ -1386,6 +1397,7 @@ static void ClearContext() {
   vkcontext.swapchain = VK_NULL_HANDLE;
   vkcontext.swapchainFormat = VK_FORMAT_UNDEFINED;
   vkcontext.currentSwapIndex = 0;
+  vkcontext.swapCommandPools.Zero();
   vkcontext.swapchainImages.Zero();
   vkcontext.swapchainViews.Zero();
   vkcontext.currentCommandBuffer = NULL;
@@ -1400,7 +1412,6 @@ static void ClearContext() {
     vkcontext.queryResults[i].Zero();
 
     {
-      vkcontext.deletionQueue[i].commandBuffers.Clear();
       vkcontext.deletionQueue[i].framebuffers.Clear();
       vkcontext.deletionQueue[i].fences.Clear();
       vkcontext.deletionQueue[i].renderPasses.Clear();
@@ -2103,18 +2114,17 @@ void idRenderBackend::GL_BlockingSwapBuffers() {
       vkWaitForFences(vkcontext.device, 1, &fence, VK_TRUE, UINT64_MAX));
 
   ID_VK_CHECK(vkResetFences(vkcontext.device, 1, &fence));
+
+  ID_VK_CHECK(vkResetCommandPool(
+      vkcontext.device, vkcontext.swapCommandPools[vkcontext.frameParity],
+      VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT));
+
   swapRecorded[vkcontext.frameParity] = false;
 
   // Clean out the deletion queue.
   {
     vulkanDeletionQueue_t& queue =
         vkcontext.deletionQueue[vkcontext.frameParity];
-
-    // Start with the command buffer, work our way down to the attachments.
-    vkFreeCommandBuffers(vkcontext.device, vkcontext.commandPool,
-                         queue.commandBuffers.Num(),
-                         queue.commandBuffers.Ptr());
-    queue.commandBuffers.Clear();
 
     for (auto& it : queue.renderPasses) {
       vkDestroyRenderPass(vkcontext.device, it, NULL);

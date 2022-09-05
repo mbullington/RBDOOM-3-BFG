@@ -78,7 +78,9 @@ CommandBuffer::CommandBuffer(CommandBuffer **dependencies,
   {
     VkCommandBufferAllocateInfo info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .commandPool = vkcontext.commandPool,
+        .commandPool = isHeapAllocated
+                           ? vkcontext.commandPool
+                           : vkcontext.swapCommandPools[vkcontext.frameParity],
         .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
         .commandBufferCount = 1,
     };
@@ -110,12 +112,23 @@ CommandBuffer::CommandBuffer(CommandBuffer **dependencies,
 }
 
 CommandBuffer::~CommandBuffer() {
+  // In this case, just delete resources and return.
+  if (isHeapAllocated) {
+    if (semaphore) {
+      vkDestroySemaphore(vkcontext.device, semaphore, NULL);
+    }
+    if (fence) {
+      vkDestroyFence(vkcontext.device, fence, NULL);
+    }
+
+    return;
+  }
+
   // When we're done with these resources, we can add them to the Vulkan
   // deletion queue.
   vulkanDeletionQueue_t &deletionQueue =
       vkcontext.deletionQueue[vkcontext.frameParity];
 
-  if (handle) deletionQueue.commandBuffers.Append(handle);
   if (semaphore) deletionQueue.semaphores.Append(semaphore);
   if (fence) deletionQueue.fences.Append(fence);
 }

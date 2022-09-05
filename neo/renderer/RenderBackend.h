@@ -145,7 +145,6 @@ struct gpuInfo_t {
 };
 
 struct vulkanDeletionQueue_t {
-  idList<VkCommandBuffer> commandBuffers;
   idList<VkSemaphore> semaphores;
   idList<VkFence> fences;
   idList<VkFramebuffer> framebuffers;
@@ -195,6 +194,8 @@ struct vulkanContext_t {
   idList<gpuInfo_t> gpus;
 
   VkCommandPool commandPool;
+  idArray<VkCommandPool, NUM_FRAME_DATA> swapCommandPools;
+
   id::CommandBuffer* currentCommandBuffer;
 
   // These are stored in memory so they're not destroyed until the next swap.
