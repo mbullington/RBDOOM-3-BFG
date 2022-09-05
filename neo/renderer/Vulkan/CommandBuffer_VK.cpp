@@ -273,12 +273,4 @@ void CommandBuffer::Submit() {
   frameParity = -1;
 }
 
-VkRenderPass CommandBuffer::GetFramebufferRenderPass() {
-  if (frameBuffer == NULL) {
-    return VK_NULL_HANDLE;
-  }
-
-  return frameBuffer->renderPass;
-}
-
 }  // namespace id

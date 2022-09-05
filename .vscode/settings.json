@@ -12,5 +12,6 @@
     "ostream": "cpp",
     "ranges": "cpp",
     "*.inc": "cpp"
-  }
+  },
+  "clangd.arguments": ["--header-insertion=never"]
 }

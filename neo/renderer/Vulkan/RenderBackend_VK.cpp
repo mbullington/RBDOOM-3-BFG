@@ -1302,63 +1302,6 @@ static void DestroyRenderTargets() {}
 
 /*
 =============
-CreateRenderPass
-=============
-*/
-static void CreateRenderPass() {
-  VkAttachmentDescription attachments[3];
-  memset(attachments, 0, sizeof(attachments));
-
-  VkAttachmentDescription& colorAttachment = attachments[0];
-  colorAttachment.format = vkcontext.swapchainFormat;
-  colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-  colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-  colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  colorAttachment.finalLayout = VK_IMAGE_LAYOUT_GENERAL;
-
-  VkAttachmentDescription& depthAttachment = attachments[1];
-  depthAttachment.format = vkcontext.depthFormat;
-  depthAttachment.samples = vkcontext.sampleCount;
-  depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-
-  // RB
-  // SRS - reenable, otherwise get Vulkan validation layer warnings
-  depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-
-  depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  depthAttachment.finalLayout =
-      VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-  VkAttachmentReference colorRef = {};
-  colorRef.attachment = 0;
-  colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-  VkAttachmentReference depthRef = {};
-  depthRef.attachment = 1;
-  depthRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-  VkSubpassDescription subpass = {};
-  subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-  subpass.colorAttachmentCount = 1;
-  subpass.pColorAttachments = &colorRef;
-  subpass.pDepthStencilAttachment = &depthRef;
-
-  VkRenderPassCreateInfo renderPassCreateInfo = {};
-  renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-  renderPassCreateInfo.attachmentCount = 2;
-  renderPassCreateInfo.pAttachments = attachments;
-  renderPassCreateInfo.subpassCount = 1;
-  renderPassCreateInfo.pSubpasses = &subpass;
-  renderPassCreateInfo.dependencyCount = 0;
-
-  ID_VK_CHECK(vkCreateRenderPass(vkcontext.device, &renderPassCreateInfo, NULL,
-                                 &vkcontext.renderPass));
-}
-
-/*
-=============
 CreatePipelineCache
 =============
 */
@@ -1375,37 +1318,24 @@ CreateFrameBuffers
 =============
 */
 void idRenderBackend::CreateFrameBuffers() {
-  VkImageView attachments[2];
-
   // depth attachment is the same
   idImage* depthImg = globalImages->GetImage("_viewDepth");
   if (depthImg == NULL) {
     idLib::FatalError("CreateFrameBuffers: No _viewDepth image.");
-  } else {
-    attachments[1] = depthImg->GetView();
   }
 
-  VkFramebufferCreateInfo frameBufferCreateInfo = {};
-  frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-  frameBufferCreateInfo.renderPass = vkcontext.renderPass;
-  frameBufferCreateInfo.attachmentCount = 2;
-  frameBufferCreateInfo.pAttachments = attachments;
-  frameBufferCreateInfo.width = renderSystem->GetWidth();
-  frameBufferCreateInfo.height = renderSystem->GetHeight();
-  frameBufferCreateInfo.layers = 1;
-
   for (int i = 0; i < NUM_FRAME_DATA; ++i) {
-    attachments[0] = vkcontext.swapchainViews[i];
-
-    VkFramebuffer vkFrameBuffer;
-    ID_VK_CHECK(vkCreateFramebuffer(vkcontext.device, &frameBufferCreateInfo,
-                                    NULL, &vkFrameBuffer));
+    VkImageView attachment = vkcontext.swapchainViews[i];
 
     swapFrameBuffers[i] =
         new Framebuffer(renderSystem->GetWidth(), renderSystem->GetHeight());
 
-    Framebuffer* fb = swapFrameBuffers[i];
-    fb->VkUpdate(vkFrameBuffer, vkcontext.renderPass, true);
+    // Populate framebuffer.
+    {
+      Framebuffer* fb = swapFrameBuffers[i];
+      fb->VkUpdate(vkcontext.swapchainFormat, attachment, depthImg->GetView(),
+                   true);
+    }
   }
 }
 
@@ -1449,7 +1379,6 @@ static void ClearContext() {
   vkcontext.surface = VK_NULL_HANDLE;
   vkcontext.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
   vkcontext.depthFormat = VK_FORMAT_UNDEFINED;
-  vkcontext.renderPass = VK_NULL_HANDLE;
   vkcontext.pipelineCache = VK_NULL_HANDLE;
   vkcontext.sampleCount = VK_SAMPLE_COUNT_1_BIT;
   vkcontext.supersampling = false;
@@ -1624,10 +1553,6 @@ void idRenderBackend::Init() {
   idLib::Printf("Creating render targets...\n");
   CreateRenderTargets();
 
-  // Create Render Pass
-  idLib::Printf("Creating render pass...\n");
-  CreateRenderPass();
-
   // Create Pipeline Cache
   idLib::Printf("Creating pipeline cache...\n");
   CreatePipelineCache();
@@ -1664,9 +1589,6 @@ void idRenderBackend::Shutdown() {
 
   // Destroy Pipeline Cache
   vkDestroyPipelineCache(vkcontext.device, vkcontext.pipelineCache, NULL);
-
-  // Destroy Render Pass
-  vkDestroyRenderPass(vkcontext.device, vkcontext.renderPass, NULL);
 
   // Destroy Render Targets
   DestroyRenderTargets();

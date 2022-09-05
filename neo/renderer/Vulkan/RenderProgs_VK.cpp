@@ -1185,7 +1185,7 @@ static VkPipeline CreateGraphicsPipeline(vertexLayoutType_t vertexLayoutType,
   createInfo.layout = pipelineLayout;
 
   createInfo.renderPass =
-      vkcontext.currentCommandBuffer->GetFramebufferRenderPass();
+      vkcontext.currentCommandBuffer->GetFramebuffer()->GetRenderPass();
   assert(createInfo.renderPass != VK_NULL_HANDLE);
 
   createInfo.pVertexInputState = &vertexInputState;

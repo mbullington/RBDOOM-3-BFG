@@ -203,7 +203,6 @@ struct vulkanContext_t {
   VkSurfaceKHR surface;
   VkPresentModeKHR presentMode;
   VkFormat depthFormat;
-  VkRenderPass renderPass;
   VkPipelineCache pipelineCache;
   VkSampleCountFlagBits sampleCount;
   bool supersampling;

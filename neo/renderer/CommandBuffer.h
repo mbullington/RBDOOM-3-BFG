@@ -37,8 +37,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #pragma once
 
-#include <vulkan/vulkan_core.h>
-
 #include "RenderFwd.h"
 
 #if defined(USE_VULKAN)
@@ -91,11 +89,12 @@ class CommandBuffer {
   void SetDependencies(CommandBuffer **dependencies, short numDependencies);
   void Submit();
 
+  Framebuffer *GetFramebuffer() const { return frameBuffer; }
+
 #if defined(USE_VULKAN)
   VkCommandBuffer GetHandle() const { return handle; }
   VkSemaphore GetSemaphore() const { return semaphore; }
   VkFence GetFence() const { return fence; }
-  VkRenderPass GetFramebufferRenderPass();
 #endif
 
  private:

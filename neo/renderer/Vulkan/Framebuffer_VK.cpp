@@ -74,12 +74,20 @@ void Framebuffer::Update(textureFormat_t format, idImage* image,
     vkDepthImageView = depthImage->GetView();
   }
 
+  VkUpdate(vkFormat, vkImageView, vkDepthImageView);
+}
+
+void Framebuffer::VkUpdate(VkFormat format, VkImageView imageView,
+                           VkImageView depthImageView, bool isSwapImage) {
+  this->isSwapImage = isSwapImage;
+  bool hasDepth = depthImageView != VK_NULL_HANDLE;
+
   // Create the render pass
   {
     VkAttachmentDescription attachments[2] = {
         // Color
         {
-            .format = vkFormat,
+            .format = format,
             .samples = VK_SAMPLE_COUNT_1_BIT,
             .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
@@ -131,7 +139,7 @@ void Framebuffer::Update(textureFormat_t format, idImage* image,
 
   // Create the framebuffer
   {
-    VkImageView imageAttachments[2] = {vkImageView, vkDepthImageView};
+    VkImageView imageAttachments[2] = {imageView, depthImageView};
     VkFramebufferCreateInfo frameBufferCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
         .renderPass = renderPass,

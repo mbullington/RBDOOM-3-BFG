@@ -59,12 +59,12 @@ class Framebuffer {
   void Update(textureFormat_t format, idImage* image,
               idImage* depthImage = NULL);
 #if defined(USE_VULKAN)
-  void VkUpdate(VkFramebuffer frameBuffer, VkRenderPass renderPass,
-                bool isSwapImage = false) {
-    this->frameBuffer = frameBuffer;
-    this->renderPass = renderPass;
-    this->isSwapImage = isSwapImage;
-  }
+  void VkUpdate(VkFormat format, VkImageView imageView,
+                VkImageView depthImageView = VK_NULL_HANDLE,
+                bool isSwapImage = false);
+
+  VkFramebuffer GetFramebuffer() const { return frameBuffer; }
+  VkRenderPass GetRenderPass() const { return renderPass; }
 #endif
 
   int GetWidth() const { return width; }
