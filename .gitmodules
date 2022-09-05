@@ -4,3 +4,6 @@
 [submodule "vendor/glslang"]
 	path = vendor/glslang
 	url = git@github.com:KhronosGroup/glslang.git
+[submodule "vendor/sx"]
+	path = vendor/sx
+	url = git@github.com:septag/sx.git

@@ -265,10 +265,15 @@ endif()
 include_directories("../vendor/zlib")
 include_directories("../vendor/jpeg-6")
 
-
 macro(SET_OPTION option value)
   set(${option} ${value} CACHE "" INTERNAL FORCE)
 endmacro()
+
+# include sx
+SET_OPTION(SX_BUILD_TESTS OFF)
+set(SX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/sx)
+add_subdirectory(${SX_DIR} sx)
+include_directories(${SX_DIR})
 
 if(USE_VULKAN)
 
