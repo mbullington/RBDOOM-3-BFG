@@ -229,10 +229,7 @@ idImage::~idImage() {
 idImage::IsLoaded
 ====================
 */
-bool idImage::IsLoaded() const {
-  return image !=
-         VK_NULL_HANDLE;  // TODO_VK maybe do something better than this.
-}
+bool idImage::IsLoaded() const { return image != VK_NULL_HANDLE; }
 
 /*
 ====================
@@ -380,6 +377,7 @@ CopyFramebuffer
 ====================
 */
 void idImage::CopyFramebuffer(int x, int y, int imageWidth, int imageHeight) {
+  // TODO(mbullington)
 #if 0
 	VkCommandBuffer commandBuffer = vkcontext.commandBuffer[ vkcontext.frameParity ];
 
@@ -584,7 +582,10 @@ idImage::Resize
 ========================
 */
 void idImage::Resize(int width, int height) {
-  // TODO
+  opts.width = width;
+  opts.height = height;
+
+  AllocImage();
 }
 
 /*
