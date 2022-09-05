@@ -241,9 +241,17 @@ void CommandBuffer::Submit() {
     }
   }
 
-  // TODO(mbullington): For now, just have all commands wait until the
-  // semaphores are ready.
-  VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+  VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_NONE;
+  // This is from the original "dependencies," not our augmented swap one.
+  if (this->dependencies.Num() > 0) {
+    // TODO(mbullington): Once we have compute shaders, we'll want to be able to
+    // specify if dependents of compute should wait for vertex shading.
+    dstStageMask |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT |
+                    VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+  }
+  if (waitOnSwapAcquire) {
+    dstStageMask |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+  }
 
   VkSubmitInfo submitInfo = {};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
