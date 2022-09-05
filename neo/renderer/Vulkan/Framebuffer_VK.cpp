@@ -53,10 +53,6 @@ Framebuffer::Framebuffer(int w, int h) {
 Framebuffer::~Framebuffer() {
   // When we're done with these resources, we can add them to the Vulkan
   // deletion queue.
-  //
-  // Deletion happens at the end of the frame.
-  // TODO(mbullington): What happens here with dependencies? Should we reference
-  // count?
   vulkanDeletionQueue_t& deletionQueue =
       vkcontext.deletionQueue[vkcontext.frameParity];
 

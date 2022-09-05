@@ -36,6 +36,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 ===========================================================================
 */
 
+#include <vulkan/vulkan_core.h>
 #include "precompiled.h"
 #include "renderer/CommandBuffer.h"
 #pragma hdrstop
@@ -1575,10 +1576,28 @@ void idRenderBackend::Init() {
   idLib::Printf("Creating command buffer...\n");
   {
     for (int i = 0; i < NUM_FRAME_DATA; ++i) {
-      resetQueryCommandBuffers[i] =
-          new CommandBuffer(NULL, 0, id::CMD_BUF_OPT_SKIP_SEMAPHORE);
-      swapSubmitCommandBuffers[i] =
-          new CommandBuffer(NULL, 0, id::CMD_BUF_OPT_CREATE_FENCE);
+      // Reset query command buffers (beginning of frame).
+      resetQueryCommandBuffers[i] = new CommandBuffer(
+          id::CMD_BUF_OPT_HEAP_ALLOCATED | id::CMD_BUF_OPT_SKIP_SEMAPHORE);
+
+      {
+        CommandBuffer* cmd = resetQueryCommandBuffers[i];
+        VkQueryPool queryPool = vkcontext.queryPools[i];
+
+        cmd->Begin();
+        cmd->MakeActive();
+
+        vkCmdResetQueryPool(cmd->GetHandle(), queryPool, 0,
+                            NUM_TIMESTAMP_QUERIES);
+        vkCmdWriteTimestamp(cmd->GetHandle(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                            queryPool, 0);
+
+        cmd->End();
+      }
+
+      // Swap submit command buffers (end of frame).
+      swapSubmitCommandBuffers[i] = new CommandBuffer(
+          id::CMD_BUF_OPT_HEAP_ALLOCATED | id::CMD_BUF_OPT_CREATE_FENCE);
     }
   }
 
@@ -2074,26 +2093,12 @@ id::Framebuffer* idRenderBackend::GL_StartFrame() {
   for (int i = 0; i < MRB_TOTAL_QUERIES; i++) {
     vkcontext.queryAssignedIndex[vkcontext.frameParity][i] = 0;
   }
+  vkcontext.queryAssignedIndex[vkcontext.frameParity][MRB_GPU_TIME * 2 + 0] = 0;
 
   inRenderPass = true;
 
   // We need to create a command buffer to reset the query pool.
   CommandBuffer* cmd = resetQueryCommandBuffers[vkcontext.frameParity];
-  cmd->Begin();
-  cmd->MakeActive();
-
-  uint32 queryIndex =
-      vkcontext
-          .queryAssignedIndex[vkcontext.frameParity][MRB_GPU_TIME * 2 + 0] =
-          vkcontext.queryIndex[vkcontext.frameParity]++;
-
-  vkCmdResetQueryPool(cmd->GetHandle(), queryPool, queryIndex,
-                      NUM_TIMESTAMP_QUERIES);
-
-  vkCmdWriteTimestamp(cmd->GetHandle(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                      queryPool, queryIndex);
-
-  cmd->End();
   cmd->Submit();
 
   // Return the swap framebuffer.

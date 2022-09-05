@@ -49,24 +49,36 @@ namespace id {
 
 enum commandBufferOptions_t {
   CMD_BUF_OPT_NONE = 0,
+  // This flag needs to be set for any command buffer created with 'new',
+  // outside of a render pass.
+  //
+  // Generally, command buffers should be ephemeral, and only saved in specific
+  // instances (like postprocessing), or where we *know* we're going to be
+  // submitting the same thing every time.
+  //
+  // This flag trades the ability for the command buffer to be created outside
+  // of a render pass, for the ability to not re-record inside of one.
+  CMD_BUF_OPT_HEAP_ALLOCATED = BIT(1),
   // This flag is needed for CommandBuffer to create a Fence object on Vulkan.
   // This is used for CPU synchronization, but may unnecessary for the
   // majority of CommandBuffers.
-  CMD_BUF_OPT_CREATE_FENCE = BIT(1),
+  CMD_BUF_OPT_CREATE_FENCE = BIT(2),
   // This flag will skip creating the Semaphore object on Vulkan, meaning this
   // object will have no dependencies.
   //
   // Usually this should be the "last link" in the chain (unless you're using
   // swap), and not having this flag will create Vulkan API validation errors.
-  CMD_BUF_OPT_SKIP_SEMAPHORE = BIT(2)
+  CMD_BUF_OPT_SKIP_SEMAPHORE = BIT(3)
 };
 
 class CommandBuffer {
-  friend class idRenderBackend;
-
  public:
-  CommandBuffer(CommandBuffer **dependencies = NULL, size_t numDependencies = 0,
+  CommandBuffer(CommandBuffer **dependencies, size_t numDependencies,
                 uint8_t opts = CMD_BUF_OPT_NONE);
+
+  CommandBuffer(uint8_t opts = CMD_BUF_OPT_NONE)
+      : CommandBuffer(NULL, 0, opts) {}
+
   virtual ~CommandBuffer();
 
   void Bind(Framebuffer *frameBuffer);
@@ -89,6 +101,7 @@ class CommandBuffer {
  private:
   bool isRecording;
   bool isBound;
+  bool isHeapAllocated;
 
   int frameParity;
   bool waitOnSwapAcquire;
@@ -97,9 +110,6 @@ class CommandBuffer {
   bool shouldSkipSemaphore;
 
   idList<CommandBuffer *> dependencies;
-
-  // TODO: Just steal the appropriate Vulkan objects from the Framebuffer
-  // and use reference counting.
   Framebuffer *frameBuffer;
 
 #if defined(USE_VULKAN)

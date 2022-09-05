@@ -49,6 +49,7 @@ CommandBuffer::CommandBuffer(CommandBuffer **dependencies,
                              size_t numDependencies, uint8_t opts) {
   isRecording = false;
   isBound = false;
+  isHeapAllocated = opts & CMD_BUF_OPT_HEAP_ALLOCATED;
 
   SetDependencies(dependencies, numDependencies);
 
@@ -60,6 +61,18 @@ CommandBuffer::CommandBuffer(CommandBuffer **dependencies,
 
   assert(vkcontext.device);
   assert(vkcontext.commandPool);
+
+  // Assure that heap allocated command buffers are not within a render pass,
+  // and vice versa.
+  if (tr.backend.inRenderPass && isHeapAllocated) {
+    common->FatalError(
+        "CommandBuffer::CommandBuffer: heap allocated command "
+        "buffers cannot be created within a render pass.");
+  } else if (!tr.backend.inRenderPass && !isHeapAllocated) {
+    common->FatalError(
+        "CommandBuffer::CommandBuffer: command buffers created "
+        "within a render pass must be heap allocated.");
+  }
 
   // Create the command buffer.
   {
@@ -99,10 +112,6 @@ CommandBuffer::CommandBuffer(CommandBuffer **dependencies,
 CommandBuffer::~CommandBuffer() {
   // When we're done with these resources, we can add them to the Vulkan
   // deletion queue.
-  //
-  // Deletion happens at the end of the frame.
-  // TODO(mbullington): What happens here with dependencies? Should we reference
-  // count?
   vulkanDeletionQueue_t &deletionQueue =
       vkcontext.deletionQueue[vkcontext.frameParity];
 
