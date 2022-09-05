@@ -378,9 +378,9 @@ static int CompileGLSLtoSPIRV(const char* filename, const idStr& dataGLSL,
 }
 #else
 
-#include "../../extern/glslang/glslang/Public/ShaderLang.h"
-#include "../../extern/glslang/glslang/Include/ResourceLimits.h"
-#include "../../extern/glslang/SPIRV/GlslangToSpv.h"
+#include "glslang/Public/ShaderLang.h"
+#include "glslang/Include/ResourceLimits.h"
+#include "SPIRV/GlslangToSpv.h"
 
 static bool glslangInitialized = false;
 

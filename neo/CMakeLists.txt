@@ -307,8 +307,8 @@ if(USE_VULKAN)
 
 		#add_definitions(-DGLSLANG_MINOR_VERSION=13)
 	
-		set(GLSLANG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/glslang)
-		add_subdirectory(${GLSLANG_DIR})
+		set(GLSLANG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/glslang)
+		add_subdirectory(${GLSLANG_DIR} glslang)
 	
 		include_directories(${GLSLANG_DIR})
 		

@@ -1,6 +1,6 @@
-[submodule "neo/extern/glslang"]
-	path = neo/extern/glslang
-	url = https://github.com/KhronosGroup/glslang.git
 [submodule "vendor/rapidjson"]
 	path = vendor/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "vendor/glslang"]
+	path = vendor/glslang
+	url = git@github.com:KhronosGroup/glslang.git
