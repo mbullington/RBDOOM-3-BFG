@@ -97,16 +97,15 @@ class idRenderLog {
 
   void StartFrame() {}
   void EndFrame() {}
-  void Close() {}
-  int Active() { return 0; }
 
   void OpenBlock(const char* label, const idVec4& color = colorBlack);
   void CloseBlock();
-  void OpenMainBlock(renderLogMainBlock_t block);  // {}
-  void CloseMainBlock();                           // {}
+  void OpenMainBlock(renderLogMainBlock_t block);
+  void CloseMainBlock();
+
+  // TODO(mbullington)
   void Indent(renderLogIndentLabel_t label = RENDER_LOG_INDENT_DEFAULT) {}
   void Outdent(renderLogIndentLabel_t label = RENDER_LOG_INDENT_DEFAULT) {}
-
   void Printf(VERIFY_FORMAT_STRING const char* fmt, ...) {}
 
   int activeLevel;
