@@ -1576,9 +1576,10 @@ void idRenderBackend::Init() {
   idLib::Printf("Creating command buffer...\n");
   {
     for (int i = 0; i < NUM_FRAME_DATA; ++i) {
+      resetQueryCommandBuffers[i] =
+          new CommandBuffer(std::nullopt, 0, id::CMD_BUF_OPT_SKIP_SEMAPHORE);
       swapSubmitCommandBuffers[i] =
           new CommandBuffer(std::nullopt, 0, id::CMD_BUF_OPT_CREATE_FENCE);
-      resetQueryCommandBuffers[i] = new CommandBuffer();
     }
   }
 

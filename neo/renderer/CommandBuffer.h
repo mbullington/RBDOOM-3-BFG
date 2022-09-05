@@ -57,14 +57,12 @@ enum commandBufferOptions_t {
   // This is used for CPU synchronization, but may unnecessary for the
   // majority of CommandBuffers.
   CMD_BUF_OPT_CREATE_FENCE = BIT(1),
-  // This flag is needed to allow multiple Begin() calls on the same frame.
+  // This flag will skip creating the Semaphore object on Vulkan, meaning this
+  // object will have no dependencies.
   //
-  // This is disabled by default because it's largely a footgun, as it
-  // overwrites
-  // the previous command buffer contents.
-  CMD_BUF_OPT_ALLOW_MULTIPLE_RECORDS_PER_FRAME = BIT(2),
-  // This flag will force the CommandBuffer to wait on the swapchain acquire.
-  CMD_BUF_OPT_WAIT_ON_SWAP_ACQUIRE = BIT(3),
+  // Usually this should be the "last link" in the chain (unless you're using
+  // swap), and not having this flag will create Vulkan API validation errors.
+  CMD_BUF_OPT_SKIP_SEMAPHORE = BIT(2)
 };
 
 class CommandBuffer {
@@ -72,8 +70,7 @@ class CommandBuffer {
 
  public:
   CommandBuffer(optional<CommandBuffer **> dependencies = nullopt,
-                short numDependencies = 0,
-                commandBufferOptions_t opts = CMD_BUF_OPT_NONE);
+                short numDependencies = 0, uint8_t opts = CMD_BUF_OPT_NONE);
   virtual ~CommandBuffer();
 
   void Bind(Framebuffer *frameBuffer);
@@ -97,10 +94,10 @@ class CommandBuffer {
   bool isBound;
 
   int frameParity;
+  bool waitOnSwapAcquire;
 
   bool shouldCreateFence;
-  bool shouldAllowMultipleRecordsPerFrame;
-  bool shouldWaitOnSwapAcquire;
+  bool shouldSkipSemaphore;
 
   idList<CommandBuffer *> dependencies;
 

@@ -48,17 +48,15 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 namespace id {
 
 CommandBuffer::CommandBuffer(optional<CommandBuffer **> dependencies,
-                             short numDependencies,
-                             commandBufferOptions_t opts) {
+                             short numDependencies, uint8_t opts) {
   isRecording = false;
   isBound = false;
 
   frameParity = -1;
+  waitOnSwapAcquire = false;
 
   shouldCreateFence = opts & CMD_BUF_OPT_CREATE_FENCE;
-  shouldAllowMultipleRecordsPerFrame =
-      opts & CMD_BUF_OPT_ALLOW_MULTIPLE_RECORDS_PER_FRAME;
-  shouldWaitOnSwapAcquire = opts & CMD_BUF_OPT_WAIT_ON_SWAP_ACQUIRE;
+  shouldSkipSemaphore = opts & CMD_BUF_OPT_SKIP_SEMAPHORE;
 
   if (numDependencies > 0) {
     this->dependencies.Append(*dependencies, numDependencies);
@@ -80,12 +78,14 @@ CommandBuffer::CommandBuffer(optional<CommandBuffer **> dependencies,
   }
 
   // Create the semaphore.
-  {
+  if (!shouldSkipSemaphore) {
     VkSemaphoreCreateInfo info = {
         .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
     };
 
     ID_VK_CHECK(vkCreateSemaphore(vkcontext.device, &info, NULL, &semaphore));
+  } else {
+    semaphore = NULL;
   }
 
   // Create the fence.
@@ -127,7 +127,7 @@ void CommandBuffer::Bind(id::Framebuffer *frameBuffer) {
   isBound = true;
 
   // Make sure regardless of Unbind, this remains true.
-  if (frameBuffer->isSwapImage) shouldWaitOnSwapAcquire = true;
+  if (frameBuffer->isSwapImage) waitOnSwapAcquire = true;
 
   VkRenderPassBeginInfo info = {};
   info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -172,8 +172,7 @@ void CommandBuffer::Begin() {
     return;
   }
 
-  if (frameParity == vkcontext.frameParity &&
-      !shouldAllowMultipleRecordsPerFrame) {
+  if (frameParity == vkcontext.frameParity) {
     common->FatalError("CommandBuffer::Begin: Already recorded this frame");
     return;
   }
@@ -225,7 +224,7 @@ void CommandBuffer::Submit() {
     waitSemaphores.Append(dependency->semaphore);
   }
 
-  if (shouldWaitOnSwapAcquire) {
+  if (waitOnSwapAcquire) {
     if (!tr.backend.inRenderPass) {
       common->Error("CommandBuffer::Submit: Waiting on swap acquire %s",
                     "but not in a render pass");
@@ -243,11 +242,14 @@ void CommandBuffer::Submit() {
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
   submitInfo.waitSemaphoreCount = waitSemaphores.Num();
   submitInfo.pWaitSemaphores = waitSemaphores.Ptr();
-  submitInfo.signalSemaphoreCount = 1;
-  submitInfo.pSignalSemaphores = &semaphore;
   submitInfo.commandBufferCount = 1;
   submitInfo.pCommandBuffers = &handle;
   submitInfo.pWaitDstStageMask = &dstStageMask;
+
+  if (!shouldSkipSemaphore) {
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &semaphore;
+  }
 
   ID_VK_CHECK(
       vkQueueSubmit(vkcontext.graphicsQueue, 1, &submitInfo, this->fence));
