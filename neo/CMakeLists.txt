@@ -273,7 +273,7 @@ endmacro()
 SET_OPTION(SX_BUILD_TESTS OFF)
 set(SX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/sx)
 add_subdirectory(${SX_DIR} sx)
-include_directories(${SX_DIR})
+include_directories(${SX_DIR}/include)
 
 if(USE_VULKAN)
 
@@ -1065,7 +1065,7 @@ else()
 			set(RT_LIBRARY rt)
 		endif()
 
-		set(LIBRARIES idlib
+		set(LIBRARIES idlib sx
 			${Vulkan_LIBRARIES}
 			${OPENGL_LIBRARIES}
 			pthread

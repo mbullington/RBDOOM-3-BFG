@@ -57,7 +57,7 @@ state).
 class idLib {
  private:
   static bool mainThreadInitialized;
-  static ID_TLS isMainThread;
+  static thread_local bool isMainThread;
 
  public:
   static class idSys* sys;

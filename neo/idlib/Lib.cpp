@@ -51,7 +51,7 @@ idCVarSystem* idLib::cvarSystem = NULL;
 idFileSystem* idLib::fileSystem = NULL;
 int idLib::frameNumber = 0;
 bool idLib::mainThreadInitialized = 0;
-ID_TLS idLib::isMainThread = 0;
+thread_local bool idLib::isMainThread = 0;
 
 char idException::error[2048];
 

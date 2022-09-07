@@ -194,7 +194,7 @@ bool idSysThread::IsWorkDone() {
 idSysThread::ThreadProc
 ========================
 */
-int idSysThread::ThreadProc(idSysThread* thread) {
+int idSysThread::ThreadProc(idSysThread* thread, void* garbage) {
   int retVal = 0;
 
   try {

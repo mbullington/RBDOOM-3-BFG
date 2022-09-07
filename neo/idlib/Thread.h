@@ -233,7 +233,7 @@ class idSysThread {
   virtual ~idSysThread();
 
   const char* GetName() const { return name.c_str(); }
-  uintptr_t GetThreadHandle() const { return threadHandle; }
+  threadHandle_t GetThreadHandle() const { return threadHandle; }
   bool IsRunning() const { return isRunning; }
   bool IsTerminating() const { return isTerminating; }
 
@@ -276,7 +276,7 @@ class idSysThread {
 
  private:
   idStr name;
-  uintptr_t threadHandle;
+  threadHandle_t threadHandle;
   bool isWorker;
   bool isRunning;
   volatile bool isTerminating;
@@ -285,7 +285,7 @@ class idSysThread {
   idSysSignal signalMoreWorkToDo;
   idSysMutex signalMutex;
 
-  static int ThreadProc(idSysThread* thread);
+  static int ThreadProc(idSysThread* thread, void* garbage);
 
   idSysThread(const idSysThread& s) {}
   void operator=(const idSysThread& s) {}
