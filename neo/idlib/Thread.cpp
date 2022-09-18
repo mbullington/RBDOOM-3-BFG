@@ -279,18 +279,3 @@ void TestThread() {
   idMyThread thread;
   thread.StartThread("myThread", CORE_ANY);
 }
-
-/*
-========================
-TestWorkers
-========================
-*/
-void TestWorkers() {
-  idSysWorkerThreadGroup<idMyThread> workers("myWorkers", 4);
-  for (;;) {
-    for (int i = 0; i < workers.GetNumThreads(); i++) {
-      // workers.GetThread( i )-> // setup work for this thread
-    }
-    workers.SignalWorkAndWait();
-  }
-}

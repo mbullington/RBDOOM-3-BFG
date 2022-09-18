@@ -4,6 +4,7 @@
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 Copyright (C) 2012 Robert Beckebans
+Copyright (C) 2022 Michael Bullington
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
 Source Code").
@@ -34,8 +35,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 ===========================================================================
 */
-#ifndef __THREAD_H__
-#define __THREAD_H__
+#pragma once
 
 /*
 ================================================
@@ -222,9 +222,6 @@ work while the main thread continues. After doing other work, the main thread
 can wait for the worker thread to finish, if it has not finished already. When
 the worker thread is done, the main thread can safely use the results from the
 worker thread.
-
-Note that worker threads are useful on all platforms but they do not map to the
-SPUs on the PS3.
 ================================================
 */
 class idSysThread {
@@ -290,202 +287,3 @@ class idSysThread {
   idSysThread(const idSysThread& s) {}
   void operator=(const idSysThread& s) {}
 };
-
-/*
-================================================
-idSysWorkerThreadGroup implements a group of worker threads that
-typically crunch through a collection of similar tasks.
-
-        class idMyWorkerThread : public idSysThread {
-        public:
-                virtual int Run() {
-                        // run thread code here
-                        return 0;
-                }
-                // specify thread data here
-        };
-
-        idSysWorkerThreadGroup<idMyWorkerThread> workers( "myWorkers", 4 );
-        for ( ; ; ) {
-                for ( int i = 0; i < workers.GetNumThreads(); i++ ) {
-                        // workers.GetThread( i )-> // setup work for this
-thread
-                }
-                workers.SignalWorkAndWait();
-                // use results from the worker threads here
-        }
-
-The concept of worker thread Groups is probably most useful for tools and
-compilers. For instance, the AAS Compiler is using a worker thread group.
-Although worker threads will work well on the PC, Mac and the 360, they do not
-directly map to the PS3, in that the worker threads won't automatically run on
-the SPUs.
-================================================
-*/
-template <class threadType>
-class idSysWorkerThreadGroup {
- public:
-  idSysWorkerThreadGroup(const char* name, int numThreads,
-                         xthreadPriority priority = THREAD_NORMAL,
-                         int stackSize = DEFAULT_THREAD_STACK_SIZE);
-
-  virtual ~idSysWorkerThreadGroup();
-
-  int GetNumThreads() const { return threadList.Num(); }
-  threadType& GetThread(int i) { return *threadList[i]; }
-
-  void SignalWorkAndWait();
-
- private:
-  idList<threadType*, TAG_THREAD> threadList;
-  bool runOneThreadInline;  // use the signalling thread as one of the threads
-  bool singleThreaded;      // set to true for debugging
-};
-
-/*
-========================
-idSysWorkerThreadGroup<threadType>::idSysWorkerThreadGroup
-========================
-*/
-template <class threadType>
-ID_INLINE idSysWorkerThreadGroup<threadType>::idSysWorkerThreadGroup(
-    const char* name, int numThreads, xthreadPriority priority, int stackSize) {
-  runOneThreadInline = (numThreads < 0);
-  singleThreaded = false;
-  numThreads = abs(numThreads);
-  for (int i = 0; i < numThreads; i++) {
-    threadType* thread = new (TAG_THREAD) threadType;
-    thread->StartWorkerThread(va("%s_worker%i", name, i), (core_t)i, priority,
-                              stackSize);
-    threadList.Append(thread);
-  }
-}
-
-/*
-========================
-idSysWorkerThreadGroup<threadType>::~idSysWorkerThreadGroup
-========================
-*/
-template <class threadType>
-ID_INLINE idSysWorkerThreadGroup<threadType>::~idSysWorkerThreadGroup() {
-  threadList.DeleteContents();
-}
-
-/*
-========================
-idSysWorkerThreadGroup<threadType>::SignalWorkAndWait
-========================
-*/
-template <class threadType>
-ID_INLINE void idSysWorkerThreadGroup<threadType>::SignalWorkAndWait() {
-  if (singleThreaded) {
-    for (int i = 0; i < threadList.Num(); i++) {
-      threadList[i]->Run();
-    }
-    return;
-  }
-  for (int i = 0; i < threadList.Num() - runOneThreadInline; i++) {
-    threadList[i]->SignalWork();
-  }
-  if (runOneThreadInline) {
-    threadList[threadList.Num() - 1]->Run();
-  }
-  for (int i = 0; i < threadList.Num() - runOneThreadInline; i++) {
-    threadList[i]->WaitForThread();
-  }
-}
-
-/*
-================================================
-idSysThreadSynchronizer, allows a group of threads to
-synchronize with each other half-way through execution.
-
-        idSysThreadSynchronizer sync;
-
-        class idMyWorkerThread : public idSysThread {
-        public:
-                virtual int Run() {
-                        // perform first part of the work here
-                        sync.Synchronize( threadNum );	// synchronize all
-threads
-                        // perform second part of the work here
-                        return 0;
-                }
-                // specify thread data here
-                unsigned int threadNum;
-        };
-
-        idSysWorkerThreadGroup<idMyWorkerThread> workers( "myWorkers", 4 );
-        for ( int i = 0; i < workers.GetNumThreads(); i++ ) {
-                workers.GetThread( i )->threadNum = i;
-        }
-
-        for ( ; ; ) {
-                for ( int i = 0; i < workers.GetNumThreads(); i++ ) {
-                        // workers.GetThread( i )-> // setup work for this
-thread
-                }
-                workers.SignalWorkAndWait();
-                // use results from the worker threads here
-        }
-
-================================================
-*/
-class idSysThreadSynchronizer {
- public:
-  static const int WAIT_INFINITE = -1;
-
-  ID_INLINE void SetNumThreads(unsigned int num);
-  ID_INLINE void Signal(unsigned int threadNum);
-  ID_INLINE bool Synchronize(unsigned int threadNum,
-                             int timeout = WAIT_INFINITE);
-
- private:
-  idList<idSysSignal*, TAG_THREAD> signals;
-  idSysInterlockedInteger busyCount;
-};
-
-/*
-========================
-idSysThreadSynchronizer::SetNumThreads
-========================
-*/
-ID_INLINE void idSysThreadSynchronizer::SetNumThreads(unsigned int num) {
-  assert(busyCount.GetValue() == signals.Num());
-  if ((int)num != signals.Num()) {
-    signals.DeleteContents();
-    signals.SetNum((int)num);
-    for (unsigned int i = 0; i < num; i++) {
-      signals[i] = new (TAG_THREAD) idSysSignal();
-    }
-    busyCount.SetValue(num);
-    SYS_MEMORYBARRIER;
-  }
-}
-
-/*
-========================
-idSysThreadSynchronizer::Signal
-========================
-*/
-ID_INLINE void idSysThreadSynchronizer::Signal(unsigned int threadNum) {
-  if (busyCount.Decrement() == 0) {
-    busyCount.SetValue((unsigned int)signals.Num());
-    SYS_MEMORYBARRIER;
-    for (int i = 0; i < signals.Num(); i++) {
-      signals[i]->Raise();
-    }
-  }
-}
-
-/*
-========================
-idSysThreadSynchronizer::Synchronize
-========================
-*/
-ID_INLINE bool idSysThreadSynchronizer::Synchronize(unsigned int threadNum,
-                                                    int timeout) {
-  return signals[threadNum]->Wait(timeout);
-}
-
-#endif  // !__THREAD_H__
