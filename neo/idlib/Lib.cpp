@@ -37,6 +37,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
+#include <sx/allocator.h>
+
 /*
 ===============================================================================
 
@@ -89,6 +91,10 @@ void idLib::Init() {
 
   // initialize the dictionary string pools
   idDict::Init();
+
+  // initialize task scheduler.
+  alloc = sx_alloc_malloc();
+  id::taskScheduler = new id::TaskScheduler();
 }
 
 /*
@@ -105,6 +111,9 @@ void idLib::ShutDown() {
 
   // shut down the SIMD engine
   idSIMD::Shutdown();
+
+  // shut down task scheduler.
+  delete id::taskScheduler;
 }
 
 /*

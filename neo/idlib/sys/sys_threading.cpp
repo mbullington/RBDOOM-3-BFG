@@ -41,7 +41,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "sx/allocator.h"
 #include "sx/threads.h"
 
-const sx_alloc* alloc = sx_alloc_malloc();
+const sx_alloc* alloc;
 
 /*
 ========================

@@ -49,6 +49,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 ================================================================================================
 */
 
+extern const sx_alloc* alloc;
+
 typedef sx_thread* threadHandle_t;
 typedef sx_mutex* mutexHandle_t;
 typedef sx_signal* signalHandle_t;
