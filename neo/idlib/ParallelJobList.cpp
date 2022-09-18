@@ -48,8 +48,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 const char* jobNames[] = {
     ASSERT_ENUM_STRING(JOBLIST_RENDERER_FRONTEND, 0),
-    ASSERT_ENUM_STRING(JOBLIST_RENDERER_BACKEND, 1),
-    ASSERT_ENUM_STRING(JOBLIST_UTILITY, 9),
+    ASSERT_ENUM_STRING(JOBLIST_UTILITY, 8),
 };
 
 static const int MAX_REGISTERED_JOBS = 128;
@@ -1132,7 +1131,7 @@ extern void Sys_CPUCount(int& logicalNum, int& coreNum, int& packageNum);
 // http://download.microsoft.com/download/5/7/7/577a5684-8a83-43ae-9272-ff260a9c20e2/Hyper-thread_Windows.doc
 //
 //											Physical
-//Logical (Cores + HT)
+// Logical (Cores + HT)
 // Windows XP Home Edition					1
 // 2 Windows XP Professional					2
 // 4 Windows Server 2003, Standard Edition	4			8

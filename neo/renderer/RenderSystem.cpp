@@ -120,47 +120,10 @@ void idRenderSystemLocal::RenderCommandBuffers(
     return;
   }
 
-  // r_skipBackEnd allows the entire time of the back end
-  // to be removed from performance measurements, although
-  // nothing will be drawn to the screen.  If the prints
-  // are going to a file, or r_skipBackEnd is later disabled,
-  // usefull data can be received.
-
   // r_skipRender is usually more usefull, because it will still
   // draw 2D graphics
   if (!r_skipBackEnd.GetBool()) {
-// SRS - For OSX skip total rendering time query due to missing GL_TIMESTAMP
-// support in Apple OpenGL 4.1, will calculate it inside
-// SwapCommandBuffers_FinishRendering instead
-#if !defined(USE_VULKAN) && !defined(__APPLE__)
-    if (glConfig.timerQueryAvailable) {
-      if (glcontext.renderLogMainBlockTimeQueryIds[glcontext.frameParity]
-                                                  [MRB_GPU_TIME] == 0) {
-        glCreateQueries(
-            GL_TIMESTAMP, 2,
-            &glcontext.renderLogMainBlockTimeQueryIds[glcontext.frameParity]
-                                                     [MRB_GPU_TIME]);
-      }
-
-      glQueryCounter(
-          glcontext.renderLogMainBlockTimeQueryIds[glcontext.frameParity]
-                                                  [MRB_GPU_TIME * 2 + 0],
-          GL_TIMESTAMP);
-      backend.ExecuteBackEndCommands(cmdHead);
-      glQueryCounter(
-          glcontext.renderLogMainBlockTimeQueryIds[glcontext.frameParity]
-                                                  [MRB_GPU_TIME * 2 + 1],
-          GL_TIMESTAMP);
-
-      glcontext.renderLogMainBlockTimeQueryIssued[glcontext.frameParity]
-                                                 [MRB_GPU_TIME * 2 + 1]++;
-
-      glFlush();
-    } else
-#endif
-    {
-      backend.ExecuteBackEndCommands(cmdHead);
-    }
+    backend.ExecuteBackEndCommands(cmdHead);
   }
 
   // pass in null for now - we may need to do some map specific hackery in the
