@@ -68,6 +68,31 @@ void SxThreadInit(sx_job_context* context, int thread_index,
   }
 }
 
+struct sxTaskData_t {
+  jobFn_t* fn;
+  int workLen;
+  void* data;
+};
+
+sxTaskData_t* CreateSxTaskData(jobFn_t* fn, int workLen, void* data) {
+  auto taskData = new sxTaskData_t;
+  taskData->fn = fn;
+  taskData->workLen = workLen;
+  taskData->data = data;
+  return taskData;
+}
+
+void SxJobFunc(int range_start, int range_end, int thread_index, void* user) {
+  sxTaskData_t* taskData = (sxTaskData_t*)user;
+
+  for (int i = range_start; i < range_end; i++) {
+    taskData->fn(i, taskData->workLen, taskData->data);
+  }
+
+  // Free task data
+  delete taskData;
+}
+
 TaskScheduler::TaskScheduler(int stackSizeBytes) {
   // Per https://fabiensanglard.net/doom3_bfg/threading.php, there are three
   // "serialized" threads:
@@ -96,9 +121,10 @@ TaskScheduler::TaskScheduler(int stackSizeBytes) {
 
 TaskScheduler::~TaskScheduler() { sx_job_destroy_context(context, alloc); }
 
-jobListHandle_t TaskScheduler::Submit(taskTags_t tag, jobFn_t fn,
-                                      int workgroupSize, void* data) {
-  auto job = sx_job_dispatch(context, workgroupSize, fn, data,
+jobListHandle_t TaskScheduler::Submit(taskTags_t tag, jobFn_t fn, int workLen,
+                                      void* data) {
+  auto taskData = CreateSxTaskData(fn, workLen, data);
+  auto job = sx_job_dispatch(context, workLen, SxJobFunc, taskData,
                              SX_JOB_PRIORITY_NORMAL, tag);
   return {
       .job = job,

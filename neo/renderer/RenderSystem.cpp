@@ -105,8 +105,7 @@ struct jobBackEndCommandsHelper_t {
   idRenderBackend* backend;
 };
 
-void Job_ExecuteBackEndCommands(int range_start, int range_end,
-                                int thread_index, void* user) {
+void Job_ExecuteBackEndCommands(int workItemIdx, int workItemLen, void* user) {
   auto helper = (jobBackEndCommandsHelper_t*)user;
   helper->backend->ExecuteBackEndCommands(helper->cmdHead);
 }

@@ -43,7 +43,7 @@ namespace id {
 const int MAX_FIBERS = 2048;
 const int STACK_SIZE_BYTES = 1048576;  // 1MB stack size
 
-typedef sx_job_cb jobFn_t;
+typedef void(jobFn_t)(int work_idx, int work_len, void* user_data);
 typedef sx_job_context* jobContextHandle_t;
 
 struct jobListHandle_t {
@@ -81,10 +81,9 @@ struct TaskScheduler {
   ~TaskScheduler();
 
   // Submit the jobs in this list.
-  jobListHandle_t Submit(taskTags_t tag, jobFn_t fn, int workgroupSize,
-                         void* data);
-  inline jobListHandle_t Submit(jobFn_t fn, int workgroupSize, void* data) {
-    return Submit(TAG_NONE, fn, workgroupSize, data);
+  jobListHandle_t Submit(taskTags_t tag, jobFn_t fn, int workLen, void* data);
+  inline jobListHandle_t Submit(jobFn_t fn, int workLen, void* data) {
+    return Submit(TAG_NONE, fn, workLen, data);
   }
 
   // Wait for the jobs in this list to finish.
