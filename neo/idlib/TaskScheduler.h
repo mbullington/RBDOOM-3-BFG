@@ -41,7 +41,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 namespace id {
 
 const int MAX_FIBERS = 2048;
-const int STACK_SIZE_BYTES = 4 * 1048576;  // 4MB stack size
+const int STACK_SIZE_BYTES = 1048576;  // 1MB stack size
 
 typedef sx_job_cb jobFn_t;
 typedef sx_job_context* jobContextHandle_t;
@@ -92,6 +92,8 @@ struct TaskScheduler {
   // Try to wait for the jobs in this list to finish but either way return
   // immediately. Returns true if all jobs are done.
   bool TryWait(jobListHandle_t handle);
+
+  bool InTask();
 
  private:
   jobContextHandle_t context;

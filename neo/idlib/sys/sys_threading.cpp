@@ -38,8 +38,10 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
-#include "sx/allocator.h"
-#include "sx/threads.h"
+#include "../TaskScheduler.h"
+
+#include <sx/allocator.h>
+#include <sx/threads.h>
 
 const sx_alloc* alloc;
 
@@ -77,7 +79,15 @@ void Sys_DestroyThread(threadHandle_t threadHandle) {
 Sys_Yield
 ========================
 */
-void Sys_Yield() { sx_thread_yield(); }
+void Sys_Yield() {
+  if (id::taskScheduler->InTask()) {
+    common->FatalError(
+        "Cannot use operating system thread sync within task; use locks "
+        "instead.");
+  }
+
+  sx_thread_yield();
+}
 
 /*
 ================================================================================================
@@ -126,6 +136,12 @@ Sys_SignalWait
 ========================
 */
 bool Sys_SignalWait(signalHandle_t& handle, int timeout) {
+  if (id::taskScheduler->InTask()) {
+    common->FatalError(
+        "Cannot use operating system thread sync within task; use locks "
+        "instead.");
+  }
+
   return sx_signal_wait(handle, timeout);
 }
 
@@ -160,6 +176,12 @@ Sys_MutexLock
 ========================
 */
 bool Sys_MutexLock(mutexHandle_t& handle, bool blocking) {
+  if (id::taskScheduler->InTask()) {
+    common->FatalError(
+        "Cannot use operating system thread sync within task; use locks "
+        "instead.");
+  }
+
   if (sx_mutex_try(handle) != 0) {
     if (!blocking) {
       return false;
@@ -174,7 +196,15 @@ bool Sys_MutexLock(mutexHandle_t& handle, bool blocking) {
 Sys_MutexUnlock
 ========================
 */
-void Sys_MutexUnlock(mutexHandle_t& handle) { sx_mutex_exit(handle); }
+void Sys_MutexUnlock(mutexHandle_t& handle) {
+  if (id::taskScheduler->InTask()) {
+    common->FatalError(
+        "Cannot use operating system thread sync within task; use locks "
+        "instead.");
+  }
+
+  sx_mutex_exit(handle);
+}
 
 /*
 ================================================================================================

@@ -108,7 +108,7 @@ jobListHandle_t TaskScheduler::Submit(taskTags_t tag, jobFn_t fn,
 
 void TaskScheduler::Wait(jobListHandle_t handle) {
   if (handle.deleted) {
-    common->Error("TaskScheduler::Wait: cannot wait for deleted job list");
+    return;
   }
 
   sx_job_wait_and_del(context, handle.job);
@@ -117,7 +117,7 @@ void TaskScheduler::Wait(jobListHandle_t handle) {
 
 bool TaskScheduler::TryWait(jobListHandle_t handle) {
   if (handle.deleted) {
-    common->Error("TaskScheduler::TryWait: cannot wait for deleted job list");
+    return true;
   }
 
   bool ret = sx_job_test_and_del(context, handle.job);
@@ -127,5 +127,7 @@ bool TaskScheduler::TryWait(jobListHandle_t handle) {
 
   return ret;
 }
+
+bool TaskScheduler::InTask() { return sx_job_in_job(context); }
 
 }  // namespace id
