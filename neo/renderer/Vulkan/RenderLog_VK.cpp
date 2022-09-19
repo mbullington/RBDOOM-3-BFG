@@ -104,7 +104,7 @@ void idRenderLog::OpenMainBlock(renderLogMainBlock_t block) {
   if (glConfig.timerQueryAvailable) {
     mainBlock = block;
 
-    id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+    id::CommandBuffer* cmd = vklocal.currentCommandBuffer;
     if (!cmd) {
       common->Warning("idRenderLog::OpenMainBlock: no current command buffer");
       return;
@@ -134,7 +134,7 @@ void idRenderLog::CloseMainBlock() {
   // SRS - Use glConfig.timerQueryAvailable flag to control timestamp capture
   // for all platforms
   if (glConfig.timerQueryAvailable) {
-    id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+    id::CommandBuffer* cmd = vklocal.currentCommandBuffer;
     if (!cmd) {
       common->Warning("idRenderLog::CloseMainBlock: no current command buffer");
       return;
@@ -165,7 +165,7 @@ void idRenderLog::OpenBlock(const char* szName, const idVec4& color) {
     return;
   }
 
-  id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  id::CommandBuffer* cmd = vklocal.currentCommandBuffer;
   if (!cmd) {
     common->Warning("PC_BeginNamedEvent: no current command buffer");
     return;
@@ -207,7 +207,7 @@ void idRenderLog::CloseBlock() {
     return;
   }
 
-  id::CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  id::CommandBuffer* cmd = vklocal.currentCommandBuffer;
   if (!cmd) {
     common->Warning("idRenderLog::CloseBlock: no current command buffer");
     return;

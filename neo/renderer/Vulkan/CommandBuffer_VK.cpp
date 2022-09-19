@@ -217,15 +217,15 @@ void CommandBuffer::End() {
   }
 
   isRecording = false;
-  if (vkcontext.currentCommandBuffer == this) {
-    vkcontext.currentCommandBuffer = NULL;
+  if (vklocal.currentCommandBuffer == this) {
+    vklocal.currentCommandBuffer = NULL;
   }
 
   assert(handle);
   ID_VK_CHECK(vkEndCommandBuffer(handle));
 }
 
-void CommandBuffer::MakeActive() { vkcontext.currentCommandBuffer = this; }
+void CommandBuffer::MakeActive() { vklocal.currentCommandBuffer = this; }
 
 void CommandBuffer::SetDependencies(CommandBuffer **dependencies,
                                     short numDependencies) {

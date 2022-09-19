@@ -88,6 +88,7 @@ idCVar r_vkEnableValidationLayers("r_vkEnableValidationLayers", "0",
                                   CVAR_BOOL | CVAR_INIT, "");
 
 vulkanContext_t vkcontext;
+thread_local vulkanLocal_t vklocal;
 
 #if defined(VK_USE_PLATFORM_WIN32_KHR)  //_WIN32
 static const int g_numInstanceExtensions = 2;
@@ -1368,7 +1369,6 @@ static void ClearContext() {
 #endif
   vkcontext.frameCounter = 0;
   vkcontext.frameParity = 0;
-  vkcontext.jointCacheHandle = 0;
   vkcontext.instance = VK_NULL_HANDLE;
   vkcontext.physicalDevice = VK_NULL_HANDLE;
   vkcontext.physicalDeviceFeatures = {};
@@ -1400,11 +1400,7 @@ static void ClearContext() {
   vkcontext.swapCommandPools.Zero();
   vkcontext.swapchainImages.Zero();
   vkcontext.swapchainViews.Zero();
-  vkcontext.currentCommandBuffer = NULL;
   vkcontext.acquireSemaphores.Zero();
-
-  vkcontext.currentImageParm = 0;
-  vkcontext.imageParms.Zero();
 
   vkcontext.queryIndex.Zero();
   for (int i = 0; i < NUM_FRAME_DATA; ++i) {
@@ -1728,7 +1724,7 @@ idRenderBackend::DrawElementsWithCounters
 =============
 */
 void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
 
   // get vertex buffer
   const vertCacheHandle_t vbHandle = surf->ambientCache;
@@ -1786,7 +1782,7 @@ void idRenderBackend::DrawElementsWithCounters(const drawSurf_t* surf) {
     }
   }
 
-  vkcontext.jointCacheHandle = surf->jointCache;
+  vklocal.jointCacheHandle = surf->jointCache;
 
   renderProgManager.CommitUniforms(cmd, glStateBits);
 
@@ -2228,13 +2224,13 @@ idRenderBackend::SelectTexture
 ====================
 */
 void idRenderBackend::GL_SelectTexture(int index) {
-  if (vkcontext.currentImageParm == index) {
+  if (vklocal.currentImageParm == index) {
     return;
   }
 
   RENDERLOG_PRINTF("GL_SelectTexture( %d );\n", index);
 
-  vkcontext.currentImageParm = index;
+  vklocal.currentImageParm = index;
 }
 
 /*
@@ -2244,7 +2240,7 @@ idRenderBackend::GL_Scissor
 */
 void idRenderBackend::GL_Scissor(int x /* left*/, int y /* bottom */, int w,
                                  int h) {
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
 
   VkRect2D scissor;
   scissor.offset.x = x;
@@ -2262,7 +2258,7 @@ idRenderBackend::GL_Viewport
 */
 void idRenderBackend::GL_Viewport(int x /* left */, int y /* bottom */, int w,
                                   int h) {
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
 
   VkViewport viewport;
   viewport.x = x;
@@ -2281,7 +2277,7 @@ idRenderBackend::GL_PolygonOffset
 ====================
 */
 void idRenderBackend::GL_PolygonOffset(float scale, float bias) {
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
   vkCmdSetDepthBias(cmd->GetHandle(), bias, 0.0f, scale);
 
   RENDERLOG_PRINTF("GL_PolygonOffset( scale=%f, bias=%f )\n", scale, bias);
@@ -2297,7 +2293,7 @@ void idRenderBackend::GL_DepthBoundsTest(const float zmin, const float zmax) {
     return;
   }
 
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
 
   if (zmin == 0.0f && zmax == 0.0f) {
     glStateBits = glStateBits & ~GLS_DEPTH_TEST_MASK;
@@ -2331,7 +2327,7 @@ idRenderBackend::GL_Clear
 void idRenderBackend::GL_Clear(bool color, bool depth, bool stencil,
                                byte stencilValue, float r, float g, float b,
                                float a) {
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
 
   RENDERLOG_PRINTF(
       "GL_Clear( color=%d, depth=%d, stencil=%d, stencil=%d, r=%f, g=%f, b=%f, "
@@ -2529,7 +2525,7 @@ void idRenderBackend::DrawFlickerBox() {
     return;
   }
 
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
 
   VkClearAttachment attachment = {};
 
@@ -2606,7 +2602,7 @@ extern idCVar r_useStencilShadowPreload;
 
 void idRenderBackend::DrawStencilShadowPass(const drawSurf_t* drawSurf,
                                             const bool renderZPass) {
-  const CommandBuffer* cmd = vkcontext.currentCommandBuffer;
+  const CommandBuffer* cmd = vklocal.currentCommandBuffer;
 
   if (renderZPass) {
     // Z-pass
@@ -2671,7 +2667,7 @@ void idRenderBackend::DrawStencilShadowPass(const drawSurf_t* drawSurf,
   RENDERLOG_PRINTF("Binding Buffers(%d): %p:%i %p:%i\n", drawSurf->numIndexes,
                    vertexBuffer, vertOffset, indexBuffer, indexOffset);
 
-  vkcontext.jointCacheHandle = drawSurf->jointCache;
+  vklocal.jointCacheHandle = drawSurf->jointCache;
 
   // PrintState( glStateBits, vkcontext.stencilOperations );
   renderProgManager.CommitUniforms(cmd, glStateBits);

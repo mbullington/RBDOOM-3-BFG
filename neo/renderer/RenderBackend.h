@@ -161,8 +161,6 @@ struct vulkanContext_t {
   uint64 frameCounter;
   uint32 frameParity;
 
-  vertCacheHandle_t jointCacheHandle;
-
   VkInstance instance;
 
   // selected physical device
@@ -195,8 +193,6 @@ struct vulkanContext_t {
 
   VkCommandPool commandPool;
   idArray<VkCommandPool, NUM_FRAME_DATA> swapCommandPools;
-
-  id::CommandBuffer* currentCommandBuffer;
 
   // These are stored in memory so they're not destroyed until the next swap.
   idArray<vulkanDeletionQueue_t, NUM_FRAME_DATA> deletionQueue;
@@ -231,7 +227,25 @@ struct vulkanContext_t {
   idArray<VkQueryPool, NUM_FRAME_DATA> queryPools;
 };
 
+struct vulkanLocal_t {
+  vertCacheHandle_t jointCacheHandle;
+
+  id::CommandBuffer* currentCommandBuffer;
+  int currentImageParm;
+  idArray<idImage*, MAX_IMAGE_PARMS> imageParms;
+
+  vulkanLocal_t() {
+    jointCacheHandle = 0;
+
+    currentCommandBuffer = NULL;
+
+    currentImageParm = 0;
+    imageParms.Zero();
+  }
+};
+
 extern vulkanContext_t vkcontext;
+extern thread_local vulkanLocal_t vklocal;
 
 #else  // if defined( ID_OPENGL )
 

@@ -1185,7 +1185,7 @@ static VkPipeline CreateGraphicsPipeline(vertexLayoutType_t vertexLayoutType,
   createInfo.layout = pipelineLayout;
 
   createInfo.renderPass =
-      vkcontext.currentCommandBuffer->GetFramebuffer()->GetRenderPass();
+      vklocal.currentCommandBuffer->GetFramebuffer()->GetRenderPass();
   assert(createInfo.renderPass != VK_NULL_HANDLE);
 
   createInfo.pVertexInputState = &vertexInputState;
@@ -1286,8 +1286,8 @@ void idRenderProgManager::CommitUniforms(const id::CommandBuffer* commandBuffer,
   }
 
   idUniformBuffer jointBuffer;
-  if (prog.usesJoints && vkcontext.jointCacheHandle > 0) {
-    if (!vertexCache.GetJointBuffer(vkcontext.jointCacheHandle, &jointBuffer)) {
+  if (prog.usesJoints && vklocal.jointCacheHandle > 0) {
+    if (!vertexCache.GetJointBuffer(vklocal.jointCacheHandle, &jointBuffer)) {
       idLib::Error("idRenderProgManager::CommitCurrent: jointBuffer == NULL");
       return;
     }
@@ -1334,7 +1334,7 @@ void idRenderProgManager::CommitUniforms(const id::CommandBuffer* commandBuffer,
         break;
       }
       case BINDING_TYPE_SAMPLER: {
-        idImage* image = vkcontext.imageParms[imageIndex];
+        idImage* image = vklocal.imageParms[imageIndex];
 
         VkDescriptorImageInfo& imageInfo = imageInfos[imageIndex++];
         memset(&imageInfo, 0, sizeof(VkDescriptorImageInfo));
