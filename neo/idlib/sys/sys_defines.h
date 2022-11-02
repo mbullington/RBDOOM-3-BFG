@@ -71,14 +71,6 @@ If you have questions concerning this license or the applicable additional terms
 	#define ID_FORCE_INLINE					__forceinline
 	#define ID_FORCE_INLINE_EXTERN			extern __forceinline
 
-	// DG: #pragma hdrstop is only available on MSVC, so make sure it doesn't cause compiler warnings on other compilers..
-	#ifdef _MSC_VER
-		// afaik __pragma is a MSVC specific alternative to #pragma that can be used in macros
-		#define ID_HDRSTOP __pragma(hdrstop)
-	#else
-		#define ID_HDRSTOP
-	#endif // DG end
-
 	// we should never rely on this define in our code. this is here so dodgy external libraries don't get confused
 	#ifndef WIN32
 		#define WIN32
@@ -136,7 +128,6 @@ If you have questions concerning this license or the applicable additional terms
 	#define ID_FORCE_INLINE					__attribute__((always_inline)) inline
 	#define ID_FORCE_INLINE_EXTERN			extern __attribute__((always_inline)) inline
 
-	#define ID_HDRSTOP
 	#define CALLBACK
 	#define __cdecl
 
