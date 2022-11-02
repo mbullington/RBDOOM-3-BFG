@@ -136,6 +136,7 @@ typedef enum { MEASURE_SIZE = 0, MEASURE_BANDWIDTH } Measure_t;
 class idStr {
  public:
   idStr();
+  idStr(idStr&& text) noexcept;  // Admer: added move constructor
   idStr(const idStr& text);
   idStr(const idStr& text, int start, int end);
   idStr(const char* text);
@@ -155,6 +156,7 @@ class idStr {
   char operator[](int index) const;
   char& operator[](int index);
 
+  void operator=(idStr&& text) noexcept;  // Admer: added move operator
   void operator=(const idStr& text);
   void operator=(const char* text);
 
@@ -497,6 +499,11 @@ ID_INLINE void idStr::SetStaticBuffer(char* buffer, const int bufferLength) {
 
 ID_INLINE idStr::idStr() { Construct(); }
 
+ID_INLINE idStr::idStr(idStr&& text) noexcept {
+  Construct();
+  *this = std::move(text);
+}
+
 ID_INLINE idStr::idStr(const idStr& text) {
   Construct();
   int l;
@@ -655,6 +662,24 @@ ID_INLINE char idStr::operator[](int index) const {
 ID_INLINE char& idStr::operator[](int index) {
   assert((index >= 0) && (index <= len));
   return data[index];
+}
+
+ID_INLINE void idStr::operator=(idStr&& text) noexcept {
+  Clear();
+
+  len = text.len;
+  allocedAndFlag = text.allocedAndFlag;
+  memcpy(baseBuffer, text.baseBuffer, sizeof(baseBuffer));
+
+  if (text.data == text.baseBuffer) {
+    data = baseBuffer;
+  } else {
+    data = text.data;
+  }
+
+  text.len = 0;
+  text.allocedAndFlag = 0;
+  text.data = nullptr;
 }
 
 ID_INLINE void idStr::operator=(const idStr& text) {

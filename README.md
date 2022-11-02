@@ -56,6 +56,8 @@ That means my fork is also unsupported, and you should use [RBDOOM-3-BFG](https:
 
 ## Renderer
 
+- **New** Multi-threaded Vulkan renderer (**wip**)
+
 - Swap out Vulkan allocator for newest VulkanMemoryAllocator checkout.
 - Move all in-game image loading to use `stb_image`, clean up old dependencies.
 - Fix MoltenVK support through Homebrew
@@ -77,12 +79,15 @@ That means my fork is also unsupported, and you should use [RBDOOM-3-BFG](https:
 - Remove `doom_classic` to simplify source code
 - Remove option to use FFMPEG, force using libbinkdec (doesn't affect build times much for me, especially re: Ninja)
 - Remove option to use XAudio2, focus on OpenAL Soft
+- Remove option to use Collada models, focus on (eventually) glTF
 
 External contributions:
 
 - `dhewm3`: https://github.com/dhewm/dhewm3/commit/befe732dbb60d5b408ccb86515a7d91a2d55fbb0
 - `dhewm3`: https://github.com/dhewm/dhewm3/commit/ea781c577e703667e024916ccef240b19c393e79
 - https://github.com/RobertBeckebans/RBDOOM-3-BFG/pull/659
+- https://github.com/RobertBeckebans/RBDOOM-3-BFG/pull/699
+- https://github.com/RobertBeckebans/RBDOOM-3-BFG/pull/709
 
 # Table of Contents
 

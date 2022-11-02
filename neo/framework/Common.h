@@ -156,6 +156,8 @@ struct MemInfo_t {
 };
 
 struct mpMap_t {
+  mpMap_t& operator=(mpMap_t&& src) = default;
+
   void operator=(const mpMap_t& src) {
     mapFile = src.mapFile;
     mapName = src.mapName;
@@ -201,11 +203,10 @@ class idCommon {
   // DG end
 
   virtual void UpdateLevelLoadPacifier() = 0;
-  // virtual void				UpdateLevelLoadPacifier( int mProgress )
-  // = 0; virtual void				UpdateLevelLoadPacifier( bool
-  // updateSecondary ) = 0;
-  // virtual void				UpdateLevelLoadPacifier( bool updateSecondary,
-  // int Progress ) = 0;
+  // virtual void				UpdateLevelLoadPacifier( int mProgress
+  // ) = 0; virtual void				UpdateLevelLoadPacifier(
+  // bool updateSecondary ) = 0; virtual void
+  // UpdateLevelLoadPacifier( bool updateSecondary, int Progress ) = 0;
 
   // Checks for and removes command line "+set var arg" constructs.
   // If match is NULL, all set commands will be executed, otherwise
