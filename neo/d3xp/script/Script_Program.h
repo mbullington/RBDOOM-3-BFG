@@ -230,22 +230,22 @@ class idScriptVariable {
 };
 
 template <class type, etype_t etype, class returnType>
-ID_INLINE idScriptVariable<type, etype, returnType>::idScriptVariable() {
+inline idScriptVariable<type, etype, returnType>::idScriptVariable() {
   data = NULL;
 }
 
 template <class type, etype_t etype, class returnType>
-ID_INLINE bool idScriptVariable<type, etype, returnType>::IsLinked() const {
+inline bool idScriptVariable<type, etype, returnType>::IsLinked() const {
   return (data != NULL);
 }
 
 template <class type, etype_t etype, class returnType>
-ID_INLINE void idScriptVariable<type, etype, returnType>::Unlink() {
+inline void idScriptVariable<type, etype, returnType>::Unlink() {
   data = NULL;
 }
 
 template <class type, etype_t etype, class returnType>
-ID_INLINE void idScriptVariable<type, etype, returnType>::LinkTo(
+inline void idScriptVariable<type, etype, returnType>::LinkTo(
     idScriptObject& obj, const char* name) {
   data = (type*)obj.GetVariable(name, etype);
   if (!data) {
@@ -255,7 +255,7 @@ ID_INLINE void idScriptVariable<type, etype, returnType>::LinkTo(
 }
 
 template <class type, etype_t etype, class returnType>
-ID_INLINE idScriptVariable<type, etype, returnType>&
+inline idScriptVariable<type, etype, returnType>&
 idScriptVariable<type, etype, returnType>::operator=(const returnType& value) {
   // check if we attempt to access the object before it's been linked
   assert(data);
@@ -268,8 +268,7 @@ idScriptVariable<type, etype, returnType>::operator=(const returnType& value) {
 }
 
 template <class type, etype_t etype, class returnType>
-ID_INLINE idScriptVariable<type, etype, returnType>::operator returnType()
-    const {
+inline idScriptVariable<type, etype, returnType>::operator returnType() const {
   // check if we attempt to access the object before it's been linked
   assert(data);
 
@@ -584,7 +583,7 @@ class idProgram {
 idProgram::GetStatement
 ================
 */
-ID_INLINE statement_t& idProgram::GetStatement(int index) {
+inline statement_t& idProgram::GetStatement(int index) {
   return statements[index];
 }
 
@@ -593,7 +592,7 @@ ID_INLINE statement_t& idProgram::GetStatement(int index) {
 idProgram::GetFunction
 ================
 */
-ID_INLINE function_t* idProgram::GetFunction(int index) {
+inline function_t* idProgram::GetFunction(int index) {
   return &functions[index];
 }
 
@@ -602,7 +601,7 @@ ID_INLINE function_t* idProgram::GetFunction(int index) {
 idProgram::GetFunctionIndex
 ================
 */
-ID_INLINE int idProgram::GetFunctionIndex(const function_t* func) {
+inline int idProgram::GetFunctionIndex(const function_t* func) {
   return func - &functions[0];
 }
 
@@ -611,16 +610,14 @@ ID_INLINE int idProgram::GetFunctionIndex(const function_t* func) {
 idProgram::GetReturnedInteger
 ================
 */
-ID_INLINE int idProgram::GetReturnedInteger() {
-  return *returnDef->value.intPtr;
-}
+inline int idProgram::GetReturnedInteger() { return *returnDef->value.intPtr; }
 
 /*
 ================
 idProgram::ReturnFloat
 ================
 */
-ID_INLINE void idProgram::ReturnFloat(float value) {
+inline void idProgram::ReturnFloat(float value) {
   *returnDef->value.floatPtr = value;
 }
 
@@ -629,7 +626,7 @@ ID_INLINE void idProgram::ReturnFloat(float value) {
 idProgram::ReturnInteger
 ================
 */
-ID_INLINE void idProgram::ReturnInteger(int value) {
+inline void idProgram::ReturnInteger(int value) {
   *returnDef->value.intPtr = value;
 }
 
@@ -638,7 +635,7 @@ ID_INLINE void idProgram::ReturnInteger(int value) {
 idProgram::ReturnVector
 ================
 */
-ID_INLINE void idProgram::ReturnVector(idVec3 const& vec) {
+inline void idProgram::ReturnVector(idVec3 const& vec) {
   *returnDef->value.vectorPtr = vec;
 }
 
@@ -647,7 +644,7 @@ ID_INLINE void idProgram::ReturnVector(idVec3 const& vec) {
 idProgram::ReturnString
 ================
 */
-ID_INLINE void idProgram::ReturnString(const char* string) {
+inline void idProgram::ReturnString(const char* string) {
   idStr::Copynz(returnStringDef->value.stringPtr, string, MAX_STRING_LEN);
 }
 
@@ -656,14 +653,14 @@ ID_INLINE void idProgram::ReturnString(const char* string) {
 idProgram::GetFilename
 ================
 */
-ID_INLINE const char* idProgram::GetFilename(int num) { return fileList[num]; }
+inline const char* idProgram::GetFilename(int num) { return fileList[num]; }
 
 /*
 ================
 idProgram::GetLineNumberForStatement
 ================
 */
-ID_INLINE int idProgram::GetLineNumberForStatement(int index) {
+inline int idProgram::GetLineNumberForStatement(int index) {
   return statements[index].linenumber;
 }
 
@@ -672,7 +669,7 @@ ID_INLINE int idProgram::GetLineNumberForStatement(int index) {
 idProgram::GetFilenameForStatement
 ================
 */
-ID_INLINE const char* idProgram::GetFilenameForStatement(int index) {
+inline const char* idProgram::GetFilenameForStatement(int index) {
   return GetFilename(statements[index].file);
 }
 

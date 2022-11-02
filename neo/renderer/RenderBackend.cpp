@@ -73,7 +73,7 @@ extern idCVar stereoRender_swapEyes;
 SetVertexParm
 ================
 */
-static ID_INLINE void SetVertexParm(renderParm_t rp, const float* value) {
+static inline void SetVertexParm(renderParm_t rp, const float* value) {
   renderProgManager.SetUniformValue(rp, value);
 }
 
@@ -82,8 +82,8 @@ static ID_INLINE void SetVertexParm(renderParm_t rp, const float* value) {
 SetVertexParms
 ================
 */
-static ID_INLINE void SetVertexParms(renderParm_t rp, const float* value,
-                                     int num) {
+static inline void SetVertexParms(renderParm_t rp, const float* value,
+                                  int num) {
   for (int i = 0; i < num; i++) {
     renderProgManager.SetUniformValue((renderParm_t)(rp + i), value + (i * 4));
   }
@@ -94,7 +94,7 @@ static ID_INLINE void SetVertexParms(renderParm_t rp, const float* value,
 SetFragmentParm
 ================
 */
-static ID_INLINE void SetFragmentParm(renderParm_t rp, const float* value) {
+static inline void SetFragmentParm(renderParm_t rp, const float* value) {
   renderProgManager.SetUniformValue(rp, value);
 }
 

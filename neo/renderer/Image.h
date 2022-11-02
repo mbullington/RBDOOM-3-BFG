@@ -176,7 +176,7 @@ class idImageOpts {
 idImageOpts::idImageOpts
 ========================
 */
-ID_INLINE idImageOpts::idImageOpts() {
+inline idImageOpts::idImageOpts() {
   format = FMT_NONE;
   colorFormat = CFM_DEFAULT;
   samples = SAMPLE_1;
@@ -194,7 +194,7 @@ ID_INLINE idImageOpts::idImageOpts() {
 idImageOpts::operator==
 ========================
 */
-ID_INLINE bool idImageOpts::operator==(const idImageOpts& opts) {
+inline bool idImageOpts::operator==(const idImageOpts& opts) {
   return (memcmp(this, &opts, sizeof(*this)) == 0);
 }
 

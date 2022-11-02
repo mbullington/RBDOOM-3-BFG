@@ -48,23 +48,19 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 ================================================================================================
 */
 
-ID_INLINE_EXTERN float __fmuls(float a, float b) { return (a * b); }
-ID_INLINE_EXTERN float __fmadds(float a, float b, float c) {
-  return (a * b + c);
-}
-ID_INLINE_EXTERN float __fnmsubs(float a, float b, float c) {
-  return (c - a * b);
-}
-ID_INLINE_EXTERN float __fsels(float a, float b, float c) {
+extern inline float __fmuls(float a, float b) { return (a * b); }
+extern inline float __fmadds(float a, float b, float c) { return (a * b + c); }
+extern inline float __fnmsubs(float a, float b, float c) { return (c - a * b); }
+extern inline float __fsels(float a, float b, float c) {
   return (a >= 0.0f) ? b : c;
 }
-ID_INLINE_EXTERN float __frcps(float x) { return (1.0f / x); }
-ID_INLINE_EXTERN float __fdivs(float x, float y) { return (x / y); }
-ID_INLINE_EXTERN float __frsqrts(float x) { return (1.0f / sqrtf(x)); }
-ID_INLINE_EXTERN float __frcps16(float x) { return (1.0f / x); }
-ID_INLINE_EXTERN float __fdivs16(float x, float y) { return (x / y); }
-ID_INLINE_EXTERN float __frsqrts16(float x) { return (1.0f / sqrtf(x)); }
-ID_INLINE_EXTERN float __frndz(float x) { return (float)((int)(x)); }
+extern inline float __frcps(float x) { return (1.0f / x); }
+extern inline float __fdivs(float x, float y) { return (x / y); }
+extern inline float __frsqrts(float x) { return (1.0f / sqrtf(x)); }
+extern inline float __frcps16(float x) { return (1.0f / x); }
+extern inline float __fdivs16(float x, float y) { return (x / y); }
+extern inline float __frsqrts16(float x) { return (1.0f / sqrtf(x)); }
+extern inline float __frndz(float x) { return (float)((int)(x)); }
 
 /*
 ================================================================================================
@@ -114,13 +110,13 @@ ID_FORCE_INLINE void FlushCacheLine(const void* ptr, int offset) {
 
 #define CACHE_LINE_SIZE 128
 
-ID_INLINE void Prefetch(const void *ptr, int offset) {}
-ID_INLINE void ZeroCacheLine(void *ptr, int offset) {
+inline void Prefetch(const void *ptr, int offset) {}
+inline void ZeroCacheLine(void *ptr, int offset) {
   byte *bytePtr =
       (byte *)((((uintptr_t)(ptr)) + (offset)) & ~(CACHE_LINE_SIZE - 1));
   memset(bytePtr, 0, CACHE_LINE_SIZE);
 }
-ID_INLINE void FlushCacheLine(const void *ptr, int offset) {}
+inline void FlushCacheLine(const void *ptr, int offset) {}
 
 #endif
 
@@ -132,7 +128,7 @@ ID_INLINE void FlushCacheLine(const void *ptr, int offset) {}
 
 // number of additional elements that are potentially cleared when clearing
 // whole cache lines at a time
-ID_INLINE_EXTERN int CACHE_LINE_CLEAR_OVERFLOW_COUNT(int size) {
+extern inline int CACHE_LINE_CLEAR_OVERFLOW_COUNT(int size) {
   if ((size & (CACHE_LINE_SIZE - 1)) == 0) {
     return 0;
   }

@@ -194,25 +194,25 @@ class idCVar {
   static idCVar* staticVars;
 };
 
-ID_INLINE idCVar::idCVar(const char* name, const char* value, int flags,
-                         const char* description,
-                         argCompletion_t valueCompletion) {
+inline idCVar::idCVar(const char* name, const char* value, int flags,
+                      const char* description,
+                      argCompletion_t valueCompletion) {
   if (!valueCompletion && (flags & CVAR_BOOL)) {
     valueCompletion = idCmdSystem::ArgCompletion_Boolean;
   }
   Init(name, value, flags, description, 1, -1, NULL, valueCompletion);
 }
 
-ID_INLINE idCVar::idCVar(const char* name, const char* value, int flags,
-                         const char* description, float valueMin,
-                         float valueMax, argCompletion_t valueCompletion) {
+inline idCVar::idCVar(const char* name, const char* value, int flags,
+                      const char* description, float valueMin, float valueMax,
+                      argCompletion_t valueCompletion) {
   Init(name, value, flags, description, valueMin, valueMax, NULL,
        valueCompletion);
 }
 
-ID_INLINE idCVar::idCVar(const char* name, const char* value, int flags,
-                         const char* description, const char** valueStrings,
-                         argCompletion_t valueCompletion) {
+inline idCVar::idCVar(const char* name, const char* value, int flags,
+                      const char* description, const char** valueStrings,
+                      argCompletion_t valueCompletion) {
   Init(name, value, flags, description, 1, -1, valueStrings, valueCompletion);
 }
 
@@ -301,10 +301,10 @@ variable idCVar::staticVars like this: idCVar * idCVar::staticVars = NULL;
 ===============================================================================
 */
 
-ID_INLINE void idCVar::Init(const char* name, const char* value, int flags,
-                            const char* description, float valueMin,
-                            float valueMax, const char** valueStrings,
-                            argCompletion_t valueCompletion) {
+inline void idCVar::Init(const char* name, const char* value, int flags,
+                         const char* description, float valueMin,
+                         float valueMax, const char** valueStrings,
+                         argCompletion_t valueCompletion) {
   this->name = name;
   this->value = value;
   this->flags = flags;
@@ -325,7 +325,7 @@ ID_INLINE void idCVar::Init(const char* name, const char* value, int flags,
   }
 }
 
-ID_INLINE void idCVar::RegisterStaticVars() {
+inline void idCVar::RegisterStaticVars() {
   if (staticVars != (idCVar*)UINTPTR_MAX) {
     for (idCVar* cvar = staticVars; cvar; cvar = cvar->next) {
       cvarSystem->Register(cvar);

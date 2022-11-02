@@ -342,7 +342,7 @@ class idBitMsg {
 idBitMsg::InitWrite
 ========================
 */
-ID_INLINE void idBitMsg::InitWrite(byte* data, int length) {
+inline void idBitMsg::InitWrite(byte* data, int length) {
   writeData = data;
   readData = data;
   maxSize = length;
@@ -362,7 +362,7 @@ ID_INLINE void idBitMsg::InitWrite(byte* data, int length) {
 idBitMsg::InitRead
 ========================
 */
-ID_INLINE void idBitMsg::InitRead(const byte* data, int length) {
+inline void idBitMsg::InitRead(const byte* data, int length) {
   writeData = NULL;
   readData = data;
   maxSize = length;
@@ -382,49 +382,49 @@ ID_INLINE void idBitMsg::InitRead(const byte* data, int length) {
 idBitMsg::GetWriteData
 ========================
 */
-ID_INLINE byte* idBitMsg::GetWriteData() { return writeData; }
+inline byte* idBitMsg::GetWriteData() { return writeData; }
 
 /*
 ========================
 idBitMsg::GetReadData
 ========================
 */
-ID_INLINE const byte* idBitMsg::GetReadData() const { return readData; }
+inline const byte* idBitMsg::GetReadData() const { return readData; }
 
 /*
 ========================
 idBitMsg::GetMaxSize
 ========================
 */
-ID_INLINE int idBitMsg::GetMaxSize() const { return maxSize; }
+inline int idBitMsg::GetMaxSize() const { return maxSize; }
 
 /*
 ========================
 idBitMsg::SetAllowOverflow
 ========================
 */
-ID_INLINE void idBitMsg::SetAllowOverflow(bool set) { allowOverflow = set; }
+inline void idBitMsg::SetAllowOverflow(bool set) { allowOverflow = set; }
 
 /*
 ========================
 idBitMsg::IsOverflowed
 ========================
 */
-ID_INLINE bool idBitMsg::IsOverflowed() const { return overflowed; }
+inline bool idBitMsg::IsOverflowed() const { return overflowed; }
 
 /*
 ========================
 idBitMsg::GetSize
 ========================
 */
-ID_INLINE int idBitMsg::GetSize() const { return curSize + (writeBit != 0); }
+inline int idBitMsg::GetSize() const { return curSize + (writeBit != 0); }
 
 /*
 ========================
 idBitMsg::SetSize
 ========================
 */
-ID_INLINE void idBitMsg::SetSize(int size) {
+inline void idBitMsg::SetSize(int size) {
   assert(writeBit == 0);
 
   if (size > maxSize) {
@@ -439,14 +439,14 @@ ID_INLINE void idBitMsg::SetSize(int size) {
 idBitMsg::GetWriteBit
 ========================
 */
-ID_INLINE int idBitMsg::GetWriteBit() const { return writeBit; }
+inline int idBitMsg::GetWriteBit() const { return writeBit; }
 
 /*
 ========================
 idBitMsg::SetWriteBit
 ========================
 */
-ID_INLINE void idBitMsg::SetWriteBit(int bit) {
+inline void idBitMsg::SetWriteBit(int bit) {
   // see idBitMsg::WriteByteAlign
   assert(false);
   writeBit = bit & 7;
@@ -460,7 +460,7 @@ ID_INLINE void idBitMsg::SetWriteBit(int bit) {
 idBitMsg::GetNumBitsWritten
 ========================
 */
-ID_INLINE int idBitMsg::GetNumBitsWritten() const {
+inline int idBitMsg::GetNumBitsWritten() const {
   return (curSize << 3) + writeBit;
 }
 
@@ -469,16 +469,14 @@ ID_INLINE int idBitMsg::GetNumBitsWritten() const {
 idBitMsg::GetRemainingSpace
 ========================
 */
-ID_INLINE int idBitMsg::GetRemainingSpace() const {
-  return maxSize - GetSize();
-}
+inline int idBitMsg::GetRemainingSpace() const { return maxSize - GetSize(); }
 
 /*
 ========================
 idBitMsg::GetRemainingWriteBits
 ========================
 */
-ID_INLINE int idBitMsg::GetRemainingWriteBits() const {
+inline int idBitMsg::GetRemainingWriteBits() const {
   return (maxSize << 3) - GetNumBitsWritten();
 }
 
@@ -487,7 +485,7 @@ ID_INLINE int idBitMsg::GetRemainingWriteBits() const {
 idBitMsg::SaveWriteState
 ========================
 */
-ID_INLINE void idBitMsg::SaveWriteState(int& s, int& b, uint64& t) const {
+inline void idBitMsg::SaveWriteState(int& s, int& b, uint64& t) const {
   s = curSize;
   b = writeBit;
   t = tempValue;
@@ -498,7 +496,7 @@ ID_INLINE void idBitMsg::SaveWriteState(int& s, int& b, uint64& t) const {
 idBitMsg::RestoreWriteState
 ========================
 */
-ID_INLINE void idBitMsg::RestoreWriteState(int s, int b, uint64 t) {
+inline void idBitMsg::RestoreWriteState(int s, int b, uint64 t) {
   curSize = s;
   writeBit = b & 7;
   if (writeBit) {
@@ -512,35 +510,35 @@ ID_INLINE void idBitMsg::RestoreWriteState(int s, int b, uint64 t) {
 idBitMsg::GetReadCount
 ========================
 */
-ID_INLINE int idBitMsg::GetReadCount() const { return readCount; }
+inline int idBitMsg::GetReadCount() const { return readCount; }
 
 /*
 ========================
 idBitMsg::SetReadCount
 ========================
 */
-ID_INLINE void idBitMsg::SetReadCount(int bytes) { readCount = bytes; }
+inline void idBitMsg::SetReadCount(int bytes) { readCount = bytes; }
 
 /*
 ========================
 idBitMsg::GetReadBit
 ========================
 */
-ID_INLINE int idBitMsg::GetReadBit() const { return readBit; }
+inline int idBitMsg::GetReadBit() const { return readBit; }
 
 /*
 ========================
 idBitMsg::SetReadBit
 ========================
 */
-ID_INLINE void idBitMsg::SetReadBit(int bit) { readBit = bit & 7; }
+inline void idBitMsg::SetReadBit(int bit) { readBit = bit & 7; }
 
 /*
 ========================
 idBitMsg::GetNumBitsRead
 ========================
 */
-ID_INLINE int idBitMsg::GetNumBitsRead() const {
+inline int idBitMsg::GetNumBitsRead() const {
   return ((readCount << 3) - ((8 - readBit) & 7));
 }
 
@@ -549,7 +547,7 @@ ID_INLINE int idBitMsg::GetNumBitsRead() const {
 idBitMsg::GetRemainingData
 ========================
 */
-ID_INLINE int idBitMsg::GetRemainingData() const {
+inline int idBitMsg::GetRemainingData() const {
   assert(writeBit == 0);
   return curSize - readCount;
 }
@@ -559,7 +557,7 @@ ID_INLINE int idBitMsg::GetRemainingData() const {
 idBitMsg::GetRemainingReadBits
 ========================
 */
-ID_INLINE int idBitMsg::GetRemainingReadBits() const {
+inline int idBitMsg::GetRemainingReadBits() const {
   assert(writeBit == 0);
   return (curSize << 3) - GetNumBitsRead();
 }
@@ -569,7 +567,7 @@ ID_INLINE int idBitMsg::GetRemainingReadBits() const {
 idBitMsg::SaveReadState
 ========================
 */
-ID_INLINE void idBitMsg::SaveReadState(int& c, int& b) const {
+inline void idBitMsg::SaveReadState(int& c, int& b) const {
   assert(writeBit == 0);
   c = readCount;
   b = readBit;
@@ -580,7 +578,7 @@ ID_INLINE void idBitMsg::SaveReadState(int& c, int& b) const {
 idBitMsg::RestoreReadState
 ========================
 */
-ID_INLINE void idBitMsg::RestoreReadState(int c, int b) {
+inline void idBitMsg::RestoreReadState(int c, int b) {
   assert(writeBit == 0);
   readCount = c;
   readBit = b & 7;
@@ -591,7 +589,7 @@ ID_INLINE void idBitMsg::RestoreReadState(int c, int b) {
 idBitMsg::BeginWriting
 ========================
 */
-ID_INLINE void idBitMsg::BeginWriting() {
+inline void idBitMsg::BeginWriting() {
   curSize = 0;
   overflowed = false;
   writeBit = 0;
@@ -603,7 +601,7 @@ ID_INLINE void idBitMsg::BeginWriting() {
 idBitMsg::WriteByteAlign
 ========================
 */
-ID_INLINE void idBitMsg::WriteByteAlign() {
+inline void idBitMsg::WriteByteAlign() {
   // it is important that no uninitialized data slips in the msg stream,
   // because we use memcmp to decide if entities have changed and wether we
   // should transmit them this function has the potential to leave uninitialized
@@ -625,49 +623,49 @@ ID_INLINE void idBitMsg::WriteByteAlign() {
 idBitMsg::WriteBool
 ========================
 */
-ID_INLINE void idBitMsg::WriteBool(bool c) { WriteBits(c, 1); }
+inline void idBitMsg::WriteBool(bool c) { WriteBits(c, 1); }
 
 /*
 ========================
 idBitMsg::WriteChar
 ========================
 */
-ID_INLINE void idBitMsg::WriteChar(int8 c) { WriteBits(c, -8); }
+inline void idBitMsg::WriteChar(int8 c) { WriteBits(c, -8); }
 
 /*
 ========================
 idBitMsg::WriteByte
 ========================
 */
-ID_INLINE void idBitMsg::WriteByte(uint8 c) { WriteBits(c, 8); }
+inline void idBitMsg::WriteByte(uint8 c) { WriteBits(c, 8); }
 
 /*
 ========================
 idBitMsg::WriteShort
 ========================
 */
-ID_INLINE void idBitMsg::WriteShort(int16 c) { WriteBits(c, -16); }
+inline void idBitMsg::WriteShort(int16 c) { WriteBits(c, -16); }
 
 /*
 ========================
 idBitMsg::WriteUShort
 ========================
 */
-ID_INLINE void idBitMsg::WriteUShort(uint16 c) { WriteBits(c, 16); }
+inline void idBitMsg::WriteUShort(uint16 c) { WriteBits(c, 16); }
 
 /*
 ========================
 idBitMsg::WriteLong
 ========================
 */
-ID_INLINE void idBitMsg::WriteLong(int32 c) { WriteBits(c, 32); }
+inline void idBitMsg::WriteLong(int32 c) { WriteBits(c, 32); }
 
 /*
 ========================
 idBitMsg::WriteLongLong
 ========================
 */
-ID_INLINE void idBitMsg::WriteLongLong(int64 c) {
+inline void idBitMsg::WriteLongLong(int64 c) {
   int a = c;
   int b = c >> 32;
   WriteBits(a, 32);
@@ -679,7 +677,7 @@ ID_INLINE void idBitMsg::WriteLongLong(int64 c) {
 idBitMsg::WriteFloat
 ========================
 */
-ID_INLINE void idBitMsg::WriteFloat(float f) {
+inline void idBitMsg::WriteFloat(float f) {
   WriteBits(*reinterpret_cast<int*>(&f), 32);
 }
 
@@ -688,8 +686,7 @@ ID_INLINE void idBitMsg::WriteFloat(float f) {
 idBitMsg::WriteFloat
 ========================
 */
-ID_INLINE void idBitMsg::WriteFloat(float f, int exponentBits,
-                                    int mantissaBits) {
+inline void idBitMsg::WriteFloat(float f, int exponentBits, int mantissaBits) {
   int bits = idMath::FloatToBits(f, exponentBits, mantissaBits);
   WriteBits(bits, 1 + exponentBits + mantissaBits);
 }
@@ -699,21 +696,21 @@ ID_INLINE void idBitMsg::WriteFloat(float f, int exponentBits,
 idBitMsg::WriteAngle8
 ========================
 */
-ID_INLINE void idBitMsg::WriteAngle8(float f) { WriteByte(ANGLE2BYTE(f)); }
+inline void idBitMsg::WriteAngle8(float f) { WriteByte(ANGLE2BYTE(f)); }
 
 /*
 ========================
 idBitMsg::WriteAngle16
 ========================
 */
-ID_INLINE void idBitMsg::WriteAngle16(float f) { WriteShort(ANGLE2SHORT(f)); }
+inline void idBitMsg::WriteAngle16(float f) { WriteShort(ANGLE2SHORT(f)); }
 
 /*
 ========================
 idBitMsg::WriteDir
 ========================
 */
-ID_INLINE void idBitMsg::WriteDir(const idVec3& dir, int numBits) {
+inline void idBitMsg::WriteDir(const idVec3& dir, int numBits) {
   WriteBits(DirToBits(dir, numBits), numBits);
 }
 
@@ -722,7 +719,7 @@ ID_INLINE void idBitMsg::WriteDir(const idVec3& dir, int numBits) {
 idBitMsg::BeginReading
 ========================
 */
-ID_INLINE void idBitMsg::BeginReading() const {
+inline void idBitMsg::BeginReading() const {
   readCount = 0;
   readBit = 0;
 
@@ -735,14 +732,14 @@ ID_INLINE void idBitMsg::BeginReading() const {
 idBitMsg::ReadByteAlign
 ========================
 */
-ID_INLINE void idBitMsg::ReadByteAlign() const { readBit = 0; }
+inline void idBitMsg::ReadByteAlign() const { readBit = 0; }
 
 /*
 ========================
 idBitMsg::ReadBool
 ========================
 */
-ID_INLINE bool idBitMsg::ReadBool() const {
+inline bool idBitMsg::ReadBool() const {
   return (ReadBits(1) == 1) ? true : false;
 }
 
@@ -751,44 +748,42 @@ ID_INLINE bool idBitMsg::ReadBool() const {
 idBitMsg::ReadChar
 ========================
 */
-ID_INLINE int idBitMsg::ReadChar() const { return (signed char)ReadBits(-8); }
+inline int idBitMsg::ReadChar() const { return (signed char)ReadBits(-8); }
 
 /*
 ========================
 idBitMsg::ReadByte
 ========================
 */
-ID_INLINE int idBitMsg::ReadByte() const { return (unsigned char)ReadBits(8); }
+inline int idBitMsg::ReadByte() const { return (unsigned char)ReadBits(8); }
 
 /*
 ========================
 idBitMsg::ReadShort
 ========================
 */
-ID_INLINE int idBitMsg::ReadShort() const { return (short)ReadBits(-16); }
+inline int idBitMsg::ReadShort() const { return (short)ReadBits(-16); }
 
 /*
 ========================
 idBitMsg::ReadUShort
 ========================
 */
-ID_INLINE int idBitMsg::ReadUShort() const {
-  return (unsigned short)ReadBits(16);
-}
+inline int idBitMsg::ReadUShort() const { return (unsigned short)ReadBits(16); }
 
 /*
 ========================
 idBitMsg::ReadLong
 ========================
 */
-ID_INLINE int idBitMsg::ReadLong() const { return ReadBits(32); }
+inline int idBitMsg::ReadLong() const { return ReadBits(32); }
 
 /*
 ========================
 idBitMsg::ReadLongLong
 ========================
 */
-ID_INLINE int64 idBitMsg::ReadLongLong() const {
+inline int64 idBitMsg::ReadLongLong() const {
   int64 a = ReadBits(32);
   int64 b = ReadBits(32);
   int64 c = (0x00000000ffffffff & a) | (b << 32);
@@ -800,7 +795,7 @@ ID_INLINE int64 idBitMsg::ReadLongLong() const {
 idBitMsg::ReadFloat
 ========================
 */
-ID_INLINE float idBitMsg::ReadFloat() const {
+inline float idBitMsg::ReadFloat() const {
   float value;
   *reinterpret_cast<int*>(&value) = ReadBits(32);
   return value;
@@ -811,7 +806,7 @@ ID_INLINE float idBitMsg::ReadFloat() const {
 idBitMsg::ReadFloat
 ========================
 */
-ID_INLINE float idBitMsg::ReadFloat(int exponentBits, int mantissaBits) const {
+inline float idBitMsg::ReadFloat(int exponentBits, int mantissaBits) const {
   int bits = ReadBits(1 + exponentBits + mantissaBits);
   return idMath::BitsToFloat(bits, exponentBits, mantissaBits);
 }
@@ -821,23 +816,21 @@ ID_INLINE float idBitMsg::ReadFloat(int exponentBits, int mantissaBits) const {
 idBitMsg::ReadAngle8
 ========================
 */
-ID_INLINE float idBitMsg::ReadAngle8() const { return BYTE2ANGLE(ReadByte()); }
+inline float idBitMsg::ReadAngle8() const { return BYTE2ANGLE(ReadByte()); }
 
 /*
 ========================
 idBitMsg::ReadAngle16
 ========================
 */
-ID_INLINE float idBitMsg::ReadAngle16() const {
-  return SHORT2ANGLE(ReadShort());
-}
+inline float idBitMsg::ReadAngle16() const { return SHORT2ANGLE(ReadShort()); }
 
 /*
 ========================
 idBitMsg::ReadDir
 ========================
 */
-ID_INLINE idVec3 idBitMsg::ReadDir(int numBits) const {
+inline idVec3 idBitMsg::ReadDir(int numBits) const {
   return BitsToDir(ReadBits(numBits), numBits);
 }
 
@@ -847,7 +840,7 @@ idBitMsg::WriteQuantizedFloat
 ========================
 */
 template <int _max_, int _numBits_>
-ID_INLINE void idBitMsg::WriteQuantizedFloat(float value) {
+inline void idBitMsg::WriteQuantizedFloat(float value) {
   enum { storeMax = (1 << (_numBits_ - 1)) - 1 };
   if (_max_ > storeMax) {
     // Scaling down (scale should be < 1)
@@ -870,7 +863,7 @@ idBitMsg::WriteQuantizedUFloat
 ========================
 */
 template <int _max_, int _numBits_>
-ID_INLINE void idBitMsg::WriteQuantizedUFloat(float value) {
+inline void idBitMsg::WriteQuantizedUFloat(float value) {
   enum { storeMax = (1 << _numBits_) - 1 };
   if (_max_ > storeMax) {
     // Scaling down (scale should be < 1)
@@ -891,7 +884,7 @@ idBitMsg::ReadQuantizedFloat
 ========================
 */
 template <int _max_, int _numBits_>
-ID_INLINE float idBitMsg::ReadQuantizedFloat() const {
+inline float idBitMsg::ReadQuantizedFloat() const {
   enum { storeMax = (1 << (_numBits_ - 1)) - 1 };
   if (_max_ > storeMax) {
     // Scaling down (scale should be < 1)

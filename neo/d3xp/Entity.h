@@ -658,11 +658,11 @@ class idEntity : public idClass {
   void Event_GuiNamedEvent(int guiNum, const char* event);
 };
 
-ID_INLINE float idEntity::DistanceTo(idEntity* ent) {
+inline float idEntity::DistanceTo(idEntity* ent) {
   return DistanceTo(ent->GetPhysics()->GetOrigin());
 }
 
-ID_INLINE float idEntity::DistanceTo(const idVec3& pos) const {
+inline float idEntity::DistanceTo(const idVec3& pos) const {
   return (pos - GetPhysics()->GetOrigin()).LengthFast();
 }
 
@@ -752,14 +752,14 @@ class SetTimeState {
   void PushState(int timeGroup);
 };
 
-ID_INLINE SetTimeState::SetTimeState() { activated = false; }
+inline SetTimeState::SetTimeState() { activated = false; }
 
-ID_INLINE SetTimeState::SetTimeState(int timeGroup) {
+inline SetTimeState::SetTimeState(int timeGroup) {
   activated = false;
   PushState(timeGroup);
 }
 
-ID_INLINE void SetTimeState::PushState(int timeGroup) {
+inline void SetTimeState::PushState(int timeGroup) {
   // Don't mess with time in Multiplayer
   if (!common->IsMultiplayer()) {
     activated = true;
@@ -783,7 +783,7 @@ ID_INLINE void SetTimeState::PushState(int timeGroup) {
   }
 }
 
-ID_INLINE SetTimeState::~SetTimeState() {
+inline SetTimeState::~SetTimeState() {
   if (activated && !common->IsMultiplayer()) {
     // set previous correct time
     gameLocal.SelectTimeGroup(previousFast);

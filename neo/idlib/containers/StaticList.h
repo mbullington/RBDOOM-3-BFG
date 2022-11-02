@@ -111,7 +111,7 @@ idStaticList<type,size>::idStaticList()
 ================
 */
 template <class type, int size>
-ID_INLINE idStaticList<type, size>::idStaticList() {
+inline idStaticList<type, size>::idStaticList() {
   num = 0;
 }
 
@@ -121,7 +121,7 @@ idStaticList<type,size>::idStaticList( const idStaticList<type,size> &other )
 ================
 */
 template <class type, int size>
-ID_INLINE idStaticList<type, size>::idStaticList(
+inline idStaticList<type, size>::idStaticList(
     const idStaticList<type, size>& other) {
   *this = other;
 }
@@ -132,7 +132,7 @@ idStaticList<type,size>::~idStaticList<type,size>
 ================
 */
 template <class type, int size>
-ID_INLINE idStaticList<type, size>::~idStaticList() {}
+inline idStaticList<type, size>::~idStaticList() {}
 
 /*
 ================
@@ -143,7 +143,7 @@ handles freeing up memory.
 ================
 */
 template <class type, int size>
-ID_INLINE void idStaticList<type, size>::Clear() {
+inline void idStaticList<type, size>::Clear() {
   num = 0;
 }
 
@@ -158,7 +158,7 @@ the list may no longer be valid.
 ========================
 */
 template <class type, int size>
-ID_INLINE void idStaticList<type, size>::Sort(const idSort<type>& sort) {
+inline void idStaticList<type, size>::Sort(const idSort<type>& sort) {
   /*  if( list == NULL )  */
   if (Num() <= 0)  // SRS - Instead of checking this->list for NULL, check
                    // this->Num() for empty list
@@ -182,7 +182,7 @@ pointers in the list to NULL.
 ================
 */
 template <class type, int size>
-ID_INLINE void idStaticList<type, size>::DeleteContents(bool clear) {
+inline void idStaticList<type, size>::DeleteContents(bool clear) {
   int i;
 
   for (i = 0; i < num; i++) {
@@ -205,7 +205,7 @@ Returns the number of elements currently contained in the list.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::Num() const {
+inline int idStaticList<type, size>::Num() const {
   return num;
 }
 
@@ -217,7 +217,7 @@ Returns the maximum number of elements in the list.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::Max() const {
+inline int idStaticList<type, size>::Max() const {
   return size;
 }
 
@@ -227,7 +227,7 @@ idStaticList<type>::Allocated
 ================
 */
 template <class type, int size>
-ID_INLINE size_t idStaticList<type, size>::Allocated() const {
+inline size_t idStaticList<type, size>::Allocated() const {
   return size * sizeof(type);
 }
 
@@ -237,7 +237,7 @@ idStaticList<type>::Size
 ================
 */
 template <class type, int size>
-ID_INLINE size_t idStaticList<type, size>::Size() const {
+inline size_t idStaticList<type, size>::Size() const {
   return sizeof(idStaticList<type, size>) + Allocated();
 }
 
@@ -247,7 +247,7 @@ idStaticList<type,size>::Num
 ================
 */
 template <class type, int size>
-ID_INLINE size_t idStaticList<type, size>::MemoryUsed() const {
+inline size_t idStaticList<type, size>::MemoryUsed() const {
   return num * sizeof(list[0]);
 }
 
@@ -259,7 +259,7 @@ Set number of elements in list.
 ================
 */
 template <class type, int size>
-ID_INLINE void idStaticList<type, size>::SetNum(int newnum) {
+inline void idStaticList<type, size>::SetNum(int newnum) {
   assert(newnum >= 0);
   assert(newnum <= size);
   num = newnum;
@@ -271,8 +271,8 @@ idStaticList<_type_,_tag_>::SetNum
 ========================
 */
 template <class type, int size>
-ID_INLINE void idStaticList<type, size>::SetNum(int newNum,
-                                                const type& initValue) {
+inline void idStaticList<type, size>::SetNum(int newNum,
+                                             const type& initValue) {
   assert(newNum >= 0);
   newNum = Min(newNum, size);
   assert(newNum <= size);
@@ -291,7 +291,7 @@ debug builds. Release builds do no range checking.
 ================
 */
 template <class type, int size>
-ID_INLINE const type& idStaticList<type, size>::operator[](int index) const {
+inline const type& idStaticList<type, size>::operator[](int index) const {
   assert(index >= 0);
   assert(index < num);
 
@@ -307,7 +307,7 @@ debug builds. Release builds do no range checking.
 ================
 */
 template <class type, int size>
-ID_INLINE type& idStaticList<type, size>::operator[](int index) {
+inline type& idStaticList<type, size>::operator[](int index) {
   assert(index >= 0);
   assert(index < num);
 
@@ -327,7 +327,7 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template <class type, int size>
-ID_INLINE type* idStaticList<type, size>::Ptr() {
+inline type* idStaticList<type, size>::Ptr() {
   return &list[0];
 }
 
@@ -344,7 +344,7 @@ FIXME: Create an iterator template for this kind of thing.
 ================
 */
 template <class type, int size>
-ID_INLINE const type* idStaticList<type, size>::Ptr() const {
+inline const type* idStaticList<type, size>::Ptr() const {
   return &list[0];
 }
 
@@ -356,7 +356,7 @@ Returns a pointer to a new data element at the end of the list.
 ================
 */
 template <class type, int size>
-ID_INLINE type* idStaticList<type, size>::Alloc() {
+inline type* idStaticList<type, size>::Alloc() {
   if (num >= size) {
     return NULL;
   }
@@ -375,7 +375,7 @@ Returns the index of the new element, or -1 when list is full.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::Append(type const& obj) {
+inline int idStaticList<type, size>::Append(type const& obj) {
   assert(num < size);
   if (num < size) {
     list[num] = obj;
@@ -397,7 +397,7 @@ Returns the index of the new element, or -1 when list is full.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::Insert(type const& obj, int index) {
+inline int idStaticList<type, size>::Insert(type const& obj, int index) {
   assert(num < size);
   if (num >= size) {
     return -1;
@@ -429,7 +429,7 @@ Returns the size of the new combined list
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::Append(
+inline int idStaticList<type, size>::Append(
     const idStaticList<type, size>& other) {
   int n = other.Num();
 
@@ -452,7 +452,7 @@ data in the list.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::AddUnique(type const& obj) {
+inline int idStaticList<type, size>::AddUnique(type const& obj) {
   int index = FindIndex(obj);
   if (index < 0) {
     index = Append(obj);
@@ -470,7 +470,7 @@ if the data is not found.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::FindIndex(type const& obj) const {
+inline int idStaticList<type, size>::FindIndex(type const& obj) const {
   for (int i = 0; i < num; i++) {
     if (list[i] == obj) {
       return i;
@@ -490,7 +490,7 @@ NULL if the data is not found.
 ================
 */
 template <class type, int size>
-ID_INLINE type* idStaticList<type, size>::Find(type const& obj) const {
+inline type* idStaticList<type, size>::Find(type const& obj) const {
   int i = FindIndex(obj);
   if (i >= 0) {
     return (type*)&list[i];
@@ -510,7 +510,7 @@ on non-pointer lists will cause a compiler error.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::FindNull() const {
+inline int idStaticList<type, size>::FindNull() const {
   for (int i = 0; i < num; i++) {
     if (list[i] == NULL) {
       return i;
@@ -532,7 +532,7 @@ list, but remains silent in release builds.
 ================
 */
 template <class type, int size>
-ID_INLINE int idStaticList<type, size>::IndexOf(type const* objptr) const {
+inline int idStaticList<type, size>::IndexOf(type const* objptr) const {
   int index;
 
   index = objptr - list;
@@ -555,7 +555,7 @@ the destruction of the list.
 ================
 */
 template <class type, int size>
-ID_INLINE bool idStaticList<type, size>::RemoveIndex(int index) {
+inline bool idStaticList<type, size>::RemoveIndex(int index) {
   int i;
 
   assert(index >= 0);
@@ -589,7 +589,7 @@ until the destruction of the list.
 ========================
 */
 template <typename _type_, int size>
-ID_INLINE bool idStaticList<_type_, size>::RemoveIndexFast(int index) {
+inline bool idStaticList<_type_, size>::RemoveIndexFast(int index) {
   if ((index < 0) || (index >= num)) {
     return false;
   }
@@ -614,7 +614,7 @@ the destruction of the list.
 ================
 */
 template <class type, int size>
-ID_INLINE bool idStaticList<type, size>::Remove(type const& obj) {
+inline bool idStaticList<type, size>::Remove(type const& obj) {
   int index;
 
   index = FindIndex(obj);
@@ -633,7 +633,7 @@ Swaps the contents of two lists
 ================
 */
 template <class type, int size>
-ID_INLINE void idStaticList<type, size>::Swap(idStaticList<type, size>& other) {
+inline void idStaticList<type, size>::Swap(idStaticList<type, size>& other) {
   idStaticList<type, size> temp = *this;
   *this = other;
   other = temp;
@@ -655,7 +655,7 @@ instantiated.
 ========================
 */
 template <class type, int size>
-ID_INLINE void idStaticList<type, size>::Resize(int newsize) {
+inline void idStaticList<type, size>::Resize(int newsize) {
   assert(newsize >= 0);
 
   // free up the list if no data is being reserved

@@ -58,7 +58,7 @@ typedef idStr* idStrPtr;
 //================
 //*/
 // template<>
-// ID_INLINE int idListSortCompare<idStrPtr, memTag_t _tag_ >( const idStrPtr
+// inline int idListSortCompare<idStrPtr, memTag_t _tag_ >( const idStrPtr
 // *a, const idStrPtr *b ) { 	return ( *a )->Icmp( **b );
 //}
 
@@ -72,7 +72,7 @@ typedef idStr* idStrPtr;
 //================
 //*/
 // template<>
-// ID_INLINE void idStrList::Sort( cmp_t *compare ) {
+// inline void idStrList::Sort( cmp_t *compare ) {
 //	int i;
 //
 //	if ( !num ) {
@@ -106,7 +106,7 @@ typedef idStr* idStrPtr;
 //================
 //*/
 // template<>
-// ID_INLINE void idStrList::SortSubSection( int startIndex, int endIndex, cmp_t
+// inline void idStrList::SortSubSection( int startIndex, int endIndex, cmp_t
 // *compare ) { 	int i, s;
 //
 //	if ( !num ) {
@@ -146,7 +146,7 @@ idStrList::Size
 ================
 */
 template <>
-ID_INLINE size_t idStrList::Size() const {
+inline size_t idStrList::Size() const {
   size_t s;
   int i;
 
@@ -175,7 +175,7 @@ ID_INLINE size_t idStrList::Size() const {
 //================
 //*/
 // template<class idStrPtr>
-// ID_INLINE int idListSortComparePaths( const idStrPtr *a, const idStrPtr *b )
+// inline int idListSortComparePaths( const idStrPtr *a, const idStrPtr *b )
 // { 	return ( *a )->IcmpPath( **b );
 //}
 
@@ -187,7 +187,7 @@ ID_INLINE size_t idStrList::Size() const {
 // first.
 //================
 //*/
-// ID_INLINE void idStrListSortPaths( idStrList &list ) {
+// inline void idStrListSortPaths( idStrList &list ) {
 //	int i;
 //
 //	if ( !list.Num() ) {

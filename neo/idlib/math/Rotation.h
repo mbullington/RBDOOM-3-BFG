@@ -105,110 +105,108 @@ class idRotation {
   mutable bool axisValid;  // true if rotation axis is valid
 };
 
-ID_INLINE idRotation::idRotation() {}
+inline idRotation::idRotation() {}
 
-ID_INLINE idRotation::idRotation(const idVec3& rotationOrigin,
-                                 const idVec3& rotationVec,
-                                 const float rotationAngle) {
+inline idRotation::idRotation(const idVec3& rotationOrigin,
+                              const idVec3& rotationVec,
+                              const float rotationAngle) {
   origin = rotationOrigin;
   vec = rotationVec;
   angle = rotationAngle;
   axisValid = false;
 }
 
-ID_INLINE void idRotation::Set(const idVec3& rotationOrigin,
-                               const idVec3& rotationVec,
-                               const float rotationAngle) {
+inline void idRotation::Set(const idVec3& rotationOrigin,
+                            const idVec3& rotationVec,
+                            const float rotationAngle) {
   origin = rotationOrigin;
   vec = rotationVec;
   angle = rotationAngle;
   axisValid = false;
 }
 
-ID_INLINE void idRotation::SetOrigin(const idVec3& rotationOrigin) {
+inline void idRotation::SetOrigin(const idVec3& rotationOrigin) {
   origin = rotationOrigin;
 }
 
-ID_INLINE void idRotation::SetVec(const idVec3& rotationVec) {
+inline void idRotation::SetVec(const idVec3& rotationVec) {
   vec = rotationVec;
   axisValid = false;
 }
 
-ID_INLINE void idRotation::SetVec(float x, float y, float z) {
+inline void idRotation::SetVec(float x, float y, float z) {
   vec[0] = x;
   vec[1] = y;
   vec[2] = z;
   axisValid = false;
 }
 
-ID_INLINE void idRotation::SetAngle(const float rotationAngle) {
+inline void idRotation::SetAngle(const float rotationAngle) {
   angle = rotationAngle;
   axisValid = false;
 }
 
-ID_INLINE void idRotation::Scale(const float s) {
+inline void idRotation::Scale(const float s) {
   angle *= s;
   axisValid = false;
 }
 
-ID_INLINE void idRotation::ReCalculateMatrix() {
+inline void idRotation::ReCalculateMatrix() {
   axisValid = false;
   ToMat3();
 }
 
-ID_INLINE const idVec3& idRotation::GetOrigin() const { return origin; }
+inline const idVec3& idRotation::GetOrigin() const { return origin; }
 
-ID_INLINE const idVec3& idRotation::GetVec() const { return vec; }
+inline const idVec3& idRotation::GetVec() const { return vec; }
 
-ID_INLINE float idRotation::GetAngle() const { return angle; }
+inline float idRotation::GetAngle() const { return angle; }
 
-ID_INLINE idRotation idRotation::operator-() const {
+inline idRotation idRotation::operator-() const {
   return idRotation(origin, vec, -angle);
 }
 
-ID_INLINE idRotation idRotation::operator*(const float s) const {
+inline idRotation idRotation::operator*(const float s) const {
   return idRotation(origin, vec, angle * s);
 }
 
-ID_INLINE idRotation idRotation::operator/(const float s) const {
+inline idRotation idRotation::operator/(const float s) const {
   assert(s != 0.0f);
   return idRotation(origin, vec, angle / s);
 }
 
-ID_INLINE idRotation& idRotation::operator*=(const float s) {
+inline idRotation& idRotation::operator*=(const float s) {
   angle *= s;
   axisValid = false;
   return *this;
 }
 
-ID_INLINE idRotation& idRotation::operator/=(const float s) {
+inline idRotation& idRotation::operator/=(const float s) {
   assert(s != 0.0f);
   angle /= s;
   axisValid = false;
   return *this;
 }
 
-ID_INLINE idVec3 idRotation::operator*(const idVec3& v) const {
+inline idVec3 idRotation::operator*(const idVec3& v) const {
   if (!axisValid) {
     ToMat3();
   }
   return ((v - origin) * axis + origin);
 }
 
-ID_INLINE idRotation operator*(const float s, const idRotation& r) {
+inline idRotation operator*(const float s, const idRotation& r) {
   return r * s;
 }
 
-ID_INLINE idVec3 operator*(const idVec3& v, const idRotation& r) {
-  return r * v;
-}
+inline idVec3 operator*(const idVec3& v, const idRotation& r) { return r * v; }
 
-ID_INLINE idVec3& operator*=(idVec3& v, const idRotation& r) {
+inline idVec3& operator*=(idVec3& v, const idRotation& r) {
   v = r * v;
   return v;
 }
 
-ID_INLINE void idRotation::RotatePoint(idVec3& point) const {
+inline void idRotation::RotatePoint(idVec3& point) const {
   if (!axisValid) {
     ToMat3();
   }

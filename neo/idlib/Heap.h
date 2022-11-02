@@ -59,36 +59,34 @@ static const int MAX_TAGS = 256;
 void* Mem_Alloc16(const size_t size, const memTag_t tag);
 void Mem_Free16(void* ptr);
 
-ID_INLINE void* Mem_Alloc(const size_t size, const memTag_t tag) {
+inline void* Mem_Alloc(const size_t size, const memTag_t tag) {
   return Mem_Alloc16(size, tag);
 }
 
-ID_INLINE void Mem_Free(void* ptr) { Mem_Free16(ptr); }
+inline void Mem_Free(void* ptr) { Mem_Free16(ptr); }
 
 void* Mem_ClearedAlloc(const size_t size, const memTag_t tag);
 char* Mem_CopyString(const char* in);
 // RB end
 
-ID_INLINE void* operator new(size_t s) { return Mem_Alloc(s, TAG_NEW); }
+inline void* operator new(size_t s) { return Mem_Alloc(s, TAG_NEW); }
 
 // SRS - Added noexcept to silence build-time warning
-ID_INLINE void operator delete(void* p) noexcept { Mem_Free(p); }
-ID_INLINE void* operator new[](size_t s) { return Mem_Alloc(s, TAG_NEW); }
+inline void operator delete(void* p) noexcept { Mem_Free(p); }
+inline void* operator new[](size_t s) { return Mem_Alloc(s, TAG_NEW); }
 
 // SRS - Added noexcept to silence build-time warning
-ID_INLINE void operator delete[](void* p) noexcept { Mem_Free(p); }
+inline void operator delete[](void* p) noexcept { Mem_Free(p); }
 
-ID_INLINE void* operator new(size_t s, memTag_t tag) {
+inline void* operator new(size_t s, memTag_t tag) { return Mem_Alloc(s, tag); }
+
+inline void operator delete(void* p, memTag_t tag) { Mem_Free(p); }
+
+inline void* operator new[](size_t s, memTag_t tag) {
   return Mem_Alloc(s, tag);
 }
 
-ID_INLINE void operator delete(void* p, memTag_t tag) { Mem_Free(p); }
-
-ID_INLINE void* operator new[](size_t s, memTag_t tag) {
-  return Mem_Alloc(s, tag);
-}
-
-ID_INLINE void operator delete[](void* p, memTag_t tag) { Mem_Free(p); }
+inline void operator delete[](void* p, memTag_t tag) { Mem_Free(p); }
 
 // Define replacements for the PS3 library's aligned new operator.
 // Without these, allocations of objects with 32 byte or greater alignment
@@ -142,7 +140,7 @@ idTempArray::idTempArray
 ========================
 */
 template <class T>
-ID_INLINE idTempArray<T>::idTempArray(idTempArray<T>& other) {
+inline idTempArray<T>::idTempArray(idTempArray<T>& other) {
   this->num = other.num;
   this->buffer = other.buffer;
   other.num = 0;
@@ -155,7 +153,7 @@ idTempArray::idTempArray
 ========================
 */
 template <class T>
-ID_INLINE idTempArray<T>::idTempArray(unsigned int num) {
+inline idTempArray<T>::idTempArray(unsigned int num) {
   this->num = num;
   buffer = (T*)Mem_Alloc(num * sizeof(T), TAG_TEMP);
 }
@@ -166,7 +164,7 @@ idTempArray::~idTempArray
 ========================
 */
 template <class T>
-ID_INLINE idTempArray<T>::~idTempArray() {
+inline idTempArray<T>::~idTempArray() {
   Mem_Free(buffer);
 }
 
@@ -197,8 +195,8 @@ All objects are properly constructed and destructed.
 template <class _type_, int _blockSize_, memTag_t memTag = TAG_BLOCKALLOC>
 class idBlockAlloc {
  public:
-  ID_INLINE idBlockAlloc(bool clear = false);
-  ID_INLINE ~idBlockAlloc();
+  inline idBlockAlloc(bool clear = false);
+  inline ~idBlockAlloc();
 
   // returns total size of allocated memory
   size_t Allocated() const { return total * sizeof(_type_); }
@@ -206,12 +204,12 @@ class idBlockAlloc {
   // returns total size of allocated memory including size of (*this)
   size_t Size() const { return sizeof(*this) + Allocated(); }
 
-  ID_INLINE void Shutdown();
-  ID_INLINE void SetFixedBlocks(int numBlocks);
-  ID_INLINE void FreeEmptyBlocks();
+  inline void Shutdown();
+  inline void SetFixedBlocks(int numBlocks);
+  inline void FreeEmptyBlocks();
 
-  ID_INLINE _type_* Alloc();
-  ID_INLINE void Free(_type_* element);
+  inline _type_* Alloc();
+  inline void Free(_type_* element);
 
   int GetTotalCount() const { return total; }
   int GetAllocCount() const { return active; }
@@ -244,7 +242,7 @@ class idBlockAlloc {
   bool allowAllocs;
   bool clearAllocs;
 
-  ID_INLINE void AllocNewBlock();
+  inline void AllocNewBlock();
 };
 
 /*
@@ -253,7 +251,7 @@ idBlockAlloc<_type_,_blockSize_,align_t>::idBlockAlloc
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE idBlockAlloc<_type_, _blockSize_, memTag>::idBlockAlloc(bool clear)
+inline idBlockAlloc<_type_, _blockSize_, memTag>::idBlockAlloc(bool clear)
     : blocks(NULL),
       free(NULL),
       total(0),
@@ -267,7 +265,7 @@ idBlockAlloc<_type_,_blockSize__,align_t>::~idBlockAlloc
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE idBlockAlloc<_type_, _blockSize_, memTag>::~idBlockAlloc() {
+inline idBlockAlloc<_type_, _blockSize_, memTag>::~idBlockAlloc() {
   Shutdown();
 }
 
@@ -277,7 +275,7 @@ idBlockAlloc<_type_,_blockSize_,align_t>::Alloc
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE _type_* idBlockAlloc<_type_, _blockSize_, memTag>::Alloc() {
+inline _type_* idBlockAlloc<_type_, _blockSize_, memTag>::Alloc() {
 #ifdef FORCE_DISCRETE_BLOCK_ALLOCS
   // for debugging tools
   return new _type_;
@@ -312,7 +310,7 @@ idBlockAlloc<_type_,_blockSize_,align_t>::Free
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE void idBlockAlloc<_type_, _blockSize_, memTag>::Free(_type_* t) {
+inline void idBlockAlloc<_type_, _blockSize_, memTag>::Free(_type_* t) {
 #ifdef FORCE_DISCRETE_BLOCK_ALLOCS
   // for debugging tools
   delete t;
@@ -336,7 +334,7 @@ idBlockAlloc<_type_,_blockSize_,align_t>::Shutdown
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE void idBlockAlloc<_type_, _blockSize_, memTag>::Shutdown() {
+inline void idBlockAlloc<_type_, _blockSize_, memTag>::Shutdown() {
   while (blocks != NULL) {
     idBlock* block = blocks;
     blocks = blocks->next;
@@ -353,7 +351,7 @@ idBlockAlloc<_type_,_blockSize_,align_t>::SetFixedBlocks
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE void idBlockAlloc<_type_, _blockSize_, memTag>::SetFixedBlocks(
+inline void idBlockAlloc<_type_, _blockSize_, memTag>::SetFixedBlocks(
     int numBlocks) {
   int currentNumBlocks = 0;
   for (idBlock* block = blocks; block != NULL; block = block->next) {
@@ -371,7 +369,7 @@ idBlockAlloc<_type_,_blockSize_,align_t>::AllocNewBlock
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE void idBlockAlloc<_type_, _blockSize_, memTag>::AllocNewBlock() {
+inline void idBlockAlloc<_type_, _blockSize_, memTag>::AllocNewBlock() {
   idBlock* block = (idBlock*)Mem_Alloc(sizeof(idBlock), memTag);
   block->next = blocks;
   blocks = block;
@@ -392,7 +390,7 @@ idBlockAlloc<_type_,_blockSize_,align_t>::FreeEmptyBlocks
 ========================
 */
 template <class _type_, int _blockSize_, memTag_t memTag>
-ID_INLINE void idBlockAlloc<_type_, _blockSize_, memTag>::FreeEmptyBlocks() {
+inline void idBlockAlloc<_type_, _blockSize_, memTag>::FreeEmptyBlocks() {
   // first count how many free elements are in each block
   // and build up a free chain per block
   for (idBlock* block = blocks; block != NULL; block = block->next) {
@@ -1107,7 +1105,7 @@ void idDynamicBlockAlloc<type, baseBlockSize, minBlockSize,
 }
 
 template <class type, int baseBlockSize, int minBlockSize, memTag_t _tag_>
-ID_INLINE void
+inline void
 idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::LinkFreeInternal(
     idDynamicBlock<type>* block) {
   block->node = freeTree.Add(block, block->GetSize());
@@ -1116,7 +1114,7 @@ idDynamicBlockAlloc<type, baseBlockSize, minBlockSize, _tag_>::LinkFreeInternal(
 }
 
 template <class type, int baseBlockSize, int minBlockSize, memTag_t _tag_>
-ID_INLINE void
+inline void
 idDynamicBlockAlloc<type, baseBlockSize, minBlockSize,
                     _tag_>::UnlinkFreeInternal(idDynamicBlock<type>* block) {
   freeTree.Remove(block->node);

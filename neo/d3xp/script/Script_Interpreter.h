@@ -143,7 +143,7 @@ class idInterpreter {
 idInterpreter::PopParms
 ====================
 */
-ID_INLINE void idInterpreter::PopParms(int numParms) {
+inline void idInterpreter::PopParms(int numParms) {
   // pop our parms off the stack
   if (localstackUsed < numParms) {
     Error("locals stack underflow\n");
@@ -158,7 +158,7 @@ idInterpreter::Push
 ====================
 */
 // RB: 64 bit fix, changed int to intptr_t
-ID_INLINE void idInterpreter::Push(intptr_t value) {
+inline void idInterpreter::Push(intptr_t value) {
   if (localstackUsed + sizeof(intptr_t) > LOCALSTACK_SIZE) {
     Error("Push: locals stack overflow\n");
   }
@@ -173,7 +173,7 @@ ID_INLINE void idInterpreter::Push(intptr_t value) {
 idInterpreter::PushVector
 ====================
 */
-ID_INLINE void idInterpreter::PushVector(const idVec3& vector) {
+inline void idInterpreter::PushVector(const idVec3& vector) {
   if (localstackUsed + E_EVENT_SIZEOF_VEC > LOCALSTACK_SIZE) {
     Error("Push: locals stack overflow\n");
   }
@@ -187,7 +187,7 @@ ID_INLINE void idInterpreter::PushVector(const idVec3& vector) {
 idInterpreter::PushString
 ====================
 */
-ID_INLINE void idInterpreter::PushString(const char* string) {
+inline void idInterpreter::PushString(const char* string) {
   if (localstackUsed + MAX_STRING_LEN > LOCALSTACK_SIZE) {
     Error("PushString: locals stack overflow\n");
   }
@@ -200,7 +200,7 @@ ID_INLINE void idInterpreter::PushString(const char* string) {
 idInterpreter::FloatToString
 ====================
 */
-ID_INLINE const char* idInterpreter::FloatToString(float value) {
+inline const char* idInterpreter::FloatToString(float value) {
   static char text[32];
 
   if (value == (float)(int)value) {
@@ -216,7 +216,7 @@ ID_INLINE const char* idInterpreter::FloatToString(float value) {
 idInterpreter::AppendString
 ====================
 */
-ID_INLINE void idInterpreter::AppendString(idVarDef* def, const char* from) {
+inline void idInterpreter::AppendString(idVarDef* def, const char* from) {
   if (def->initialized == idVarDef::stackVariable) {
     idStr::Append((char*)&localstack[localstackBase + def->value.stackOffset],
                   MAX_STRING_LEN, from);
@@ -230,7 +230,7 @@ ID_INLINE void idInterpreter::AppendString(idVarDef* def, const char* from) {
 idInterpreter::SetString
 ====================
 */
-ID_INLINE void idInterpreter::SetString(idVarDef* def, const char* from) {
+inline void idInterpreter::SetString(idVarDef* def, const char* from) {
   if (def->initialized == idVarDef::stackVariable) {
     idStr::Copynz((char*)&localstack[localstackBase + def->value.stackOffset],
                   from, MAX_STRING_LEN);
@@ -244,7 +244,7 @@ ID_INLINE void idInterpreter::SetString(idVarDef* def, const char* from) {
 idInterpreter::GetString
 ====================
 */
-ID_INLINE const char* idInterpreter::GetString(idVarDef* def) {
+inline const char* idInterpreter::GetString(idVarDef* def) {
   if (def->initialized == idVarDef::stackVariable) {
     return (char*)&localstack[localstackBase + def->value.stackOffset];
   } else {
@@ -257,7 +257,7 @@ ID_INLINE const char* idInterpreter::GetString(idVarDef* def) {
 idInterpreter::GetVariable
 ====================
 */
-ID_INLINE varEval_t idInterpreter::GetVariable(idVarDef* def) {
+inline varEval_t idInterpreter::GetVariable(idVarDef* def) {
   if (def->initialized == idVarDef::stackVariable) {
     varEval_t val;
     val.intPtr = (int*)&localstack[localstackBase + def->value.stackOffset];
@@ -272,7 +272,7 @@ ID_INLINE varEval_t idInterpreter::GetVariable(idVarDef* def) {
 idInterpreter::NextInstruction
 ====================
 */
-ID_INLINE void idInterpreter::NextInstruction(int position) {
+inline void idInterpreter::NextInstruction(int position) {
   // Before we execute an instruction, we increment instructionPointer,
   // therefore we need to compensate for that here.
   instructionPointer = position - 1;

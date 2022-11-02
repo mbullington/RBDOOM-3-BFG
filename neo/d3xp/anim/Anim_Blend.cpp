@@ -265,8 +265,8 @@ bool idAnim::GetOriginRotation(idQuat& rotation, int animNum, int currentTime,
 idAnim::GetBounds
 =====================
 */
-ID_INLINE bool idAnim::GetBounds(idBounds& bounds, int animNum, int currentTime,
-                                 int cyclecount) const {
+inline bool idAnim::GetBounds(idBounds& bounds, int animNum, int currentTime,
+                              int cyclecount) const {
   if (!anims[animNum]) {
     return false;
   }

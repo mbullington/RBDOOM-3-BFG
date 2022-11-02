@@ -453,12 +453,12 @@ class idWeapon : public idAnimatedEntity {
   void Event_StopWeaponLight(const char* name);
 };
 
-ID_INLINE bool idWeapon::IsLinked() { return isLinked; }
+inline bool idWeapon::IsLinked() { return isLinked; }
 
-ID_INLINE bool idWeapon::IsWorldModelReady() {
+inline bool idWeapon::IsWorldModelReady() {
   return (worldModel.GetEntity() != NULL);
 }
 
-ID_INLINE idPlayer* idWeapon::GetOwner() { return owner; }
+inline idPlayer* idWeapon::GetOwner() { return owner; }
 
 #endif /* !__GAME_WEAPON_H__ */

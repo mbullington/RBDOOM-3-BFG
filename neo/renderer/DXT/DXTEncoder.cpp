@@ -337,8 +337,8 @@ params:	inPtr		- input image, 4 bytes per pixel
 paramO:	colorBlock	- 4*4 output tile, 4 bytes per pixel
 ========================
 */
-ID_INLINE void idDxtEncoder::ExtractBlock(const byte* inPtr, int width,
-                                          byte* colorBlock) const {
+inline void idDxtEncoder::ExtractBlock(const byte* inPtr, int width,
+                                       byte* colorBlock) const {
   for (int j = 0; j < 4; j++) {
     memcpy(&colorBlock[j * 4 * 4], inPtr, 4 * 4);
     inPtr += width * 4;
@@ -3061,7 +3061,7 @@ void idDxtEncoder::CompressNormalMapDXT1RenormalizeHQ(const byte* inBuf,
       EmitUInt(colorIndices);
 
       ////idLib::Printf( "\r%3d%%", ( j * width + i * 4 ) * 100 / ( width *
-      ///height ) );
+      /// height ) );
     }
     outData += dstPadding;
     inBuf += srcPadding;
@@ -3518,9 +3518,8 @@ paramO:	minColor	- 4 byte Min color found
 paramO:	maxColor	- 4 byte Max color found
 ========================
 */
-ID_INLINE void idDxtEncoder::GetMinMaxBBox(const byte* colorBlock,
-                                           byte* minColor,
-                                           byte* maxColor) const {
+inline void idDxtEncoder::GetMinMaxBBox(const byte* colorBlock, byte* minColor,
+                                        byte* maxColor) const {
   minColor[0] = minColor[1] = minColor[2] = minColor[3] = 255;
   maxColor[0] = maxColor[1] = maxColor[2] = maxColor[3] = 0;
 
@@ -3557,8 +3556,8 @@ ID_INLINE void idDxtEncoder::GetMinMaxBBox(const byte* colorBlock,
 idDxtEncoder::InsetColorsBBox
 ========================
 */
-ID_INLINE void idDxtEncoder::InsetColorsBBox(byte* minColor,
-                                             byte* maxColor) const {
+inline void idDxtEncoder::InsetColorsBBox(byte* minColor,
+                                          byte* maxColor) const {
   byte inset[4];
 
   inset[0] = (maxColor[0] - minColor[0]) >> INSET_COLOR_SHIFT;
@@ -4366,8 +4365,7 @@ void idDxtEncoder::ScaleYCoCg(byte* colorBlock, byte* minColor,
 idDxtEncoder::InsetYCoCgBBox
 ========================
 */
-ID_INLINE void idDxtEncoder::InsetYCoCgBBox(byte* minColor,
-                                            byte* maxColor) const {
+inline void idDxtEncoder::InsetYCoCgBBox(byte* minColor, byte* maxColor) const {
 #if 0
 
 	byte inset[4];
@@ -4528,8 +4526,8 @@ ID_INLINE void idDxtEncoder::InsetYCoCgBBox(byte* minColor,
 idDxtEncoder::InsetYCoCgAlpaBBox
 ========================
 */
-ID_INLINE void idDxtEncoder::InsetYCoCgAlpaBBox(byte* minColor,
-                                                byte* maxColor) const {
+inline void idDxtEncoder::InsetYCoCgAlpaBBox(byte* minColor,
+                                             byte* maxColor) const {
   int inset[4];
   int mini[4];
   int maxi[4];

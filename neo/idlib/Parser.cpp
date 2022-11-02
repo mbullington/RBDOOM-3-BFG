@@ -153,7 +153,7 @@ static void PC_PrintDefineHashTable(define_t **definehash) {
 PC_NameHash
 ================
 */
-ID_INLINE int PC_NameHash(const char* name) {
+inline int PC_NameHash(const char* name) {
   int hash, i;
 
   hash = 0;

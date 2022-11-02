@@ -183,7 +183,7 @@ idHashTableT<_key_,_value_>::idHashTableT
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE idHashTableT<_key_, _value_>::idHashTableT(const int tableSize) {
+inline idHashTableT<_key_, _value_>::idHashTableT(const int tableSize) {
   assert(idMath::IsPowerOfTwo(tableSize));
 
   this->tableSize = tableSize;
@@ -201,8 +201,7 @@ idHashTableT<_key_,_value_>::idHashTableT
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE idHashTableT<_key_, _value_>::idHashTableT(
-    const idHashTableT& other) {
+inline idHashTableT<_key_, _value_>::idHashTableT(const idHashTableT& other) {
   Copy(other);
 }
 
@@ -212,7 +211,7 @@ idHashTableT<_key_,_value_>::~idHashTableT
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE idHashTableT<_key_, _value_>::~idHashTableT() {
+inline idHashTableT<_key_, _value_>::~idHashTableT() {
   Clear();
   delete[] heads;
   heads = NULL;
@@ -227,7 +226,7 @@ idHashTableT<_key_,_value_>::Allocated
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE size_t idHashTableT<_key_, _value_>::Allocated() const {
+inline size_t idHashTableT<_key_, _value_>::Allocated() const {
   return sizeof(heads) * tableSize + sizeof(hashnode_t*) * numEntries;
 }
 
@@ -237,7 +236,7 @@ idHashTableT<_key_,_value_>::Size
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE size_t idHashTableT<_key_, _value_>::Size() const {
+inline size_t idHashTableT<_key_, _value_>::Size() const {
   return sizeof(idHashTableT) + sizeof(heads) * tableSize +
          sizeof(hashnode_t*) * numEntries;
 }
@@ -248,8 +247,8 @@ idHashTableT<_key_,_value_>::Set
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE _value_& idHashTableT<_key_, _value_>::Set(const _key_& key,
-                                                     const _value_& value) {
+inline _value_& idHashTableT<_key_, _value_>::Set(const _key_& key,
+                                                  const _value_& value) {
   // insert sorted
   int hash = hashnode_t::GetHash(key, tableSizeMask);
   hashnode_t** nextPtr = &(heads[hash]);
@@ -279,8 +278,8 @@ idHashTableT<_key_,_value_>::Get
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE bool idHashTableT<_key_, _value_>::Get(const _key_& key,
-                                                 _value_** value) {
+inline bool idHashTableT<_key_, _value_>::Get(const _key_& key,
+                                              _value_** value) {
   int hash = hashnode_t::GetHash(key, tableSizeMask);
   hashnode_t* node = heads[hash];
   for (; node != NULL; node = node->next) {
@@ -307,8 +306,8 @@ idHashTableT<_key_,_value_>::Get
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE bool idHashTableT<_key_, _value_>::Get(const _key_& key,
-                                                 const _value_** value) const {
+inline bool idHashTableT<_key_, _value_>::Get(const _key_& key,
+                                              const _value_** value) const {
   int hash = hashnode_t::GetHash(key, tableSizeMask);
   hashnode_t* node = heads[hash];
   for (; node != NULL; node = node->next) {
@@ -335,8 +334,7 @@ idHashTableT<_key_,_value_>::GetIndex
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE _value_* idHashTableT<_key_, _value_>::GetIndex(
-    const int index) const {
+inline _value_* idHashTableT<_key_, _value_>::GetIndex(const int index) const {
   if (index < 0 || index > numEntries) {
     assert(0);
     return NULL;
@@ -360,8 +358,8 @@ idHashTableT<_key_,_value_>::GetIndexKey
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE bool idHashTableT<_key_, _value_>::GetIndexKey(const int index,
-                                                         _key_& key) const {
+inline bool idHashTableT<_key_, _value_>::GetIndexKey(const int index,
+                                                      _key_& key) const {
   if (index < 0 || index > numEntries) {
     assert(0);
     return false;
@@ -386,7 +384,7 @@ idHashTableT<_key_,_value_>::Remove
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE bool idHashTableT<_key_, _value_>::Remove(const _key_& key) {
+inline bool idHashTableT<_key_, _value_>::Remove(const _key_& key) {
   int hash = hashnode_t::GetHash(key, tableSizeMask);
   hashnode_t** head = &heads[hash];
   if (*head) {
@@ -415,7 +413,7 @@ idHashTableT<_key_,_value_>::Clear
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE void idHashTableT<_key_, _value_>::Clear() {
+inline void idHashTableT<_key_, _value_>::Clear() {
   for (int i = 0; i < tableSize; i++) {
     hashnode_t* next = heads[i];
     while (next != NULL) {
@@ -434,7 +432,7 @@ idHashTableT<_key_,_value_>::DeleteContents
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE void idHashTableT<_key_, _value_>::DeleteContents() {
+inline void idHashTableT<_key_, _value_>::DeleteContents() {
   for (int i = 0; i < tableSize; i++) {
     hashnode_t* next = heads[i];
     while (next != NULL) {
@@ -454,7 +452,7 @@ idHashTableT<_key_,_value_>::Num
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE int idHashTableT<_key_, _value_>::Num() const {
+inline int idHashTableT<_key_, _value_>::Num() const {
   return numEntries;
 }
 
@@ -464,7 +462,7 @@ idHashTableT<_key_,_value_>::GetSpread
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE int idHashTableT<_key_, _value_>::GetSpread() const {
+inline int idHashTableT<_key_, _value_>::GetSpread() const {
   if (!numEntries) {
     return 100;
   }
@@ -490,7 +488,7 @@ idHashTableT<_key_,_value_>::operator=
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE idHashTableT<_key_, _value_>& idHashTableT<_key_, _value_>::operator=(
+inline idHashTableT<_key_, _value_>& idHashTableT<_key_, _value_>::operator=(
     const idHashTableT& other) {
   Copy(other);
   return *this;
@@ -502,7 +500,7 @@ idHashTableT<_key_,_value_>::Copy
 ========================
 */
 template <typename _key_, class _value_>
-ID_INLINE void idHashTableT<_key_, _value_>::Copy(const idHashTableT& other) {
+inline void idHashTableT<_key_, _value_>::Copy(const idHashTableT& other) {
   if (&other == this) {
     return;
   }
@@ -588,7 +586,7 @@ idHashTable<Type>::idHashTable
 ================
 */
 template <class Type>
-ID_INLINE idHashTable<Type>::idHashTable(int newtablesize) {
+inline idHashTable<Type>::idHashTable(int newtablesize) {
   assert(idMath::IsPowerOfTwo(newtablesize));
 
   tablesize = newtablesize;
@@ -608,7 +606,7 @@ idHashTable<Type>::idHashTable
 ================
 */
 template <class Type>
-ID_INLINE idHashTable<Type>::idHashTable(const idHashTable<Type>& map) {
+inline idHashTable<Type>::idHashTable(const idHashTable<Type>& map) {
   int i;
   hashnode_s* node;
   hashnode_s** prev;
@@ -640,7 +638,7 @@ idHashTable<Type>::~idHashTable<Type>
 ================
 */
 template <class Type>
-ID_INLINE idHashTable<Type>::~idHashTable() {
+inline idHashTable<Type>::~idHashTable() {
   Clear();
   delete[] heads;
 }
@@ -651,7 +649,7 @@ idHashTable<Type>::Allocated
 ================
 */
 template <class Type>
-ID_INLINE size_t idHashTable<Type>::Allocated() const {
+inline size_t idHashTable<Type>::Allocated() const {
   return sizeof(heads) * tablesize + sizeof(*heads) * numentries;
 }
 
@@ -661,7 +659,7 @@ idHashTable<Type>::Size
 ================
 */
 template <class Type>
-ID_INLINE size_t idHashTable<Type>::Size() const {
+inline size_t idHashTable<Type>::Size() const {
   return sizeof(idHashTable<Type>) + sizeof(heads) * tablesize +
          sizeof(*heads) * numentries;
 }
@@ -672,7 +670,7 @@ idHashTable<Type>::GetHash
 ================
 */
 template <class Type>
-ID_INLINE int idHashTable<Type>::GetHash(const char* key) const {
+inline int idHashTable<Type>::GetHash(const char* key) const {
   return (idStr::Hash(key) & tablesizemask);
 }
 
@@ -682,7 +680,7 @@ idHashTable<Type>::Set
 ================
 */
 template <class Type>
-ID_INLINE void idHashTable<Type>::Set(const char* key, Type& value) {
+inline void idHashTable<Type>::Set(const char* key, Type& value) {
   hashnode_s *node, **nextPtr;
   int hash, s;
 
@@ -711,7 +709,7 @@ idHashTable<Type>::Get
 ================
 */
 template <class Type>
-ID_INLINE bool idHashTable<Type>::Get(const char* key, Type** value) const {
+inline bool idHashTable<Type>::Get(const char* key, Type** value) const {
   hashnode_s* node;
   int hash, s;
 
@@ -745,7 +743,7 @@ exact index for a given element may change when new elements are added
 ================
 */
 template <class Type>
-ID_INLINE Type* idHashTable<Type>::GetIndex(int index) const {
+inline Type* idHashTable<Type>::GetIndex(int index) const {
   hashnode_s* node;
   int count;
   int i;
@@ -774,7 +772,7 @@ idHashTable<Type>::Remove
 ================
 */
 template <class Type>
-ID_INLINE bool idHashTable<Type>::Remove(const char* key) {
+inline bool idHashTable<Type>::Remove(const char* key) {
   hashnode_s** head;
   hashnode_s* node;
   hashnode_s* prev;
@@ -808,7 +806,7 @@ idHashTable<Type>::Clear
 ================
 */
 template <class Type>
-ID_INLINE void idHashTable<Type>::Clear() {
+inline void idHashTable<Type>::Clear() {
   int i;
   hashnode_s* node;
   hashnode_s* next;
@@ -833,7 +831,7 @@ idHashTable<Type>::DeleteContents
 ================
 */
 template <class Type>
-ID_INLINE void idHashTable<Type>::DeleteContents() {
+inline void idHashTable<Type>::DeleteContents() {
   int i;
   hashnode_s* node;
   hashnode_s* next;
@@ -859,7 +857,7 @@ idHashTable<Type>::Num
 ================
 */
 template <class Type>
-ID_INLINE int idHashTable<Type>::Num() const {
+inline int idHashTable<Type>::Num() const {
   return numentries;
 }
 

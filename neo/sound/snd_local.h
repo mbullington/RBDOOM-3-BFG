@@ -63,10 +63,10 @@ MsecToSamples
 SamplesToMsec
 ========================
 */
-ID_INLINE_EXTERN uint32 MsecToSamples(uint32 msec, uint32 sampleRate) {
+extern inline uint32 MsecToSamples(uint32 msec, uint32 sampleRate) {
   return (msec * (sampleRate / 100)) / 10;
 }
-ID_INLINE_EXTERN uint32 SamplesToMsec(uint32 samples, uint32 sampleRate) {
+extern inline uint32 SamplesToMsec(uint32 samples, uint32 sampleRate) {
   return sampleRate < 100 ? 0 : (samples * 10) / (sampleRate / 100);
 }
 
@@ -76,10 +76,10 @@ DBtoLinear
 LinearToDB
 ========================
 */
-ID_INLINE_EXTERN float DBtoLinear(float db) {
+extern inline float DBtoLinear(float db) {
   return idMath::Pow(2.0f, db * (1.0f / 6.0f));
 }
-ID_INLINE_EXTERN float LinearToDB(float linear) {
+extern inline float LinearToDB(float linear) {
   return (linear > 0.0f) ? (idMath::Log(linear) * (6.0f / 0.693147181f))
                          : -999.0f;
 }
@@ -110,7 +110,7 @@ typedef enum {
 #include "OpenAL/AL_SoundVoice.h"
 #include "OpenAL/AL_SoundHardware.h"
 
-ID_INLINE_EXTERN ALenum CheckALErrors_(const char* filename, int line) {
+extern inline ALenum CheckALErrors_(const char* filename, int line) {
   ALenum err = alGetError();
   if (err != AL_NO_ERROR) {
     idLib::Printf("OpenAL Error: %s (0x%x), @ %s %d\n", alGetString(err), err,
@@ -120,8 +120,8 @@ ID_INLINE_EXTERN ALenum CheckALErrors_(const char* filename, int line) {
 }
 #define CheckALErrors() CheckALErrors_(__FILE__, __LINE__)
 
-ID_INLINE_EXTERN ALCenum CheckALCErrors_(ALCdevice* device,
-                                         const char* filename, int linenum) {
+extern inline ALCenum CheckALCErrors_(ALCdevice* device, const char* filename,
+                                      int linenum) {
   ALCenum err = alcGetError(device);
   if (err != ALC_NO_ERROR) {
     idLib::Printf("ALC Error: %s (0x%x), @ %s %d\n", alcGetString(device, err),

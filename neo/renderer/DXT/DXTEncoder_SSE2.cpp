@@ -291,8 +291,8 @@ params:	inPtr		- input image, 4 bytes per pixel
 paramO:	colorBlock	- 4*4 output tile, 4 bytes per pixel
 ========================
 */
-ID_INLINE void idDxtEncoder::ExtractBlock_SSE2(const byte* inPtr, int width,
-                                               byte* colorBlock) const {
+inline void idDxtEncoder::ExtractBlock_SSE2(const byte* inPtr, int width,
+                                            byte* colorBlock) const {
   *((__m128i*)(&colorBlock[0])) =
       _mm_load_si128((__m128i*)(inPtr + width * 4 * 0));
   *((__m128i*)(&colorBlock[16])) =
@@ -314,9 +314,9 @@ paramO:	minColor	- Min 4 byte output color
 paramO:	maxColor	- Max 4 byte output color
 ========================
 */
-ID_INLINE void idDxtEncoder::GetMinMaxBBox_SSE2(const byte* colorBlock,
-                                                byte* minColor,
-                                                byte* maxColor) const {
+inline void idDxtEncoder::GetMinMaxBBox_SSE2(const byte* colorBlock,
+                                             byte* minColor,
+                                             byte* maxColor) const {
   __m128i block0 = *((__m128i*)(&colorBlock[0]));
   __m128i block1 = *((__m128i*)(&colorBlock[16]));
   __m128i block2 = *((__m128i*)(&colorBlock[32]));
@@ -351,8 +351,8 @@ ID_INLINE void idDxtEncoder::GetMinMaxBBox_SSE2(const byte* colorBlock,
 idDxtEncoder::InsetColorsBBox_SSE2
 ========================
 */
-ID_INLINE void idDxtEncoder::InsetColorsBBox_SSE2(byte* minColor,
-                                                  byte* maxColor) const {
+inline void idDxtEncoder::InsetColorsBBox_SSE2(byte* minColor,
+                                               byte* maxColor) const {
   __m128i min = _mm_cvtsi32_si128(*(int*)minColor);
   __m128i max = _mm_cvtsi32_si128(*(int*)maxColor);
 
@@ -1276,8 +1276,8 @@ void idDxtEncoder::CompressImageDXT5Fast_SSE2(const byte* inBuf, byte* outBuf,
 idDxtEncoder::ScaleYCoCg_SSE2
 ========================
 */
-ID_INLINE void idDxtEncoder::ScaleYCoCg_SSE2(byte* colorBlock, byte* minColor,
-                                             byte* maxColor) const {
+inline void idDxtEncoder::ScaleYCoCg_SSE2(byte* colorBlock, byte* minColor,
+                                          byte* maxColor) const {
   __m128i block0 = *((__m128i*)(&colorBlock[0]));
   __m128i block1 = *((__m128i*)(&colorBlock[16]));
   __m128i block2 = *((__m128i*)(&colorBlock[32]));
@@ -1391,8 +1391,8 @@ ID_INLINE void idDxtEncoder::ScaleYCoCg_SSE2(byte* colorBlock, byte* minColor,
 idDxtEncoder::InsetYCoCgBBox_SSE2
 ========================
 */
-ID_INLINE void idDxtEncoder::InsetYCoCgBBox_SSE2(byte* minColor,
-                                                 byte* maxColor) const {
+inline void idDxtEncoder::InsetYCoCgBBox_SSE2(byte* minColor,
+                                              byte* maxColor) const {
   __m128c temp0, temp1, temp2, temp3, temp4, temp5, temp6, temp7;
 
   temp0 = _mm_cvtsi32_si128(*(int*)minColor);
@@ -1441,9 +1441,9 @@ paramO:	maxColor	- max color found
 return: diagonal to use
 ========================
 */
-ID_INLINE void idDxtEncoder::SelectYCoCgDiagonal_SSE2(const byte* colorBlock,
-                                                      byte* minColor,
-                                                      byte* maxColor) const {
+inline void idDxtEncoder::SelectYCoCgDiagonal_SSE2(const byte* colorBlock,
+                                                   byte* minColor,
+                                                   byte* maxColor) const {
   __m128i block0 = *((__m128i*)(&colorBlock[0]));
   __m128i block1 = *((__m128i*)(&colorBlock[16]));
   __m128i block2 = *((__m128i*)(&colorBlock[32]));

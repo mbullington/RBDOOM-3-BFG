@@ -152,34 +152,34 @@ class idPlane {
 extern idPlane plane_origin;
 #define plane_zero plane_origin
 
-ID_INLINE idPlane::idPlane() {}
+inline idPlane::idPlane() {}
 
-ID_INLINE idPlane::idPlane(float a, float b, float c, float d) {
+inline idPlane::idPlane(float a, float b, float c, float d) {
   this->a = a;
   this->b = b;
   this->c = c;
   this->d = d;
 }
 
-ID_INLINE idPlane::idPlane(const idVec3& normal, const float dist) {
+inline idPlane::idPlane(const idVec3& normal, const float dist) {
   this->a = normal.x;
   this->b = normal.y;
   this->c = normal.z;
   this->d = -dist;
 }
 
-ID_INLINE idPlane::idPlane(const idVec3& v0, const idVec3& v1, const idVec3& v2,
-                           bool fixDegenerate) {
+inline idPlane::idPlane(const idVec3& v0, const idVec3& v1, const idVec3& v2,
+                        bool fixDegenerate) {
   FromPoints(v0, v1, v2, fixDegenerate);
 }
 
-ID_INLINE float idPlane::operator[](int index) const { return (&a)[index]; }
+inline float idPlane::operator[](int index) const { return (&a)[index]; }
 
-ID_INLINE float& idPlane::operator[](int index) { return (&a)[index]; }
+inline float& idPlane::operator[](int index) { return (&a)[index]; }
 
-ID_INLINE idPlane idPlane::operator-() const { return idPlane(-a, -b, -c, -d); }
+inline idPlane idPlane::operator-() const { return idPlane(-a, -b, -c, -d); }
 
-ID_INLINE idPlane& idPlane::operator=(const idVec3& v) {
+inline idPlane& idPlane::operator=(const idVec3& v) {
   a = v.x;
   b = v.y;
   c = v.z;
@@ -187,28 +187,28 @@ ID_INLINE idPlane& idPlane::operator=(const idVec3& v) {
   return *this;
 }
 
-ID_INLINE idPlane idPlane::operator+(const idPlane& p) const {
+inline idPlane idPlane::operator+(const idPlane& p) const {
   return idPlane(a + p.a, b + p.b, c + p.c, d + p.d);
 }
 
-ID_INLINE idPlane idPlane::operator-(const idPlane& p) const {
+inline idPlane idPlane::operator-(const idPlane& p) const {
   return idPlane(a - p.a, b - p.b, c - p.c, d - p.d);
 }
 
-ID_INLINE idPlane idPlane::operator*(const float s) const {
+inline idPlane idPlane::operator*(const float s) const {
   return idPlane(a * s, b * s, c * s, d * s);
 }
 
-ID_INLINE idPlane& idPlane::operator*=(const idMat3& m) {
+inline idPlane& idPlane::operator*=(const idMat3& m) {
   Normal() *= m;
   return *this;
 }
 
-ID_INLINE bool idPlane::Compare(const idPlane& p) const {
+inline bool idPlane::Compare(const idPlane& p) const {
   return (a == p.a && b == p.b && c == p.c && d == p.d);
 }
 
-ID_INLINE bool idPlane::Compare(const idPlane& p, const float epsilon) const {
+inline bool idPlane::Compare(const idPlane& p, const float epsilon) const {
   if (idMath::Fabs(a - p.a) > epsilon) {
     return false;
   }
@@ -228,8 +228,8 @@ ID_INLINE bool idPlane::Compare(const idPlane& p, const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idPlane::Compare(const idPlane& p, const float normalEps,
-                                const float distEps) const {
+inline bool idPlane::Compare(const idPlane& p, const float normalEps,
+                             const float distEps) const {
   if (idMath::Fabs(d - p.d) > distEps) {
     return false;
   }
@@ -239,29 +239,25 @@ ID_INLINE bool idPlane::Compare(const idPlane& p, const float normalEps,
   return true;
 }
 
-ID_INLINE bool idPlane::operator==(const idPlane& p) const {
-  return Compare(p);
-}
+inline bool idPlane::operator==(const idPlane& p) const { return Compare(p); }
 
-ID_INLINE bool idPlane::operator!=(const idPlane& p) const {
-  return !Compare(p);
-}
+inline bool idPlane::operator!=(const idPlane& p) const { return !Compare(p); }
 
-ID_INLINE void idPlane::Zero() { a = b = c = d = 0.0f; }
+inline void idPlane::Zero() { a = b = c = d = 0.0f; }
 
-ID_INLINE void idPlane::SetNormal(const idVec3& normal) {
+inline void idPlane::SetNormal(const idVec3& normal) {
   a = normal.x;
   b = normal.y;
   c = normal.z;
 }
 
-ID_INLINE const idVec3& idPlane::Normal() const {
+inline const idVec3& idPlane::Normal() const {
   return *reinterpret_cast<const idVec3*>(&a);
 }
 
-ID_INLINE idVec3& idPlane::Normal() { return *reinterpret_cast<idVec3*>(&a); }
+inline idVec3& idPlane::Normal() { return *reinterpret_cast<idVec3*>(&a); }
 
-ID_INLINE float idPlane::Normalize(bool fixDegenerate) {
+inline float idPlane::Normalize(bool fixDegenerate) {
   float length = reinterpret_cast<idVec3*>(&a)->Normalize();
 
   if (fixDegenerate) {
@@ -270,11 +266,11 @@ ID_INLINE float idPlane::Normalize(bool fixDegenerate) {
   return length;
 }
 
-ID_INLINE bool idPlane::FixDegenerateNormal() {
+inline bool idPlane::FixDegenerateNormal() {
   return Normal().FixDegenerateNormal();
 }
 
-ID_INLINE bool idPlane::FixDegeneracies(float distEpsilon) {
+inline bool idPlane::FixDegeneracies(float distEpsilon) {
   bool fixedNormal = FixDegenerateNormal();
   // only fix dist if the normal was degenerate
   if (fixedNormal) {
@@ -285,12 +281,12 @@ ID_INLINE bool idPlane::FixDegeneracies(float distEpsilon) {
   return fixedNormal;
 }
 
-ID_INLINE float idPlane::Dist() const { return -d; }
+inline float idPlane::Dist() const { return -d; }
 
-ID_INLINE void idPlane::SetDist(const float dist) { d = -dist; }
+inline void idPlane::SetDist(const float dist) { d = -dist; }
 
-ID_INLINE bool idPlane::FromPoints(const idVec3& p1, const idVec3& p2,
-                                   const idVec3& p3, bool fixDegenerate) {
+inline bool idPlane::FromPoints(const idVec3& p1, const idVec3& p2,
+                                const idVec3& p3, bool fixDegenerate) {
   Normal() = (p1 - p2).Cross(p3 - p2);
   if (Normalize(fixDegenerate) == 0.0f) {
     return false;
@@ -299,8 +295,8 @@ ID_INLINE bool idPlane::FromPoints(const idVec3& p1, const idVec3& p2,
   return true;
 }
 
-ID_INLINE bool idPlane::FromVecs(const idVec3& dir1, const idVec3& dir2,
-                                 const idVec3& p, bool fixDegenerate) {
+inline bool idPlane::FromVecs(const idVec3& dir1, const idVec3& dir2,
+                              const idVec3& p, bool fixDegenerate) {
   Normal() = dir1.Cross(dir2);
   if (Normalize(fixDegenerate) == 0.0f) {
     return false;
@@ -309,40 +305,36 @@ ID_INLINE bool idPlane::FromVecs(const idVec3& dir1, const idVec3& dir2,
   return true;
 }
 
-ID_INLINE void idPlane::FitThroughPoint(const idVec3& p) {
-  d = -(Normal() * p);
-}
+inline void idPlane::FitThroughPoint(const idVec3& p) { d = -(Normal() * p); }
 
-ID_INLINE idPlane idPlane::Translate(const idVec3& translation) const {
+inline idPlane idPlane::Translate(const idVec3& translation) const {
   return idPlane(a, b, c, d - translation * Normal());
 }
 
-ID_INLINE idPlane& idPlane::TranslateSelf(const idVec3& translation) {
+inline idPlane& idPlane::TranslateSelf(const idVec3& translation) {
   d -= translation * Normal();
   return *this;
 }
 
-ID_INLINE idPlane idPlane::Rotate(const idVec3& origin,
-                                  const idMat3& axis) const {
+inline idPlane idPlane::Rotate(const idVec3& origin, const idMat3& axis) const {
   idPlane p;
   p.Normal() = Normal() * axis;
   p.d = d + origin * Normal() - origin * p.Normal();
   return p;
 }
 
-ID_INLINE idPlane& idPlane::RotateSelf(const idVec3& origin,
-                                       const idMat3& axis) {
+inline idPlane& idPlane::RotateSelf(const idVec3& origin, const idMat3& axis) {
   d += origin * Normal();
   Normal() *= axis;
   d -= origin * Normal();
   return *this;
 }
 
-ID_INLINE float idPlane::Distance(const idVec3& v) const {
+inline float idPlane::Distance(const idVec3& v) const {
   return a * v.x + b * v.y + c * v.z + d;
 }
 
-ID_INLINE int idPlane::Side(const idVec3& v, const float epsilon) const {
+inline int idPlane::Side(const idVec3& v, const float epsilon) const {
   float dist = Distance(v);
   if (dist > epsilon) {
     return PLANESIDE_FRONT;
@@ -353,8 +345,8 @@ ID_INLINE int idPlane::Side(const idVec3& v, const float epsilon) const {
   }
 }
 
-ID_INLINE bool idPlane::LineIntersection(const idVec3& start,
-                                         const idVec3& end) const {
+inline bool idPlane::LineIntersection(const idVec3& start,
+                                      const idVec3& end) const {
   float d1, d2, fraction;
 
   d1 = Normal() * start + d;
@@ -372,8 +364,8 @@ ID_INLINE bool idPlane::LineIntersection(const idVec3& start,
   return (fraction >= 0.0f && fraction <= 1.0f);
 }
 
-ID_INLINE bool idPlane::RayIntersection(const idVec3& start, const idVec3& dir,
-                                        float& scale) const {
+inline bool idPlane::RayIntersection(const idVec3& start, const idVec3& dir,
+                                     float& scale) const {
   float d1, d2;
 
   d1 = Normal() * start + d;
@@ -385,18 +377,18 @@ ID_INLINE bool idPlane::RayIntersection(const idVec3& start, const idVec3& dir,
   return true;
 }
 
-ID_INLINE int idPlane::GetDimension() const { return 4; }
+inline int idPlane::GetDimension() const { return 4; }
 
-ID_INLINE const idVec4& idPlane::ToVec4() const {
+inline const idVec4& idPlane::ToVec4() const {
   return *reinterpret_cast<const idVec4*>(&a);
 }
 
-ID_INLINE idVec4& idPlane::ToVec4() { return *reinterpret_cast<idVec4*>(&a); }
+inline idVec4& idPlane::ToVec4() { return *reinterpret_cast<idVec4*>(&a); }
 
-ID_INLINE const float* idPlane::ToFloatPtr() const {
+inline const float* idPlane::ToFloatPtr() const {
   return reinterpret_cast<const float*>(&a);
 }
 
-ID_INLINE float* idPlane::ToFloatPtr() { return reinterpret_cast<float*>(&a); }
+inline float* idPlane::ToFloatPtr() { return reinterpret_cast<float*>(&a); }
 
 #endif /* !__MATH_PLANE_H__ */

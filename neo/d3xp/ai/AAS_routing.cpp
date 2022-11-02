@@ -721,7 +721,7 @@ idReachability* idAASLocal::GetAreaReachability(int areaNum,
 idAASLocal::ClusterAreaNum
 ============
 */
-ID_INLINE int idAASLocal::ClusterAreaNum(int clusterNum, int areaNum) const {
+inline int idAASLocal::ClusterAreaNum(int clusterNum, int areaNum) const {
   int side, areaCluster;
 
   areaCluster = file->GetArea(areaNum).cluster;
@@ -1161,10 +1161,11 @@ bool idAASLocal::RouteToGoalArea(int areaNum, const idVec3 origin,
     t = portalCache->travelTimes[portalNum] +
         areaCache->travelTimes[clusterAreaNum];
     // NOTE:	Should add the exact travel time through the portal area.
-    //			However we add the largest travel time through the portal
-    //area. 			We cannot directly calculate the exact travel time through the
-    //portal area 			because the reachability used to travel into the portal area
-    //is not known.
+    //			However we add the largest travel time through the
+    //portal
+    // area. 			We cannot directly calculate the exact travel time through
+    // the portal area 			because the reachability used to travel
+    // into the portal area is not known.
     t += portal->maxAreaTravelTime;
 
     // if the time is better than the one already found

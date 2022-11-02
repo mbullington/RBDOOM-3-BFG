@@ -179,8 +179,8 @@ class idParallelJobList_Threads {
   //------------------------
   // These are called from the one thread that manages this list.
   //------------------------
-  ID_INLINE void AddJob(jobRun_t function, void* data);
-  ID_INLINE void InsertSyncPoint(jobSyncType_t syncType);
+  inline void AddJob(jobRun_t function, void* data);
+  inline void InsertSyncPoint(jobSyncType_t syncType);
   void Submit(idParallelJobList_Threads* waitForJobList_, int parallelism);
   void Wait();
   bool TryWait();
@@ -309,8 +309,7 @@ idParallelJobList_Threads::~idParallelJobList_Threads() { Wait(); }
 idParallelJobList_Threads::AddJob
 ========================
 */
-ID_INLINE void idParallelJobList_Threads::AddJob(jobRun_t function,
-                                                 void* data) {
+inline void idParallelJobList_Threads::AddJob(jobRun_t function, void* data) {
   assert(done);
 #if defined(_DEBUG)
   // make sure there isn't already a job with the same function and data in the
@@ -359,8 +358,7 @@ ID_INLINE void idParallelJobList_Threads::AddJob(jobRun_t function,
 idParallelJobList_Threads::InsertSyncPoint
 ========================
 */
-ID_INLINE void idParallelJobList_Threads::InsertSyncPoint(
-    jobSyncType_t syncType) {
+inline void idParallelJobList_Threads::InsertSyncPoint(jobSyncType_t syncType) {
   assert(done);
   switch (syncType) {
     case SYNC_SIGNAL: {

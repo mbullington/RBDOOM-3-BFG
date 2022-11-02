@@ -76,9 +76,9 @@ class idRegister {
   void ReadFromSaveGame(idFile* savefile);
 };
 
-ID_INLINE idRegister::idRegister() {}
+inline idRegister::idRegister() {}
 
-ID_INLINE idRegister::idRegister(const char* p, int t) {
+inline idRegister::idRegister(const char* p, int t) {
   name = p;
   type = t;
   assert(t >= 0 && t < NUMTYPES);
@@ -87,7 +87,7 @@ ID_INLINE idRegister::idRegister(const char* p, int t) {
   var = NULL;
 };
 
-ID_INLINE void idRegister::CopyRegs(idRegister* src) {
+inline void idRegister::CopyRegs(idRegister* src) {
   regs[0] = src->regs[0];
   regs[1] = src->regs[1];
   regs[2] = src->regs[2];
@@ -118,12 +118,12 @@ class idRegisterList {
   idHashIndex regHash;
 };
 
-ID_INLINE idRegisterList::idRegisterList() {
+inline idRegisterList::idRegisterList() {
   regs.SetGranularity(4);
   regHash.SetGranularity(4);
   regHash.Clear(32, 4);
 }
 
-ID_INLINE idRegisterList::~idRegisterList() {}
+inline idRegisterList::~idRegisterList() {}
 
 #endif /* !__REGEXP_H__ */

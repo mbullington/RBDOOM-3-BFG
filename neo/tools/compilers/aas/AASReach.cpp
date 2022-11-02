@@ -69,7 +69,7 @@ bool idAASReach::ReachabilityExists(int fromAreaNum, int toAreaNum) {
 idAASReach::CanSwimInArea
 ================
 */
-ID_INLINE bool idAASReach::CanSwimInArea(int areaNum) {
+inline bool idAASReach::CanSwimInArea(int areaNum) {
   return (file->areas[areaNum].contents & AREACONTENTS_WATER) != 0;
 }
 
@@ -78,7 +78,7 @@ ID_INLINE bool idAASReach::CanSwimInArea(int areaNum) {
 idAASReach::AreaHasFloor
 ================
 */
-ID_INLINE bool idAASReach::AreaHasFloor(int areaNum) {
+inline bool idAASReach::AreaHasFloor(int areaNum) {
   return (file->areas[areaNum].flags & AREA_FLOOR) != 0;
 }
 
@@ -87,7 +87,7 @@ ID_INLINE bool idAASReach::AreaHasFloor(int areaNum) {
 idAASReach::AreaIsClusterPortal
 ================
 */
-ID_INLINE bool idAASReach::AreaIsClusterPortal(int areaNum) {
+inline bool idAASReach::AreaIsClusterPortal(int areaNum) {
   return (file->areas[areaNum].contents & AREACONTENTS_CLUSTERPORTAL) != 0;
 }
 

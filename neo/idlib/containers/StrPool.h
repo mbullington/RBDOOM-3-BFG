@@ -94,7 +94,7 @@ class idStrPool {
 idStrPool::SetCaseSensitive
 ================
 */
-ID_INLINE void idStrPool::SetCaseSensitive(bool caseSensitive) {
+inline void idStrPool::SetCaseSensitive(bool caseSensitive) {
   this->caseSensitive = caseSensitive;
 }
 
@@ -103,7 +103,7 @@ ID_INLINE void idStrPool::SetCaseSensitive(bool caseSensitive) {
 idStrPool::AllocString
 ================
 */
-ID_INLINE const idPoolStr* idStrPool::AllocString(const char* string) {
+inline const idPoolStr* idStrPool::AllocString(const char* string) {
   int i, hash;
   idPoolStr* poolStr;
 
@@ -137,7 +137,7 @@ ID_INLINE const idPoolStr* idStrPool::AllocString(const char* string) {
 idStrPool::FreeString
 ================
 */
-ID_INLINE void idStrPool::FreeString(const idPoolStr* poolStr) {
+inline void idStrPool::FreeString(const idPoolStr* poolStr) {
   int i, hash;
 
   /*
@@ -200,7 +200,7 @@ ID_INLINE void idStrPool::FreeString(const idPoolStr* poolStr) {
 idStrPool::CopyString
 ================
 */
-ID_INLINE const idPoolStr* idStrPool::CopyString(const idPoolStr* poolStr) {
+inline const idPoolStr* idStrPool::CopyString(const idPoolStr* poolStr) {
   assert(poolStr->numUsers >= 1);
 
   if (poolStr->pool == this) {
@@ -219,7 +219,7 @@ ID_INLINE const idPoolStr* idStrPool::CopyString(const idPoolStr* poolStr) {
 idStrPool::Clear
 ================
 */
-ID_INLINE void idStrPool::Clear() {
+inline void idStrPool::Clear() {
   int i;
 
   for (i = 0; i < pool.Num(); i++) {
@@ -234,7 +234,7 @@ ID_INLINE void idStrPool::Clear() {
 idStrPool::Allocated
 ================
 */
-ID_INLINE size_t idStrPool::Allocated() const {
+inline size_t idStrPool::Allocated() const {
   int i;
   size_t size;
 
@@ -250,7 +250,7 @@ ID_INLINE size_t idStrPool::Allocated() const {
 idStrPool::Size
 ================
 */
-ID_INLINE size_t idStrPool::Size() const {
+inline size_t idStrPool::Size() const {
   int i;
   size_t size;
 

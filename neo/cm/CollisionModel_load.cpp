@@ -1085,10 +1085,12 @@ void idCollisionModelManagerLocal::ChopWindingListWithBrush(
           res = front.Split(&back, plane, CHOP_EPSILON);
         }
 
-        // NOTE:	disabling this can create gaps at places where Z-fighting
-        // occurs
-        //			Z-fighting should not occur but what if there is a
-        //decal brush side 			with exactly the same size as another brush side ?
+        // NOTE:	disabling this can create gaps at places where
+        // Z-fighting occurs
+        //			Z-fighting should not occur but what if there is
+        //a
+        // decal brush side 			with exactly the same size as another
+        // brush side ?
         // only leave windings on a brush if the winding plane and brush side
         // plane face the same direction
         if (res == SIDE_ON && list->primitiveNum >= 0 &&
@@ -2347,7 +2349,7 @@ void idCollisionModelManagerLocal::ClearHash(idBounds& bounds) {
 idCollisionModelManagerLocal::HashVec
 ================
 */
-ID_INLINE int idCollisionModelManagerLocal::HashVec(const idVec3& vec) {
+inline int idCollisionModelManagerLocal::HashVec(const idVec3& vec) {
   /*
   int x, y;
 

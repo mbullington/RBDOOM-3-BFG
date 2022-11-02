@@ -37,16 +37,16 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __SWF_TYPES1_H__
 #define __SWF_TYPES1_H__
 
-ID_INLINE float SWFTWIP(int twip) { return twip * (1.0f / 20.0f); }
-ID_INLINE float SWFFIXED16(int fixed) { return fixed * (1.0f / 65536.0f); }
-ID_INLINE float SWFFIXED8(int fixed) { return fixed * (1.0f / 256.0f); }
+inline float SWFTWIP(int twip) { return twip * (1.0f / 20.0f); }
+inline float SWFFIXED16(int fixed) { return fixed * (1.0f / 65536.0f); }
+inline float SWFFIXED8(int fixed) { return fixed * (1.0f / 256.0f); }
 
 // RB begin
-ID_INLINE int FLOAT2SWFTWIP(float value) { return (int)(value * 20); }
+inline int FLOAT2SWFTWIP(float value) { return (int)(value * 20); }
 
-ID_INLINE int FLOAT2SWFFIXED16(float value) { return (int)(value * 65536); }
+inline int FLOAT2SWFFIXED16(float value) { return (int)(value * 65536); }
 
-ID_INLINE int FLOAT2SWFFIXED8(float value) { return (int)(value * 256); }
+inline int FLOAT2SWFFIXED8(float value) { return (int)(value * 256); }
 // RB end
 
 struct swfHeader_t {
@@ -295,20 +295,20 @@ struct swfRenderState_t {
   stereoDepthType_t stereoDepth;
 };
 
-ID_INLINE swfRect_t::swfRect_t() : tl(0.0f, 0.0f), br(0.0f, 0.0f) {}
+inline swfRect_t::swfRect_t() : tl(0.0f, 0.0f), br(0.0f, 0.0f) {}
 
-ID_INLINE swfMatrix_t::swfMatrix_t()
+inline swfMatrix_t::swfMatrix_t()
     : xx(1.0f), yy(1.0f), xy(0.0f), yx(0.0f), tx(0.0f), ty(0.0f) {}
 
-ID_INLINE idVec2 swfMatrix_t::Scale(const idVec2& in) const {
+inline idVec2 swfMatrix_t::Scale(const idVec2& in) const {
   return idVec2((in.x * xx) + (in.y * xy), (in.y * yy) + (in.x * yx));
 }
 
-ID_INLINE idVec2 swfMatrix_t::Transform(const idVec2& in) const {
+inline idVec2 swfMatrix_t::Transform(const idVec2& in) const {
   return idVec2((in.x * xx) + (in.y * xy) + tx, (in.y * yy) + (in.x * yx) + ty);
 }
 
-ID_INLINE swfMatrix_t swfMatrix_t::Inverse() const {
+inline swfMatrix_t swfMatrix_t::Inverse() const {
   swfMatrix_t inverse;
   float det = ((xx * yy) - (yx * xy));
   if (idMath::Fabs(det) < idMath::FLT_SMALLEST_NON_DENORMAL) {
@@ -324,7 +324,7 @@ ID_INLINE swfMatrix_t swfMatrix_t::Inverse() const {
   return inverse;
 }
 
-ID_INLINE swfMatrix_t swfMatrix_t::Multiply(const swfMatrix_t& a) const {
+inline swfMatrix_t swfMatrix_t::Multiply(const swfMatrix_t& a) const {
   swfMatrix_t result;
   result.xx = xx * a.xx + yx * a.xy;
   result.yx = xx * a.yx + yx * a.yy;
@@ -335,42 +335,42 @@ ID_INLINE swfMatrix_t swfMatrix_t::Multiply(const swfMatrix_t& a) const {
   return result;
 }
 
-ID_INLINE swfColorRGB_t::swfColorRGB_t() : r(255), g(255), b(255) {}
+inline swfColorRGB_t::swfColorRGB_t() : r(255), g(255), b(255) {}
 
-ID_INLINE idVec4 swfColorRGB_t::ToVec4() const {
+inline idVec4 swfColorRGB_t::ToVec4() const {
   return idVec4(r * (1.0f / 255.0f), g * (1.0f / 255.0f), b * (1.0f / 255.0f),
                 1.0f);
 }
 
-ID_INLINE swfColorRGBA_t::swfColorRGBA_t() : a(255) {}
+inline swfColorRGBA_t::swfColorRGBA_t() : a(255) {}
 
-ID_INLINE idVec4 swfColorRGBA_t::ToVec4() const {
+inline idVec4 swfColorRGBA_t::ToVec4() const {
   return idVec4(r * (1.0f / 255.0f), g * (1.0f / 255.0f), b * (1.0f / 255.0f),
                 a * (1.0f / 255.0f));
 }
 
-ID_INLINE swfLineStyle_t::swfLineStyle_t() : startWidth(20), endWidth(20) {}
+inline swfLineStyle_t::swfLineStyle_t() : startWidth(20), endWidth(20) {}
 
-ID_INLINE swfGradientRecord_t::swfGradientRecord_t()
+inline swfGradientRecord_t::swfGradientRecord_t()
     : startRatio(0), endRatio(0) {}
 
-ID_INLINE swfGradient_t::swfGradient_t() : numGradients(0) {}
+inline swfGradient_t::swfGradient_t() : numGradients(0) {}
 
-ID_INLINE swfFillStyle_t::swfFillStyle_t()
+inline swfFillStyle_t::swfFillStyle_t()
     : type(0), subType(0), focalPoint(0.0f), bitmapID(0) {}
 
-ID_INLINE swfColorXform_t::swfColorXform_t()
+inline swfColorXform_t::swfColorXform_t()
     : mul(1.0f, 1.0f, 1.0f, 1.0f), add(0.0f, 0.0f, 0.0f, 0.0f) {}
 
-ID_INLINE swfColorXform_t
-swfColorXform_t::Multiply(const swfColorXform_t& a) const {
+inline swfColorXform_t swfColorXform_t::Multiply(
+    const swfColorXform_t& a) const {
   swfColorXform_t result;
   result.mul = mul.Multiply(a.mul);
   result.add = (add.Multiply(a.mul)) + a.add;
   return result;
 }
 
-ID_INLINE swfDisplayEntry_t::swfDisplayEntry_t()
+inline swfDisplayEntry_t::swfDisplayEntry_t()
     : characterID(0),
       depth(0),
       clipDepth(0),
@@ -379,7 +379,7 @@ ID_INLINE swfDisplayEntry_t::swfDisplayEntry_t()
       spriteInstance(NULL),
       textInstance(NULL) {}
 
-ID_INLINE swfRenderState_t::swfRenderState_t()
+inline swfRenderState_t::swfRenderState_t()
     : material(NULL),
       materialWidth(0),
       materialHeight(0),
@@ -388,12 +388,11 @@ ID_INLINE swfRenderState_t::swfRenderState_t()
       ratio(0.0f),
       stereoDepth(STEREO_DEPTH_TYPE_NONE) {}
 
-ID_INLINE idSWFFontGlyph::idSWFFontGlyph() : code(0), advance(0) {}
+inline idSWFFontGlyph::idSWFFontGlyph() : code(0), advance(0) {}
 
-ID_INLINE idSWFFont::idSWFFont()
-    : fontID(0), ascent(0), descent(0), leading(0) {}
+inline idSWFFont::idSWFFont() : fontID(0), ascent(0), descent(0), leading(0) {}
 
-ID_INLINE idSWFTextRecord::idSWFTextRecord()
+inline idSWFTextRecord::idSWFTextRecord()
     : fontID(0),
       xOffset(0),
       yOffset(0),
@@ -401,7 +400,7 @@ ID_INLINE idSWFTextRecord::idSWFTextRecord()
       firstGlyph(0),
       numGlyphs(0) {}
 
-ID_INLINE idSWFEditText::idSWFEditText()
+inline idSWFEditText::idSWFEditText()
     : flags(SWF_ET_NONE),
       fontID(0),
       fontHeight(24),
@@ -412,6 +411,6 @@ ID_INLINE idSWFEditText::idSWFEditText()
       indent(0),
       leading(0) {}
 
-ID_INLINE swfGlyphEntry_t::swfGlyphEntry_t() : index(0), advance(0) {}
+inline swfGlyphEntry_t::swfGlyphEntry_t() : index(0), advance(0) {}
 
 #endif  // !__SWF_TYPES1_H__

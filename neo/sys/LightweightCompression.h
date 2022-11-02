@@ -140,12 +140,12 @@ class idLZWCompressor {
   }
 
   template <class type>
-  ID_INLINE size_t WriteAgnostic(const type& c) {
+  inline size_t WriteAgnostic(const type& c) {
     return Write(&c, sizeof(c));
   }
 
   template <class type>
-  ID_INLINE size_t ReadAgnostic(type& c, bool ignoreOverflow = false) {
+  inline size_t ReadAgnostic(type& c, bool ignoreOverflow = false) {
     size_t r = Read(&c, sizeof(c), ignoreOverflow);
     return r;
   }

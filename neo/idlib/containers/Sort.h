@@ -107,7 +107,7 @@ SwapValues
 ========================
 */
 template <typename _type_>
-ID_INLINE void SwapValues(_type_& a, _type_& b) {
+inline void SwapValues(_type_& a, _type_& b) {
   std::swap(a, b);
 }
 

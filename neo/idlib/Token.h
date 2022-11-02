@@ -120,22 +120,22 @@ class idToken : public idStr {
       const char a);  // append character without adding trailing zero
 };
 
-ID_INLINE idToken::idToken()
+inline idToken::idToken()
     : type(), subtype(), line(), linesCrossed(), flags() {}
 
-ID_INLINE idToken::idToken(const idToken* token) { *this = *token; }
+inline idToken::idToken(const idToken* token) { *this = *token; }
 
-ID_INLINE idToken::~idToken() {}
+inline idToken::~idToken() {}
 
-ID_INLINE void idToken::operator=(const char* text) {
+inline void idToken::operator=(const char* text) {
   *static_cast<idStr*>(this) = text;
 }
 
-ID_INLINE void idToken::operator=(const idStr& text) {
+inline void idToken::operator=(const idStr& text) {
   *static_cast<idStr*>(this) = text;
 }
 
-ID_INLINE double idToken::GetDoubleValue() {
+inline double idToken::GetDoubleValue() {
   if (type != TT_NUMBER) {
     return 0.0;
   }
@@ -145,9 +145,9 @@ ID_INLINE double idToken::GetDoubleValue() {
   return floatvalue;
 }
 
-ID_INLINE float idToken::GetFloatValue() { return (float)GetDoubleValue(); }
+inline float idToken::GetFloatValue() { return (float)GetDoubleValue(); }
 
-ID_INLINE unsigned long idToken::GetUnsignedLongValue() {
+inline unsigned long idToken::GetUnsignedLongValue() {
   if (type != TT_NUMBER) {
     return 0;
   }
@@ -157,13 +157,13 @@ ID_INLINE unsigned long idToken::GetUnsignedLongValue() {
   return intvalue;
 }
 
-ID_INLINE int idToken::GetIntValue() { return (int)GetUnsignedLongValue(); }
+inline int idToken::GetIntValue() { return (int)GetUnsignedLongValue(); }
 
-ID_INLINE int idToken::WhiteSpaceBeforeToken() const {
+inline int idToken::WhiteSpaceBeforeToken() const {
   return (whiteSpaceEnd_p > whiteSpaceStart_p);
 }
 
-ID_INLINE void idToken::AppendDirty(const char a) {
+inline void idToken::AppendDirty(const char a) {
   EnsureAlloced(len + 2, true);
   data[len++] = a;
 }

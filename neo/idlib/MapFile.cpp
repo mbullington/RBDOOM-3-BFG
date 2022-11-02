@@ -46,14 +46,14 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 FloatCRC
 ===============
 */
-ID_INLINE unsigned int FloatCRC(float f) { return *(unsigned int*)&f; }
+inline unsigned int FloatCRC(float f) { return *(unsigned int*)&f; }
 
 /*
 ===============
 StringCRC
 ===============
 */
-ID_INLINE unsigned int StringCRC(const char* str) {
+inline unsigned int StringCRC(const char* str) {
   unsigned int i, crc;
   const unsigned char* ptr;
 

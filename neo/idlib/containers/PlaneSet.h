@@ -59,8 +59,8 @@ class idPlaneSet : public idList<idPlane> {
   idHashIndex hash;
 };
 
-ID_INLINE int idPlaneSet::FindPlane(const idPlane& plane, const float normalEps,
-                                    const float distEps) {
+inline int idPlaneSet::FindPlane(const idPlane& plane, const float normalEps,
+                                 const float distEps) {
   int i, border, hashKey;
 
   assert(distEps <= 0.125f);

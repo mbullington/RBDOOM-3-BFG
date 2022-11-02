@@ -79,7 +79,7 @@ FastF32toF16
 ====================
 */
 #if defined(USE_INTRINSICS_SSE)
-ID_INLINE_EXTERN __m128i FastF32toF16(__m128i f32_bits) {
+extern inline __m128i FastF32toF16(__m128i f32_bits) {
   __m128i f16_sign = _mm_srli_epi32(
       _mm_and_si128(f32_bits, vector_int_f32_sign_mask), f32_to_f16_sign_shift);
   __m128i f16_exponent =
@@ -113,7 +113,7 @@ ID_INLINE_EXTERN __m128i FastF32toF16(__m128i f32_bits) {
 }
 #endif
 
-ID_INLINE_EXTERN halfFloat_t Scalar_FastF32toF16(float f32) {
+extern inline halfFloat_t Scalar_FastF32toF16(float f32) {
   const int f32_sign_mask = 1U << IEEE_FLT_SIGN_BIT;
   const int f32_exponent_mask = ((1U << IEEE_FLT_EXPONENT_BITS) - 1)
                                 << IEEE_FLT_MANTISSA_BITS;
@@ -159,8 +159,8 @@ LoadSkinnedDrawVertPosition
 ====================
 */
 #if defined(USE_INTRINSICS_SSE)
-ID_INLINE_EXTERN __m128 LoadSkinnedDrawVertPosition(const idDrawVert& base,
-                                                    const idJointMat* joints) {
+extern inline __m128 LoadSkinnedDrawVertPosition(const idDrawVert& base,
+                                                 const idJointMat* joints) {
   const idJointMat& j0 = joints[base.color[0]];
   const idJointMat& j1 = joints[base.color[1]];
   const idJointMat& j2 = joints[base.color[2]];
@@ -221,7 +221,7 @@ ID_INLINE_EXTERN __m128 LoadSkinnedDrawVertPosition(const idDrawVert& base,
 }
 #endif
 
-ID_INLINE_EXTERN idVec3 Scalar_LoadSkinnedDrawVertPosition(
+extern inline idVec3 Scalar_LoadSkinnedDrawVertPosition(
     const idDrawVert& vert, const idJointMat* joints) {
   const idJointMat& j0 = joints[vert.color[0]];
   const idJointMat& j1 = joints[vert.color[1]];

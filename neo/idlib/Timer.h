@@ -76,7 +76,7 @@ class idTimer {
 idTimer::idTimer
 =================
 */
-ID_INLINE idTimer::idTimer() {
+inline idTimer::idTimer() {
   state = TS_STOPPED;
   clockTicks = 0.0;
 }
@@ -86,7 +86,7 @@ ID_INLINE idTimer::idTimer() {
 idTimer::idTimer
 =================
 */
-ID_INLINE idTimer::idTimer(double _clockTicks) {
+inline idTimer::idTimer(double _clockTicks) {
   state = TS_STOPPED;
   clockTicks = _clockTicks;
 }
@@ -96,14 +96,14 @@ ID_INLINE idTimer::idTimer(double _clockTicks) {
 idTimer::~idTimer
 =================
 */
-ID_INLINE idTimer::~idTimer() {}
+inline idTimer::~idTimer() {}
 
 /*
 =================
 idTimer::operator+
 =================
 */
-ID_INLINE idTimer idTimer::operator+(const idTimer& t) const {
+inline idTimer idTimer::operator+(const idTimer& t) const {
   assert(state == TS_STOPPED && t.state == TS_STOPPED);
   return idTimer(clockTicks + t.clockTicks);
 }
@@ -113,7 +113,7 @@ ID_INLINE idTimer idTimer::operator+(const idTimer& t) const {
 idTimer::operator-
 =================
 */
-ID_INLINE idTimer idTimer::operator-(const idTimer& t) const {
+inline idTimer idTimer::operator-(const idTimer& t) const {
   assert(state == TS_STOPPED && t.state == TS_STOPPED);
   return idTimer(clockTicks - t.clockTicks);
 }
@@ -123,7 +123,7 @@ ID_INLINE idTimer idTimer::operator-(const idTimer& t) const {
 idTimer::operator+=
 =================
 */
-ID_INLINE idTimer& idTimer::operator+=(const idTimer& t) {
+inline idTimer& idTimer::operator+=(const idTimer& t) {
   assert(state == TS_STOPPED && t.state == TS_STOPPED);
   clockTicks += t.clockTicks;
   return *this;
@@ -134,7 +134,7 @@ ID_INLINE idTimer& idTimer::operator+=(const idTimer& t) {
 idTimer::operator-=
 =================
 */
-ID_INLINE idTimer& idTimer::operator-=(const idTimer& t) {
+inline idTimer& idTimer::operator-=(const idTimer& t) {
   assert(state == TS_STOPPED && t.state == TS_STOPPED);
   clockTicks -= t.clockTicks;
   return *this;
@@ -145,7 +145,7 @@ ID_INLINE idTimer& idTimer::operator-=(const idTimer& t) {
 idTimer::Start
 =================
 */
-ID_INLINE void idTimer::Start() {
+inline void idTimer::Start() {
   assert(state == TS_STOPPED);
   state = TS_STARTED;
   start = idLib::sys->GetClockTicks();
@@ -156,7 +156,7 @@ ID_INLINE void idTimer::Start() {
 idTimer::Stop
 =================
 */
-ID_INLINE void idTimer::Stop() {
+inline void idTimer::Stop() {
   assert(state == TS_STARTED);
   clockTicks += idLib::sys->GetClockTicks() - start;
   if (base < 0.0) {
@@ -173,14 +173,14 @@ ID_INLINE void idTimer::Stop() {
 idTimer::Clear
 =================
 */
-ID_INLINE void idTimer::Clear() { clockTicks = 0.0; }
+inline void idTimer::Clear() { clockTicks = 0.0; }
 
 /*
 =================
 idTimer::ClockTicks
 =================
 */
-ID_INLINE double idTimer::ClockTicks() const {
+inline double idTimer::ClockTicks() const {
   assert(state == TS_STOPPED);
   return clockTicks;
 }
@@ -190,7 +190,7 @@ ID_INLINE double idTimer::ClockTicks() const {
 idTimer::Milliseconds
 =================
 */
-ID_INLINE double idTimer::Milliseconds() const {
+inline double idTimer::Milliseconds() const {
   assert(state == TS_STOPPED);
   return clockTicks / (idLib::sys->ClockTicksPerSecond() * 0.001);
 }

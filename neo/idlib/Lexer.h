@@ -305,18 +305,18 @@ class idLexer {
   int NumLinesCrossed();
 };
 
-ID_INLINE const char* idLexer::GetFileName() { return idLexer::filename; }
+inline const char* idLexer::GetFileName() { return idLexer::filename; }
 
-ID_INLINE const int idLexer::GetFileOffset() {
+inline const int idLexer::GetFileOffset() {
   return idLexer::script_p - idLexer::buffer;
 }
 
-ID_INLINE const ID_TIME_T idLexer::GetFileTime() { return idLexer::fileTime; }
+inline const ID_TIME_T idLexer::GetFileTime() { return idLexer::fileTime; }
 
-ID_INLINE const int idLexer::GetLineNum() { return idLexer::line; }
+inline const int idLexer::GetLineNum() { return idLexer::line; }
 
-ID_INLINE void idLexer::SetFlags(int flags) { idLexer::flags = flags; }
+inline void idLexer::SetFlags(int flags) { idLexer::flags = flags; }
 
-ID_INLINE int idLexer::GetFlags() { return idLexer::flags; }
+inline int idLexer::GetFlags() { return idLexer::flags; }
 
 #endif /* !__LEXER_H__ */

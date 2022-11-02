@@ -427,9 +427,8 @@ class idDxtEncoder {
 idDxtEncoder::CompressImageDXT1Fast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressImageDXT1Fast(const byte* inBuf,
-                                                   byte* outBuf, int width,
-                                                   int height) {
+inline void idDxtEncoder::CompressImageDXT1Fast(const byte* inBuf, byte* outBuf,
+                                                int width, int height) {
 #if defined(USE_INTRINSICS_SSE)
   CompressImageDXT1Fast_SSE2(inBuf, outBuf, width, height);
 #else
@@ -442,9 +441,9 @@ ID_INLINE void idDxtEncoder::CompressImageDXT1Fast(const byte* inBuf,
 idDxtEncoder::CompressImageDXT1AlphaFast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressImageDXT1AlphaFast(const byte* inBuf,
-                                                        byte* outBuf, int width,
-                                                        int height) {
+inline void idDxtEncoder::CompressImageDXT1AlphaFast(const byte* inBuf,
+                                                     byte* outBuf, int width,
+                                                     int height) {
 #if defined(USE_INTRINSICS_SSE)
   CompressImageDXT1AlphaFast_SSE2(inBuf, outBuf, width, height);
 #else
@@ -457,9 +456,8 @@ ID_INLINE void idDxtEncoder::CompressImageDXT1AlphaFast(const byte* inBuf,
 idDxtEncoder::CompressImageDXT5Fast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressImageDXT5Fast(const byte* inBuf,
-                                                   byte* outBuf, int width,
-                                                   int height) {
+inline void idDxtEncoder::CompressImageDXT5Fast(const byte* inBuf, byte* outBuf,
+                                                int width, int height) {
 #if defined(USE_INTRINSICS_SSE)
   CompressImageDXT5Fast_SSE2(inBuf, outBuf, width, height);
 #else
@@ -472,9 +470,8 @@ ID_INLINE void idDxtEncoder::CompressImageDXT5Fast(const byte* inBuf,
 idDxtEncoder::CompressImageDXN1Fast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressImageDXN1Fast(const byte* inBuf,
-                                                   byte* outBuf, int width,
-                                                   int height) {
+inline void idDxtEncoder::CompressImageDXN1Fast(const byte* inBuf, byte* outBuf,
+                                                int width, int height) {
   CompressImageDXN1Fast_Generic(inBuf, outBuf, width, height);
 }
 
@@ -483,9 +480,8 @@ ID_INLINE void idDxtEncoder::CompressImageDXN1Fast(const byte* inBuf,
 idDxtEncoder::CompressYCoCgDXT5Fast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressYCoCgDXT5Fast(const byte* inBuf,
-                                                   byte* outBuf, int width,
-                                                   int height) {
+inline void idDxtEncoder::CompressYCoCgDXT5Fast(const byte* inBuf, byte* outBuf,
+                                                int width, int height) {
 #if defined(USE_INTRINSICS_SSE)
   CompressYCoCgDXT5Fast_SSE2(inBuf, outBuf, width, height);
 #else
@@ -498,9 +494,9 @@ ID_INLINE void idDxtEncoder::CompressYCoCgDXT5Fast(const byte* inBuf,
 idDxtEncoder::CompressYCoCgCTX1DXT5AFast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressYCoCgCTX1DXT5AFast(const byte* inBuf,
-                                                        byte* outBuf, int width,
-                                                        int height) {
+inline void idDxtEncoder::CompressYCoCgCTX1DXT5AFast(const byte* inBuf,
+                                                     byte* outBuf, int width,
+                                                     int height) {
   CompressYCoCgCTX1DXT5AFast_Generic(inBuf, outBuf, width, height);
 }
 
@@ -509,9 +505,9 @@ ID_INLINE void idDxtEncoder::CompressYCoCgCTX1DXT5AFast(const byte* inBuf,
 idDxtEncoder::CompressNormalMapDXT5Fast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressNormalMapDXT5Fast(const byte* inBuf,
-                                                       byte* outBuf, int width,
-                                                       int height) {
+inline void idDxtEncoder::CompressNormalMapDXT5Fast(const byte* inBuf,
+                                                    byte* outBuf, int width,
+                                                    int height) {
 #if defined(USE_INTRINSICS_SSE)
   CompressNormalMapDXT5Fast_SSE2(inBuf, outBuf, width, height);
 #else
@@ -524,9 +520,9 @@ ID_INLINE void idDxtEncoder::CompressNormalMapDXT5Fast(const byte* inBuf,
 idDxtEncoder::CompressNormalMapDXN2Fast
 ========================
 */
-ID_INLINE void idDxtEncoder::CompressNormalMapDXN2Fast(const byte* inBuf,
-                                                       byte* outBuf, int width,
-                                                       int height) {
+inline void idDxtEncoder::CompressNormalMapDXN2Fast(const byte* inBuf,
+                                                    byte* outBuf, int width,
+                                                    int height) {
   CompressNormalMapDXN2Fast_Generic(inBuf, outBuf, width, height);
 }
 
@@ -535,7 +531,7 @@ ID_INLINE void idDxtEncoder::CompressNormalMapDXN2Fast(const byte* inBuf,
 idDxtEncoder::EmitByte
 ========================
 */
-ID_INLINE void idDxtEncoder::EmitByte(byte b) {
+inline void idDxtEncoder::EmitByte(byte b) {
   *outData = b;
   outData += 1;
 }
@@ -545,7 +541,7 @@ ID_INLINE void idDxtEncoder::EmitByte(byte b) {
 idDxtEncoder::EmitUShort
 ========================
 */
-ID_INLINE void idDxtEncoder::EmitUShort(unsigned short s) {
+inline void idDxtEncoder::EmitUShort(unsigned short s) {
   *((unsigned short*)outData) = s;
   outData += 2;
 }
@@ -555,7 +551,7 @@ ID_INLINE void idDxtEncoder::EmitUShort(unsigned short s) {
 idDxtEncoder::EmitUInt
 ========================
 */
-ID_INLINE void idDxtEncoder::EmitUInt(unsigned int i) {
+inline void idDxtEncoder::EmitUInt(unsigned int i) {
   *((unsigned int*)outData) = i;
   outData += 4;
 }
@@ -565,8 +561,8 @@ ID_INLINE void idDxtEncoder::EmitUInt(unsigned int i) {
 idDxtEncoder::AlphaDistance
 ========================
 */
-ID_INLINE unsigned int idDxtEncoder::AlphaDistance(const byte a1,
-                                                   const byte a2) const {
+inline unsigned int idDxtEncoder::AlphaDistance(const byte a1,
+                                                const byte a2) const {
   return (a1 - a2) * (a1 - a2);
 }
 
@@ -575,8 +571,8 @@ ID_INLINE unsigned int idDxtEncoder::AlphaDistance(const byte a1,
 idDxtEncoder::ColorDistance
 ========================
 */
-ID_INLINE unsigned int idDxtEncoder::ColorDistance(const byte* c1,
-                                                   const byte* c2) const {
+inline unsigned int idDxtEncoder::ColorDistance(const byte* c1,
+                                                const byte* c2) const {
   return ((c1[0] - c2[0]) * (c1[0] - c2[0])) +
          ((c1[1] - c2[1]) * (c1[1] - c2[1])) +
          ((c1[2] - c2[2]) * (c1[2] - c2[2]));
@@ -587,8 +583,8 @@ ID_INLINE unsigned int idDxtEncoder::ColorDistance(const byte* c1,
 idDxtEncoder::ColorDistanceWeighted
 ========================
 */
-ID_INLINE unsigned int idDxtEncoder::ColorDistanceWeighted(
-    const byte* c1, const byte* c2) const {
+inline unsigned int idDxtEncoder::ColorDistanceWeighted(const byte* c1,
+                                                        const byte* c2) const {
   int r, g, b;
   int rmean;
 
@@ -606,8 +602,8 @@ ID_INLINE unsigned int idDxtEncoder::ColorDistanceWeighted(
 idDxtEncoder::CTX1Distance
 ========================
 */
-ID_INLINE unsigned int idDxtEncoder::CTX1Distance(const byte* c1,
-                                                  const byte* c2) const {
+inline unsigned int idDxtEncoder::CTX1Distance(const byte* c1,
+                                               const byte* c2) const {
   return ((c1[0] - c2[0]) * (c1[0] - c2[0])) +
          ((c1[1] - c2[1]) * (c1[1] - c2[1]));
 }
@@ -617,7 +613,7 @@ ID_INLINE unsigned int idDxtEncoder::CTX1Distance(const byte* c1,
 idDxtEncoder::ColorTo565
 ========================
 */
-ID_INLINE unsigned short idDxtEncoder::ColorTo565(const byte* color) const {
+inline unsigned short idDxtEncoder::ColorTo565(const byte* color) const {
   return ((color[0] >> 3) << 11) | ((color[1] >> 2) << 5) | (color[2] >> 3);
 }
 
@@ -626,8 +622,7 @@ ID_INLINE unsigned short idDxtEncoder::ColorTo565(const byte* color) const {
 idDxtEncoder::ColorFrom565
 ========================
 */
-ID_INLINE void idDxtEncoder::ColorFrom565(unsigned short c565,
-                                          byte* color) const {
+inline void idDxtEncoder::ColorFrom565(unsigned short c565, byte* color) const {
   color[0] = byte(((c565 >> 8) & (((1 << (8 - 3)) - 1) << 3)) |
                   ((c565 >> 13) & ((1 << 3) - 1)));
   color[1] = byte(((c565 >> 3) & (((1 << (8 - 2)) - 1) << 2)) |
@@ -641,8 +636,7 @@ ID_INLINE void idDxtEncoder::ColorFrom565(unsigned short c565,
 idDxtEncoder::ColorTo565
 ========================
 */
-ID_INLINE unsigned short idDxtEncoder::ColorTo565(byte r, byte g,
-                                                  byte b) const {
+inline unsigned short idDxtEncoder::ColorTo565(byte r, byte g, byte b) const {
   return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 }
 
@@ -651,7 +645,7 @@ ID_INLINE unsigned short idDxtEncoder::ColorTo565(byte r, byte g,
 idDxtEncoder::GreenFrom565
 ========================
 */
-ID_INLINE byte idDxtEncoder::GreenFrom565(unsigned short c565) const {
+inline byte idDxtEncoder::GreenFrom565(unsigned short c565) const {
   byte c = byte((c565 & (((1 << 6) - 1) << 5)) >> 3);
   return (c | (c >> 6));
 }
@@ -754,7 +748,7 @@ class idDxtDecoder {
 idDxtDecoder::ReadByte
 ========================
 */
-ID_INLINE byte idDxtDecoder::ReadByte() {
+inline byte idDxtDecoder::ReadByte() {
   byte b = *inData;
   inData += 1;
   return b;
@@ -765,7 +759,7 @@ ID_INLINE byte idDxtDecoder::ReadByte() {
 idDxtDecoder::ReadUShort
 ========================
 */
-ID_INLINE unsigned short idDxtDecoder::ReadUShort() {
+inline unsigned short idDxtDecoder::ReadUShort() {
   unsigned short s = *((unsigned short*)inData);
   inData += 2;
   return s;
@@ -776,7 +770,7 @@ ID_INLINE unsigned short idDxtDecoder::ReadUShort() {
 idDxtDecoder::ReadUInt
 ========================
 */
-ID_INLINE unsigned int idDxtDecoder::ReadUInt() {
+inline unsigned int idDxtDecoder::ReadUInt() {
   unsigned int i = *((unsigned int*)inData);
   inData += 4;
   return i;
@@ -787,7 +781,7 @@ ID_INLINE unsigned int idDxtDecoder::ReadUInt() {
 idDxtDecoder::ColorTo565
 ========================
 */
-ID_INLINE unsigned short idDxtDecoder::ColorTo565(const byte* color) const {
+inline unsigned short idDxtDecoder::ColorTo565(const byte* color) const {
   return ((color[0] >> 3) << 11) | ((color[1] >> 2) << 5) | (color[2] >> 3);
 }
 
@@ -796,8 +790,7 @@ ID_INLINE unsigned short idDxtDecoder::ColorTo565(const byte* color) const {
 idDxtDecoder::ColorFrom565
 ========================
 */
-ID_INLINE void idDxtDecoder::ColorFrom565(unsigned short c565,
-                                          byte* color) const {
+inline void idDxtDecoder::ColorFrom565(unsigned short c565, byte* color) const {
   color[0] = byte(((c565 >> 8) & (((1 << (8 - 3)) - 1) << 3)) |
                   ((c565 >> 13) & ((1 << 3) - 1)));
   color[1] = byte(((c565 >> 3) & (((1 << (8 - 2)) - 1) << 2)) |
@@ -811,7 +804,7 @@ ID_INLINE void idDxtDecoder::ColorFrom565(unsigned short c565,
 idDxtDecoder::NormalYTo565
 ========================
 */
-ID_INLINE unsigned short idDxtDecoder::NormalYTo565(byte y) const {
+inline unsigned short idDxtDecoder::NormalYTo565(byte y) const {
   return ((y >> 2) << 5);
 }
 
@@ -820,7 +813,7 @@ ID_INLINE unsigned short idDxtDecoder::NormalYTo565(byte y) const {
 idDxtDecoder::NormalYFrom565
 ========================
 */
-ID_INLINE byte idDxtDecoder::NormalYFrom565(unsigned short c565) const {
+inline byte idDxtDecoder::NormalYFrom565(unsigned short c565) const {
   byte c = byte((c565 & (((1 << 6) - 1) << 5)) >> 3);
   return (c | (c >> 6));
 }
@@ -830,7 +823,7 @@ ID_INLINE byte idDxtDecoder::NormalYFrom565(unsigned short c565) const {
 idDxtDecoder::NormalBiasFrom565
 ========================
 */
-ID_INLINE byte idDxtDecoder::NormalBiasFrom565(unsigned short c565) const {
+inline byte idDxtDecoder::NormalBiasFrom565(unsigned short c565) const {
   byte c = byte((c565 & (((1 << 5) - 1) << 11)) >> 8);
   return (c | (c >> 5));
 }
@@ -840,7 +833,7 @@ ID_INLINE byte idDxtDecoder::NormalBiasFrom565(unsigned short c565) const {
 idDxtDecoder::NormalScaleFrom565
 ========================
 */
-ID_INLINE byte idDxtDecoder::NormalScaleFrom565(unsigned short c565) const {
+inline byte idDxtDecoder::NormalScaleFrom565(unsigned short c565) const {
   byte c = byte((c565 & (((1 << 5) - 1) << 0)) << 3);
   return (c | (c >> 5));
 }

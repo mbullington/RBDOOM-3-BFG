@@ -36,8 +36,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #ifndef __MATH_VECTORI_H__
 #define __MATH_VECTORI_H__
 
-static ID_INLINE int MinInt(int a, int b) { return (a) < (b) ? (a) : (b); }
-static ID_INLINE int MaxInt(int a, int b) { return (a) < (b) ? (b) : (a); }
+static inline int MinInt(int a, int b) { return (a) < (b) ? (a) : (b); }
+static inline int MaxInt(int a, int b) { return (a) < (b) ? (b) : (a); }
 
 class idVec2i {
  public:

@@ -2188,7 +2188,7 @@ idLCP_Square::CalcAccelDelta
 Modifies this->delta_a and uses this->delta_f.
 ========================
 */
-ID_INLINE void idLCP_Square::CalcAccelDelta(int d) {
+inline void idLCP_Square::CalcAccelDelta(int d) {
   // only the not clamped variables, including the current variable, can have a
   // change in acceleration
   for (int j = numClamped; j <= d; j++) {
@@ -2206,7 +2206,7 @@ idLCP_Square::ChangeForce
 Modifies this->f and uses this->delta_f.
 ========================
 */
-ID_INLINE void idLCP_Square::ChangeForce(int d, float step) {
+inline void idLCP_Square::ChangeForce(int d, float step) {
   // only the clamped variables and current variable have a force delta unequal
   // zero
   MultiplyAdd(f.ToFloatPtr(), step, delta_f.ToFloatPtr(), numClamped);
@@ -2220,7 +2220,7 @@ idLCP_Square::ChangeAccel
 Modifies this->a and uses this->delta_a.
 ========================
 */
-ID_INLINE void idLCP_Square::ChangeAccel(int d, float step) {
+inline void idLCP_Square::ChangeAccel(int d, float step) {
   // only the not clamped variables, including the current variable, can have an
   // acceleration unequal zero
   MultiplyAdd(a.ToFloatPtr() + numClamped, step,
@@ -2860,7 +2860,7 @@ idLCP_Symmetric::CalcForceDelta
 Modifies this->delta_f.
 ========================
 */
-ID_INLINE void idLCP_Symmetric::CalcForceDelta(int d, float dir) {
+inline void idLCP_Symmetric::CalcForceDelta(int d, float dir) {
   delta_f[d] = dir;
 
   if (numClamped == 0) {
@@ -2886,7 +2886,7 @@ idLCP_Symmetric::CalcAccelDelta
 Modifies this->delta_a and uses this->delta_f.
 ========================
 */
-ID_INLINE void idLCP_Symmetric::CalcAccelDelta(int d) {
+inline void idLCP_Symmetric::CalcAccelDelta(int d) {
   // only the not clamped variables, including the current variable, can have a
   // change in acceleration
   for (int j = numClamped; j <= d; j++) {
@@ -2904,7 +2904,7 @@ idLCP_Symmetric::ChangeForce
 Modifies this->f and uses this->delta_f.
 ========================
 */
-ID_INLINE void idLCP_Symmetric::ChangeForce(int d, float step) {
+inline void idLCP_Symmetric::ChangeForce(int d, float step) {
   // only the clamped variables and current variable have a force delta unequal
   // zero
   MultiplyAdd(f.ToFloatPtr(), step, delta_f.ToFloatPtr(), numClamped);
@@ -2918,7 +2918,7 @@ idLCP_Symmetric::ChangeAccel
 Modifies this->a and uses this->delta_a.
 ========================
 */
-ID_INLINE void idLCP_Symmetric::ChangeAccel(int d, float step) {
+inline void idLCP_Symmetric::ChangeAccel(int d, float step) {
   // only the not clamped variables, including the current variable, can have an
   // acceleration unequal zero
   MultiplyAdd(a.ToFloatPtr() + numClamped, step,

@@ -74,7 +74,7 @@ typedef unsigned short halfFloat_t;
 F16toF32
 ========================
 */
-ID_INLINE float F16toF32(halfFloat_t x) {
+inline float F16toF32(halfFloat_t x) {
   int e = HF_EXP(x);
   int m = HF_MANTISSA(x);
   int s = HF_SIGN(x);
@@ -92,7 +92,7 @@ ID_INLINE float F16toF32(halfFloat_t x) {
 F32toF16
 ========================
 */
-ID_INLINE halfFloat_t F32toF16(float a) {
+inline halfFloat_t F32toF16(float a) {
   unsigned int f = *(unsigned*)(&a);
   unsigned int signbit = (f & 0x80000000) >> 16;
   int exponent = ((f & 0x7F800000) >> 23) - 112;
@@ -161,7 +161,7 @@ class idDrawVert {
   const idVec3 GetBiTangentRaw() const;  // not re-normalized for renderbump
 
   void SetBiTangent(float x, float y, float z);
-  ID_INLINE void SetBiTangent(const idVec3& t);
+  inline void SetBiTangent(const idVec3& t);
 
   float GetBiTangentSign() const;
   byte GetBiTangentSignBit() const;
@@ -178,8 +178,8 @@ class idDrawVert {
   const halfFloat_t GetTexCoordNativeT() const;
 
   // either 1.0f or -1.0f
-  ID_INLINE void SetBiTangentSign(float sign);
-  ID_INLINE void SetBiTangentSignBit(byte bit);
+  inline void SetBiTangentSign(float sign);
+  inline void SetBiTangentSignBit(byte bit);
 
   void Lerp(const idDrawVert& a, const idDrawVert& b, const float f);
   void LerpAll(const idDrawVert& a, const idDrawVert& b, const float f);
@@ -223,8 +223,8 @@ VertexFloatToByte
 Assumes input is in the range [-1, 1]
 ========================
 */
-ID_INLINE void VertexFloatToByte(const float& x, const float& y, const float& z,
-                                 byte* bval) {
+inline void VertexFloatToByte(const float& x, const float& y, const float& z,
+                              byte* bval) {
   assert_4_byte_aligned(bval);  // for __stvebx
 
 #if defined(USE_INTRINSICS_SSE)
@@ -264,7 +264,7 @@ ID_INLINE void VertexFloatToByte(const float& x, const float& y, const float& z,
 idDrawVert::operator[]
 ========================
 */
-ID_INLINE float idDrawVert::operator[](const int index) const {
+inline float idDrawVert::operator[](const int index) const {
   assert(index >= 0 && index < 5);
   return ((float*)(&xyz))[index];
 }
@@ -274,7 +274,7 @@ ID_INLINE float idDrawVert::operator[](const int index) const {
 idDrawVert::operator[]
 ========================
 */
-ID_INLINE float& idDrawVert::operator[](const int index) {
+inline float& idDrawVert::operator[](const int index) {
   assert(index >= 0 && index < 5);
   return ((float*)(&xyz))[index];
 }
@@ -284,7 +284,7 @@ ID_INLINE float& idDrawVert::operator[](const int index) {
 idDrawVert::Clear
 ========================
 */
-ID_INLINE void idDrawVert::Clear() {
+inline void idDrawVert::Clear() {
   *reinterpret_cast<dword*>(&this->xyz.x) = 0;
   *reinterpret_cast<dword*>(&this->xyz.y) = 0;
   *reinterpret_cast<dword*>(&this->xyz.z) = 0;
@@ -300,7 +300,7 @@ ID_INLINE void idDrawVert::Clear() {
 idDrawVert::GetNormal
 ========================
 */
-ID_INLINE const idVec3 idDrawVert::GetNormal() const {
+inline const idVec3 idDrawVert::GetNormal() const {
   idVec3 n(VERTEX_BYTE_TO_FLOAT(normal[0]), VERTEX_BYTE_TO_FLOAT(normal[1]),
            VERTEX_BYTE_TO_FLOAT(normal[2]));
   n.Normalize();  // after the normal has been compressed & uncompressed, it may
@@ -313,7 +313,7 @@ ID_INLINE const idVec3 idDrawVert::GetNormal() const {
 idDrawVert::GetNormalRaw
 ========================
 */
-ID_INLINE const idVec3 idDrawVert::GetNormalRaw() const {
+inline const idVec3 idDrawVert::GetNormalRaw() const {
   idVec3 n(VERTEX_BYTE_TO_FLOAT(normal[0]), VERTEX_BYTE_TO_FLOAT(normal[1]),
            VERTEX_BYTE_TO_FLOAT(normal[2]));
   // don't re-normalize just like we do in the vertex programs
@@ -326,7 +326,7 @@ idDrawVert::SetNormal
 must be normalized already!
 ========================
 */
-ID_INLINE void idDrawVert::SetNormal(const idVec3& n) {
+inline void idDrawVert::SetNormal(const idVec3& n) {
   VertexFloatToByte(n.x, n.y, n.z, normal);
 }
 
@@ -335,7 +335,7 @@ ID_INLINE void idDrawVert::SetNormal(const idVec3& n) {
 idDrawVert::SetNormal
 ========================
 */
-ID_INLINE void idDrawVert::SetNormal(float x, float y, float z) {
+inline void idDrawVert::SetNormal(float x, float y, float z) {
   VertexFloatToByte(x, y, z, normal);
 }
 
@@ -344,7 +344,7 @@ ID_INLINE void idDrawVert::SetNormal(float x, float y, float z) {
 &idDrawVert::GetTangent
 ========================
 */
-ID_INLINE const idVec3 idDrawVert::GetTangent() const {
+inline const idVec3 idDrawVert::GetTangent() const {
   idVec3 t(VERTEX_BYTE_TO_FLOAT(tangent[0]), VERTEX_BYTE_TO_FLOAT(tangent[1]),
            VERTEX_BYTE_TO_FLOAT(tangent[2]));
   t.Normalize();
@@ -356,7 +356,7 @@ ID_INLINE const idVec3 idDrawVert::GetTangent() const {
 &idDrawVert::GetTangentRaw
 ========================
 */
-ID_INLINE const idVec3 idDrawVert::GetTangentRaw() const {
+inline const idVec3 idDrawVert::GetTangentRaw() const {
   idVec3 t(VERTEX_BYTE_TO_FLOAT(tangent[0]), VERTEX_BYTE_TO_FLOAT(tangent[1]),
            VERTEX_BYTE_TO_FLOAT(tangent[2]));
   // don't re-normalize just like we do in the vertex programs
@@ -368,7 +368,7 @@ ID_INLINE const idVec3 idDrawVert::GetTangentRaw() const {
 idDrawVert::SetTangent
 ========================
 */
-ID_INLINE void idDrawVert::SetTangent(float x, float y, float z) {
+inline void idDrawVert::SetTangent(float x, float y, float z) {
   VertexFloatToByte(x, y, z, tangent);
 }
 
@@ -377,7 +377,7 @@ ID_INLINE void idDrawVert::SetTangent(float x, float y, float z) {
 idDrawVert::SetTangent
 ========================
 */
-ID_INLINE void idDrawVert::SetTangent(const idVec3& t) {
+inline void idDrawVert::SetTangent(const idVec3& t) {
   VertexFloatToByte(t.x, t.y, t.z, tangent);
 }
 
@@ -386,7 +386,7 @@ ID_INLINE void idDrawVert::SetTangent(const idVec3& t) {
 idDrawVert::GetBiTangent
 ========================
 */
-ID_INLINE const idVec3 idDrawVert::GetBiTangent() const {
+inline const idVec3 idDrawVert::GetBiTangent() const {
   // derive from the normal, tangent, and bitangent direction flag
   idVec3 bitangent;
   bitangent.Cross(GetNormal(), GetTangent());
@@ -399,7 +399,7 @@ ID_INLINE const idVec3 idDrawVert::GetBiTangent() const {
 idDrawVert::GetBiTangentRaw
 ========================
 */
-ID_INLINE const idVec3 idDrawVert::GetBiTangentRaw() const {
+inline const idVec3 idDrawVert::GetBiTangentRaw() const {
   // derive from the normal, tangent, and bitangent direction flag
   // don't re-normalize just like we do in the vertex programs
   idVec3 bitangent;
@@ -413,7 +413,7 @@ ID_INLINE const idVec3 idDrawVert::GetBiTangentRaw() const {
 idDrawVert::SetBiTangent
 ========================
 */
-ID_INLINE void idDrawVert::SetBiTangent(float x, float y, float z) {
+inline void idDrawVert::SetBiTangent(float x, float y, float z) {
   SetBiTangent(idVec3(x, y, z));
 }
 
@@ -422,7 +422,7 @@ ID_INLINE void idDrawVert::SetBiTangent(float x, float y, float z) {
 idDrawVert::SetBiTangent
 ========================
 */
-ID_INLINE void idDrawVert::SetBiTangent(const idVec3& t) {
+inline void idDrawVert::SetBiTangent(const idVec3& t) {
   idVec3 bitangent;
   bitangent.Cross(GetNormal(), GetTangent());
   SetBiTangentSign(bitangent * t);
@@ -433,7 +433,7 @@ ID_INLINE void idDrawVert::SetBiTangent(const idVec3& t) {
 idDrawVert::GetBiTangentSign
 ========================
 */
-ID_INLINE float idDrawVert::GetBiTangentSign() const {
+inline float idDrawVert::GetBiTangentSign() const {
   return (tangent[3] < 128) ? -1.0f : 1.0f;
 }
 
@@ -442,7 +442,7 @@ ID_INLINE float idDrawVert::GetBiTangentSign() const {
 idDrawVert::GetBiTangentSignBit
 ========================
 */
-ID_INLINE byte idDrawVert::GetBiTangentSignBit() const {
+inline byte idDrawVert::GetBiTangentSignBit() const {
   return (tangent[3] < 128) ? 1 : 0;
 }
 
@@ -451,7 +451,7 @@ ID_INLINE byte idDrawVert::GetBiTangentSignBit() const {
 idDrawVert::SetBiTangentSign
 ========================
 */
-ID_INLINE void idDrawVert::SetBiTangentSign(float sign) {
+inline void idDrawVert::SetBiTangentSign(float sign) {
   tangent[3] = (sign < 0.0f) ? 0 : 255;
 }
 
@@ -460,7 +460,7 @@ ID_INLINE void idDrawVert::SetBiTangentSign(float sign) {
 idDrawVert::SetBiTangentSignBit
 ========================
 */
-ID_INLINE void idDrawVert::SetBiTangentSignBit(byte sign) {
+inline void idDrawVert::SetBiTangentSignBit(byte sign) {
   tangent[3] = sign ? 0 : 255;
 }
 
@@ -469,8 +469,8 @@ ID_INLINE void idDrawVert::SetBiTangentSignBit(byte sign) {
 idDrawVert::Lerp
 ========================
 */
-ID_INLINE void idDrawVert::Lerp(const idDrawVert& a, const idDrawVert& b,
-                                const float f) {
+inline void idDrawVert::Lerp(const idDrawVert& a, const idDrawVert& b,
+                             const float f) {
   xyz = a.xyz + f * (b.xyz - a.xyz);
   SetTexCoord(::Lerp(a.GetTexCoord(), b.GetTexCoord(), f));
 }
@@ -480,8 +480,8 @@ ID_INLINE void idDrawVert::Lerp(const idDrawVert& a, const idDrawVert& b,
 idDrawVert::LerpAll
 ========================
 */
-ID_INLINE void idDrawVert::LerpAll(const idDrawVert& a, const idDrawVert& b,
-                                   const float f) {
+inline void idDrawVert::LerpAll(const idDrawVert& a, const idDrawVert& b,
+                                const float f) {
   xyz = ::Lerp(a.xyz, b.xyz, f);
   SetTexCoord(::Lerp(a.GetTexCoord(), b.GetTexCoord(), f));
 
@@ -511,7 +511,7 @@ ID_INLINE void idDrawVert::LerpAll(const idDrawVert& a, const idDrawVert& b,
 idDrawVert::SetNativeOrderColor
 ========================
 */
-ID_INLINE void idDrawVert::SetNativeOrderColor(dword color) {
+inline void idDrawVert::SetNativeOrderColor(dword color) {
   *reinterpret_cast<dword*>(this->color) = color;
 }
 
@@ -520,7 +520,7 @@ ID_INLINE void idDrawVert::SetNativeOrderColor(dword color) {
 idDrawVert::SetColor
 ========================
 */
-ID_INLINE void idDrawVert::SetColor(dword color) {
+inline void idDrawVert::SetColor(dword color) {
   *reinterpret_cast<dword*>(this->color) = color;
 }
 
@@ -529,7 +529,7 @@ ID_INLINE void idDrawVert::SetColor(dword color) {
 idDrawVert::SetColor
 ========================
 */
-ID_INLINE dword idDrawVert::GetColor() const {
+inline dword idDrawVert::GetColor() const {
   return *reinterpret_cast<const dword*>(this->color);
 }
 
@@ -538,8 +538,8 @@ ID_INLINE dword idDrawVert::GetColor() const {
 idDrawVert::SetTexCoordNative
 ========================
 */
-ID_INLINE void idDrawVert::SetTexCoordNative(const halfFloat_t s,
-                                             const halfFloat_t t) {
+inline void idDrawVert::SetTexCoordNative(const halfFloat_t s,
+                                          const halfFloat_t t) {
   st[0] = s;
   st[1] = t;
 }
@@ -549,7 +549,7 @@ ID_INLINE void idDrawVert::SetTexCoordNative(const halfFloat_t s,
 idDrawVert::SetTexCoord
 ========================
 */
-ID_INLINE void idDrawVert::SetTexCoord(const idVec2& st) {
+inline void idDrawVert::SetTexCoord(const idVec2& st) {
   SetTexCoordS(st.x);
   SetTexCoordT(st.y);
 }
@@ -559,7 +559,7 @@ ID_INLINE void idDrawVert::SetTexCoord(const idVec2& st) {
 idDrawVert::SetTexCoord
 ========================
 */
-ID_INLINE void idDrawVert::SetTexCoord(float s, float t) {
+inline void idDrawVert::SetTexCoord(float s, float t) {
   SetTexCoordS(s);
   SetTexCoordT(t);
 }
@@ -569,21 +569,21 @@ ID_INLINE void idDrawVert::SetTexCoord(float s, float t) {
 idDrawVert::SetTexCoordS
 ========================
 */
-ID_INLINE void idDrawVert::SetTexCoordS(float s) { st[0] = F32toF16(s); }
+inline void idDrawVert::SetTexCoordS(float s) { st[0] = F32toF16(s); }
 
 /*
 ========================
 idDrawVert::SetTexCoordT
 ========================
 */
-ID_INLINE void idDrawVert::SetTexCoordT(float t) { st[1] = F32toF16(t); }
+inline void idDrawVert::SetTexCoordT(float t) { st[1] = F32toF16(t); }
 
 /*
 ========================
 idDrawVert::GetTexCoord
 ========================
 */
-ID_INLINE const idVec2 idDrawVert::GetTexCoord() const {
+inline const idVec2 idDrawVert::GetTexCoord() const {
   return idVec2(F16toF32(st[0]), F16toF32(st[1]));
 }
 
@@ -592,25 +592,21 @@ ID_INLINE const idVec2 idDrawVert::GetTexCoord() const {
 idDrawVert::GetTexCoordT
 ========================
 */
-ID_INLINE const float idDrawVert::GetTexCoordS() const {
-  return F16toF32(st[0]);
-}
+inline const float idDrawVert::GetTexCoordS() const { return F16toF32(st[0]); }
 
 /*
 ========================
 idDrawVert::GetTexCoordS
 ========================
 */
-ID_INLINE const float idDrawVert::GetTexCoordT() const {
-  return F16toF32(st[1]);
-}
+inline const float idDrawVert::GetTexCoordT() const { return F16toF32(st[1]); }
 
 /*
 ========================
 idDrawVert::GetTexCoordNativeS
 ========================
 */
-ID_INLINE const halfFloat_t idDrawVert::GetTexCoordNativeS() const {
+inline const halfFloat_t idDrawVert::GetTexCoordNativeS() const {
   return st[0];
 }
 
@@ -619,7 +615,7 @@ ID_INLINE const halfFloat_t idDrawVert::GetTexCoordNativeS() const {
 idDrawVert::GetTexCoordNativeT
 ========================
 */
-ID_INLINE const halfFloat_t idDrawVert::GetTexCoordNativeT() const {
+inline const halfFloat_t idDrawVert::GetTexCoordNativeT() const {
   return st[1];
 }
 
@@ -628,7 +624,7 @@ ID_INLINE const halfFloat_t idDrawVert::GetTexCoordNativeT() const {
 idDrawVert::SetNativeOrderColor2
 ========================
 */
-ID_INLINE void idDrawVert::SetNativeOrderColor2(dword color2) {
+inline void idDrawVert::SetNativeOrderColor2(dword color2) {
   *reinterpret_cast<dword*>(this->color2) = color2;
 }
 
@@ -637,7 +633,7 @@ ID_INLINE void idDrawVert::SetNativeOrderColor2(dword color2) {
 idDrawVert::SetColor
 ========================
 */
-ID_INLINE void idDrawVert::SetColor2(dword color2) {
+inline void idDrawVert::SetColor2(dword color2) {
   *reinterpret_cast<dword*>(this->color2) = color2;
 }
 
@@ -646,7 +642,7 @@ ID_INLINE void idDrawVert::SetColor2(dword color2) {
 idDrawVert::ClearColor2
 ========================
 */
-ID_INLINE void idDrawVert::ClearColor2() {
+inline void idDrawVert::ClearColor2() {
   *reinterpret_cast<dword*>(this->color2) = 0x80808080;
 }
 
@@ -655,7 +651,7 @@ ID_INLINE void idDrawVert::ClearColor2() {
 idDrawVert::GetColor2
 ========================
 */
-ID_INLINE dword idDrawVert::GetColor2() const {
+inline dword idDrawVert::GetColor2() const {
   return *reinterpret_cast<const dword*>(this->color2);
 }
 
@@ -667,8 +663,8 @@ Use 16-byte in-order SIMD writes because the destVerts may live in
 write-combined memory
 ========================
 */
-ID_INLINE void WriteDrawVerts16(idDrawVert* destVerts,
-                                const idDrawVert* localVerts, int numVerts) {
+inline void WriteDrawVerts16(idDrawVert* destVerts,
+                             const idDrawVert* localVerts, int numVerts) {
   assert_sizeof(idDrawVert, 32);
   assert_16_byte_aligned(destVerts);
   assert_16_byte_aligned(localVerts);
@@ -694,8 +690,8 @@ ID_INLINE void WriteDrawVerts16(idDrawVert* destVerts,
 idDrawVert::GetSkinnedDrawVert
 =====================
 */
-ID_INLINE idDrawVert idDrawVert::GetSkinnedDrawVert(const idDrawVert& vert,
-                                                    const idJointMat* joints) {
+inline idDrawVert idDrawVert::GetSkinnedDrawVert(const idDrawVert& vert,
+                                                 const idJointMat* joints) {
   if (joints == NULL) {
     return vert;
   }
@@ -735,8 +731,8 @@ ID_INLINE idDrawVert idDrawVert::GetSkinnedDrawVert(const idDrawVert& vert,
 idDrawVert::GetSkinnedDrawVertPosition
 =====================
 */
-ID_INLINE idVec3 idDrawVert::GetSkinnedDrawVertPosition(
-    const idDrawVert& vert, const idJointMat* joints) {
+inline idVec3 idDrawVert::GetSkinnedDrawVertPosition(const idDrawVert& vert,
+                                                     const idJointMat* joints) {
   if (joints == NULL) {
     return vert.xyz;
   }
@@ -778,7 +774,7 @@ class idShadowVert {
 
 assert_offsetof(idShadowVert, xyzw, SHADOWVERT_XYZW_OFFSET);
 
-ID_INLINE void idShadowVert::Clear() { xyzw.Zero(); }
+inline void idShadowVert::Clear() { xyzw.Zero(); }
 
 /*
 ===============================================================================
@@ -805,6 +801,6 @@ assert_offsetof(idShadowVertSkinned, xyzw, SHADOWVERTSKINNED_XYZW_OFFSET);
 assert_offsetof(idShadowVertSkinned, color, SHADOWVERTSKINNED_COLOR_OFFSET);
 assert_offsetof(idShadowVertSkinned, color2, SHADOWVERTSKINNED_COLOR2_OFFSET);
 
-ID_INLINE void idShadowVertSkinned::Clear() { xyzw.Zero(); }
+inline void idShadowVertSkinned::Clear() { xyzw.Zero(); }
 
 #endif /* !__DRAWVERT_H__ */

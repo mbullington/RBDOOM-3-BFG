@@ -105,19 +105,18 @@ class idPluecker {
 extern idPluecker pluecker_origin;
 #define pluecker_zero pluecker_origin
 
-ID_INLINE idPluecker::idPluecker() {}
+inline idPluecker::idPluecker() {}
 
-ID_INLINE idPluecker::idPluecker(const float* a) {
+inline idPluecker::idPluecker(const float* a) {
   memcpy(p, a, 6 * sizeof(float));
 }
 
-ID_INLINE idPluecker::idPluecker(const idVec3& start, const idVec3& end) {
+inline idPluecker::idPluecker(const idVec3& start, const idVec3& end) {
   FromLine(start, end);
 }
 
-ID_INLINE idPluecker::idPluecker(const float a1, const float a2, const float a3,
-                                 const float a4, const float a5,
-                                 const float a6) {
+inline idPluecker::idPluecker(const float a1, const float a2, const float a3,
+                              const float a4, const float a5, const float a6) {
   p[0] = a1;
   p[1] = a2;
   p[2] = a3;
@@ -126,26 +125,24 @@ ID_INLINE idPluecker::idPluecker(const float a1, const float a2, const float a3,
   p[5] = a6;
 }
 
-ID_INLINE idPluecker idPluecker::operator-() const {
+inline idPluecker idPluecker::operator-() const {
   return idPluecker(-p[0], -p[1], -p[2], -p[3], -p[4], -p[5]);
 }
 
-ID_INLINE float idPluecker::operator[](const int index) const {
-  return p[index];
-}
+inline float idPluecker::operator[](const int index) const { return p[index]; }
 
-ID_INLINE float& idPluecker::operator[](const int index) { return p[index]; }
+inline float& idPluecker::operator[](const int index) { return p[index]; }
 
-ID_INLINE idPluecker idPluecker::operator*(const float a) const {
+inline idPluecker idPluecker::operator*(const float a) const {
   return idPluecker(p[0] * a, p[1] * a, p[2] * a, p[3] * a, p[4] * a, p[5] * a);
 }
 
-ID_INLINE float idPluecker::operator*(const idPluecker& a) const {
+inline float idPluecker::operator*(const idPluecker& a) const {
   return p[0] * a.p[4] + p[1] * a.p[5] + p[2] * a.p[3] + p[4] * a.p[0] +
          p[5] * a.p[1] + p[3] * a.p[2];
 }
 
-ID_INLINE idPluecker idPluecker::operator/(const float a) const {
+inline idPluecker idPluecker::operator/(const float a) const {
   float inva;
 
   assert(a != 0.0f);
@@ -154,17 +151,17 @@ ID_INLINE idPluecker idPluecker::operator/(const float a) const {
                     p[4] * inva, p[5] * inva);
 }
 
-ID_INLINE idPluecker idPluecker::operator+(const idPluecker& a) const {
+inline idPluecker idPluecker::operator+(const idPluecker& a) const {
   return idPluecker(p[0] + a[0], p[1] + a[1], p[2] + a[2], p[3] + a[3],
                     p[4] + a[4], p[5] + a[5]);
 }
 
-ID_INLINE idPluecker idPluecker::operator-(const idPluecker& a) const {
+inline idPluecker idPluecker::operator-(const idPluecker& a) const {
   return idPluecker(p[0] - a[0], p[1] - a[1], p[2] - a[2], p[3] - a[3],
                     p[4] - a[4], p[5] - a[5]);
 }
 
-ID_INLINE idPluecker& idPluecker::operator*=(const float a) {
+inline idPluecker& idPluecker::operator*=(const float a) {
   p[0] *= a;
   p[1] *= a;
   p[2] *= a;
@@ -174,7 +171,7 @@ ID_INLINE idPluecker& idPluecker::operator*=(const float a) {
   return *this;
 }
 
-ID_INLINE idPluecker& idPluecker::operator/=(const float a) {
+inline idPluecker& idPluecker::operator/=(const float a) {
   float inva;
 
   assert(a != 0.0f);
@@ -188,7 +185,7 @@ ID_INLINE idPluecker& idPluecker::operator/=(const float a) {
   return *this;
 }
 
-ID_INLINE idPluecker& idPluecker::operator+=(const idPluecker& a) {
+inline idPluecker& idPluecker::operator+=(const idPluecker& a) {
   p[0] += a[0];
   p[1] += a[1];
   p[2] += a[2];
@@ -198,7 +195,7 @@ ID_INLINE idPluecker& idPluecker::operator+=(const idPluecker& a) {
   return *this;
 }
 
-ID_INLINE idPluecker& idPluecker::operator-=(const idPluecker& a) {
+inline idPluecker& idPluecker::operator-=(const idPluecker& a) {
   p[0] -= a[0];
   p[1] -= a[1];
   p[2] -= a[2];
@@ -208,13 +205,13 @@ ID_INLINE idPluecker& idPluecker::operator-=(const idPluecker& a) {
   return *this;
 }
 
-ID_INLINE bool idPluecker::Compare(const idPluecker& a) const {
+inline bool idPluecker::Compare(const idPluecker& a) const {
   return ((p[0] == a[0]) && (p[1] == a[1]) && (p[2] == a[2]) &&
           (p[3] == a[3]) && (p[4] == a[4]) && (p[5] == a[5]));
 }
 
-ID_INLINE bool idPluecker::Compare(const idPluecker& a,
-                                   const float epsilon) const {
+inline bool idPluecker::Compare(const idPluecker& a,
+                                const float epsilon) const {
   if (idMath::Fabs(p[0] - a[0]) > epsilon) {
     return false;
   }
@@ -242,16 +239,16 @@ ID_INLINE bool idPluecker::Compare(const idPluecker& a,
   return true;
 }
 
-ID_INLINE bool idPluecker::operator==(const idPluecker& a) const {
+inline bool idPluecker::operator==(const idPluecker& a) const {
   return Compare(a);
 }
 
-ID_INLINE bool idPluecker::operator!=(const idPluecker& a) const {
+inline bool idPluecker::operator!=(const idPluecker& a) const {
   return !Compare(a);
 }
 
-ID_INLINE void idPluecker::Set(const float a1, const float a2, const float a3,
-                               const float a4, const float a5, const float a6) {
+inline void idPluecker::Set(const float a1, const float a2, const float a3,
+                            const float a4, const float a5, const float a6) {
   p[0] = a1;
   p[1] = a2;
   p[2] = a3;
@@ -260,11 +257,11 @@ ID_INLINE void idPluecker::Set(const float a1, const float a2, const float a3,
   p[5] = a6;
 }
 
-ID_INLINE void idPluecker::Zero() {
+inline void idPluecker::Zero() {
   p[0] = p[1] = p[2] = p[3] = p[4] = p[5] = 0.0f;
 }
 
-ID_INLINE void idPluecker::FromLine(const idVec3& start, const idVec3& end) {
+inline void idPluecker::FromLine(const idVec3& start, const idVec3& end) {
   p[0] = start[0] * end[1] - end[0] * start[1];
   p[1] = start[0] * end[2] - end[0] * start[2];
   p[2] = start[0] - end[0];
@@ -273,7 +270,7 @@ ID_INLINE void idPluecker::FromLine(const idVec3& start, const idVec3& end) {
   p[5] = end[1] - start[1];
 }
 
-ID_INLINE void idPluecker::FromRay(const idVec3& start, const idVec3& dir) {
+inline void idPluecker::FromRay(const idVec3& start, const idVec3& dir) {
   p[0] = start[0] * dir[1] - dir[0] * start[1];
   p[1] = start[0] * dir[2] - dir[0] * start[2];
   p[2] = -dir[0];
@@ -282,7 +279,7 @@ ID_INLINE void idPluecker::FromRay(const idVec3& start, const idVec3& dir) {
   p[5] = dir[1];
 }
 
-ID_INLINE bool idPluecker::ToLine(idVec3& start, idVec3& end) const {
+inline bool idPluecker::ToLine(idVec3& start, idVec3& end) const {
   idVec3 dir1, dir2;
   float d;
 
@@ -304,7 +301,7 @@ ID_INLINE bool idPluecker::ToLine(idVec3& start, idVec3& end) const {
   return true;
 }
 
-ID_INLINE bool idPluecker::ToRay(idVec3& start, idVec3& dir) const {
+inline bool idPluecker::ToRay(idVec3& start, idVec3& dir) const {
   idVec3 dir1;
   float d;
 
@@ -325,26 +322,26 @@ ID_INLINE bool idPluecker::ToRay(idVec3& start, idVec3& dir) const {
   return true;
 }
 
-ID_INLINE void idPluecker::ToDir(idVec3& dir) const {
+inline void idPluecker::ToDir(idVec3& dir) const {
   dir[0] = -p[2];
   dir[1] = p[5];
   dir[2] = -p[4];
 }
 
-ID_INLINE float idPluecker::PermutedInnerProduct(const idPluecker& a) const {
+inline float idPluecker::PermutedInnerProduct(const idPluecker& a) const {
   return p[0] * a.p[4] + p[1] * a.p[5] + p[2] * a.p[3] + p[4] * a.p[0] +
          p[5] * a.p[1] + p[3] * a.p[2];
 }
 
-ID_INLINE float idPluecker::Length() const {
+inline float idPluecker::Length() const {
   return (float)idMath::Sqrt(p[5] * p[5] + p[4] * p[4] + p[2] * p[2]);
 }
 
-ID_INLINE float idPluecker::LengthSqr() const {
+inline float idPluecker::LengthSqr() const {
   return (p[5] * p[5] + p[4] * p[4] + p[2] * p[2]);
 }
 
-ID_INLINE float idPluecker::NormalizeSelf() {
+inline float idPluecker::NormalizeSelf() {
   float l, d;
 
   l = LengthSqr();
@@ -361,7 +358,7 @@ ID_INLINE float idPluecker::NormalizeSelf() {
   return d * l;
 }
 
-ID_INLINE idPluecker idPluecker::Normalize() const {
+inline idPluecker idPluecker::Normalize() const {
   float d;
 
   d = LengthSqr();
@@ -372,10 +369,10 @@ ID_INLINE idPluecker idPluecker::Normalize() const {
   return idPluecker(p[0] * d, p[1] * d, p[2] * d, p[3] * d, p[4] * d, p[5] * d);
 }
 
-ID_INLINE int idPluecker::GetDimension() const { return 6; }
+inline int idPluecker::GetDimension() const { return 6; }
 
-ID_INLINE const float* idPluecker::ToFloatPtr() const { return p; }
+inline const float* idPluecker::ToFloatPtr() const { return p; }
 
-ID_INLINE float* idPluecker::ToFloatPtr() { return p; }
+inline float* idPluecker::ToFloatPtr() { return p; }
 
 #endif /* !__MATH_PLUECKER_H__ */

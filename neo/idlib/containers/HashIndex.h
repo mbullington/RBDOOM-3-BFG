@@ -129,7 +129,7 @@ class idHashIndex {
 idHashIndex::idHashIndex
 ================
 */
-ID_INLINE idHashIndex::idHashIndex() {
+inline idHashIndex::idHashIndex() {
   Init(DEFAULT_HASH_SIZE, DEFAULT_HASH_SIZE);
 }
 
@@ -138,8 +138,8 @@ ID_INLINE idHashIndex::idHashIndex() {
 idHashIndex::idHashIndex
 ================
 */
-ID_INLINE idHashIndex::idHashIndex(const int initialHashSize,
-                                   const int initialIndexSize) {
+inline idHashIndex::idHashIndex(const int initialHashSize,
+                                const int initialIndexSize) {
   Init(initialHashSize, initialIndexSize);
 }
 
@@ -148,14 +148,14 @@ ID_INLINE idHashIndex::idHashIndex(const int initialHashSize,
 idHashIndex::~idHashIndex
 ================
 */
-ID_INLINE idHashIndex::~idHashIndex() { Free(); }
+inline idHashIndex::~idHashIndex() { Free(); }
 
 /*
 ================
 idHashIndex::Allocated
 ================
 */
-ID_INLINE size_t idHashIndex::Allocated() const {
+inline size_t idHashIndex::Allocated() const {
   return hashSize * sizeof(int) + indexSize * sizeof(int);
 }
 
@@ -164,16 +164,14 @@ ID_INLINE size_t idHashIndex::Allocated() const {
 idHashIndex::Size
 ================
 */
-ID_INLINE size_t idHashIndex::Size() const {
-  return sizeof(*this) + Allocated();
-}
+inline size_t idHashIndex::Size() const { return sizeof(*this) + Allocated(); }
 
 /*
 ================
 idHashIndex::operator=
 ================
 */
-ID_INLINE idHashIndex& idHashIndex::operator=(const idHashIndex& other) {
+inline idHashIndex& idHashIndex::operator=(const idHashIndex& other) {
   granularity = other.granularity;
   hashMask = other.hashMask;
   lookupMask = other.lookupMask;
@@ -209,7 +207,7 @@ ID_INLINE idHashIndex& idHashIndex::operator=(const idHashIndex& other) {
 idHashIndex::Add
 ================
 */
-ID_INLINE void idHashIndex::Add(const int key, const int index) {
+inline void idHashIndex::Add(const int key, const int index) {
   int h;
 
   assert(index >= 0);
@@ -228,7 +226,7 @@ ID_INLINE void idHashIndex::Add(const int key, const int index) {
 idHashIndex::Remove
 ================
 */
-ID_INLINE void idHashIndex::Remove(const int key, const int index) {
+inline void idHashIndex::Remove(const int key, const int index) {
   int k = key & hashMask;
 
   if (hash == INVALID_INDEX) {
@@ -252,7 +250,7 @@ ID_INLINE void idHashIndex::Remove(const int key, const int index) {
 idHashIndex::First
 ================
 */
-ID_INLINE int idHashIndex::First(const int key) const {
+inline int idHashIndex::First(const int key) const {
   return hash[key & hashMask & lookupMask];
 }
 
@@ -261,7 +259,7 @@ ID_INLINE int idHashIndex::First(const int key) const {
 idHashIndex::Next
 ================
 */
-ID_INLINE int idHashIndex::Next(const int index) const {
+inline int idHashIndex::Next(const int index) const {
   assert(index >= 0 && index < indexSize);
   return indexChain[index & lookupMask];
 }
@@ -271,7 +269,7 @@ ID_INLINE int idHashIndex::Next(const int index) const {
 idHashIndex::InsertIndex
 ================
 */
-ID_INLINE void idHashIndex::InsertIndex(const int key, const int index) {
+inline void idHashIndex::InsertIndex(const int key, const int index) {
   int i, max;
 
   if (hash != INVALID_INDEX) {
@@ -308,7 +306,7 @@ ID_INLINE void idHashIndex::InsertIndex(const int key, const int index) {
 idHashIndex::RemoveIndex
 ================
 */
-ID_INLINE void idHashIndex::RemoveIndex(const int key, const int index) {
+inline void idHashIndex::RemoveIndex(const int key, const int index) {
   int i, max;
 
   Remove(key, index);
@@ -342,7 +340,7 @@ ID_INLINE void idHashIndex::RemoveIndex(const int key, const int index) {
 idHashIndex::Clear
 ================
 */
-ID_INLINE void idHashIndex::Clear() {
+inline void idHashIndex::Clear() {
   // only clear the hash table because clearing the indexChain is not really
   // needed
   if (hash != INVALID_INDEX) {
@@ -355,8 +353,7 @@ ID_INLINE void idHashIndex::Clear() {
 idHashIndex::Clear
 ================
 */
-ID_INLINE void idHashIndex::Clear(const int newHashSize,
-                                  const int newIndexSize) {
+inline void idHashIndex::Clear(const int newHashSize, const int newIndexSize) {
   Free();
   hashSize = newHashSize;
   indexSize = newIndexSize;
@@ -367,21 +364,21 @@ ID_INLINE void idHashIndex::Clear(const int newHashSize,
 idHashIndex::GetHashSize
 ================
 */
-ID_INLINE int idHashIndex::GetHashSize() const { return hashSize; }
+inline int idHashIndex::GetHashSize() const { return hashSize; }
 
 /*
 ================
 idHashIndex::GetIndexSize
 ================
 */
-ID_INLINE int idHashIndex::GetIndexSize() const { return indexSize; }
+inline int idHashIndex::GetIndexSize() const { return indexSize; }
 
 /*
 ================
 idHashIndex::SetGranularity
 ================
 */
-ID_INLINE void idHashIndex::SetGranularity(const int newGranularity) {
+inline void idHashIndex::SetGranularity(const int newGranularity) {
   assert(newGranularity > 0);
   granularity = newGranularity;
 }
@@ -391,8 +388,8 @@ ID_INLINE void idHashIndex::SetGranularity(const int newGranularity) {
 idHashIndex::GenerateKey
 ================
 */
-ID_INLINE int idHashIndex::GenerateKey(const char* string,
-                                       bool caseSensitive) const {
+inline int idHashIndex::GenerateKey(const char* string,
+                                    bool caseSensitive) const {
   if (caseSensitive) {
     return (idStr::Hash(string) & hashMask);
   } else {
@@ -405,7 +402,7 @@ ID_INLINE int idHashIndex::GenerateKey(const char* string,
 idHashIndex::GenerateKey
 ================
 */
-ID_INLINE int idHashIndex::GenerateKey(const idVec3& v) const {
+inline int idHashIndex::GenerateKey(const idVec3& v) const {
   return ((((int)v[0]) + ((int)v[1]) + ((int)v[2])) & hashMask);
 }
 
@@ -414,7 +411,7 @@ ID_INLINE int idHashIndex::GenerateKey(const idVec3& v) const {
 idHashIndex::GenerateKey
 ================
 */
-ID_INLINE int idHashIndex::GenerateKey(const int n1, const int n2) const {
+inline int idHashIndex::GenerateKey(const int n1, const int n2) const {
   return ((n1 + n2) & hashMask);
 }
 
@@ -423,8 +420,6 @@ ID_INLINE int idHashIndex::GenerateKey(const int n1, const int n2) const {
 idHashIndex::GenerateKey
 ================
 */
-ID_INLINE int idHashIndex::GenerateKey(const int n) const {
-  return n & hashMask;
-}
+inline int idHashIndex::GenerateKey(const int n) const { return n & hashMask; }
 
 #endif /* !__HASHINDEX_H__ */

@@ -68,29 +68,8 @@ If you have questions concerning this license or the applicable additional terms
 	#define PATHSEPARATOR_CHAR				'\\'
 	#define NEWLINE							"\r\n"
 
-	#define ID_INLINE						inline
-	#ifdef _MSC_VER
-		#define ID_FORCE_INLINE					__forceinline
-	#else
-		// DG: this should at least work with GCC/MinGW, probably with clang as well..
-		#define ID_FORCE_INLINE					inline // TODO: always_inline?
-		// DG end
-	#endif
-	// lint complains that extern used with definition is a hazard, but it
-	// has the benefit (?) of making it illegal to take the address of the function
-	#ifdef _lint
-		#define ID_INLINE_EXTERN				inline
-		#define ID_FORCE_INLINE_EXTERN			__forceinline
-	#else
-		#define ID_INLINE_EXTERN				extern inline
-		#ifdef _MSC_VER
-			#define ID_FORCE_INLINE_EXTERN			extern __forceinline
-		#else
-			// DG: GCC/MinGW, probably clang
-			#define ID_FORCE_INLINE_EXTERN			extern inline // TODO: always_inline ?
-			// DG end
-		#endif
-	#endif
+	#define ID_FORCE_INLINE					__forceinline
+	#define ID_FORCE_INLINE_EXTERN			extern __forceinline
 
 	// DG: #pragma hdrstop is only available on MSVC, so make sure it doesn't cause compiler warnings on other compilers..
 	#ifdef _MSC_VER
@@ -154,17 +133,8 @@ If you have questions concerning this license or the applicable additional terms
 	#define PATHSEPARATOR_CHAR				'/'
 	#define NEWLINE							"\n"
 
-	#define ID_INLINE						inline
-
-	// DG: this should at least work with GCC/MinGW, probably with clang as well..
-	#define ID_FORCE_INLINE					inline // TODO: always_inline?
-	// DG end
-
-	#define ID_INLINE_EXTERN				extern inline
-
-	// DG: GCC/MinGW, probably clang
-	#define ID_FORCE_INLINE_EXTERN			extern inline // TODO: always_inline ?
-	// DG end
+	#define ID_FORCE_INLINE					__attribute__((always_inline)) inline
+	#define ID_FORCE_INLINE_EXTERN			extern __attribute__((always_inline)) inline
 
 	#define ID_HDRSTOP
 	#define CALLBACK

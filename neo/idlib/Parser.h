@@ -267,7 +267,7 @@ class idParser {
   int ReadDollarDirective();
 };
 
-ID_INLINE const char* idParser::GetFileName() const {
+inline const char* idParser::GetFileName() const {
   if (idParser::scriptstack) {
     return idParser::scriptstack->GetFileName();
   } else {
@@ -275,7 +275,7 @@ ID_INLINE const char* idParser::GetFileName() const {
   }
 }
 
-ID_INLINE const int idParser::GetFileOffset() const {
+inline const int idParser::GetFileOffset() const {
   if (idParser::scriptstack) {
     return idParser::scriptstack->GetFileOffset();
   } else {
@@ -283,7 +283,7 @@ ID_INLINE const int idParser::GetFileOffset() const {
   }
 }
 
-ID_INLINE const ID_TIME_T idParser::GetFileTime() const {
+inline const ID_TIME_T idParser::GetFileTime() const {
   if (idParser::scriptstack) {
     return idParser::scriptstack->GetFileTime();
   } else {
@@ -291,7 +291,7 @@ ID_INLINE const ID_TIME_T idParser::GetFileTime() const {
   }
 }
 
-ID_INLINE const int idParser::GetLineNum() const {
+inline const int idParser::GetLineNum() const {
   if (idParser::scriptstack) {
     return idParser::scriptstack->GetLineNum();
   } else {

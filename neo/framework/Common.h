@@ -53,23 +53,23 @@ extern int64 com_engineHz_numerator;
 extern int64 com_engineHz_denominator;
 
 // Returns the msec the frame starts on
-ID_INLINE int FRAME_TO_MSEC(int64 frame) {
+inline int FRAME_TO_MSEC(int64 frame) {
   return (int)((frame * com_engineHz_numerator) / com_engineHz_denominator);
 }
 // Rounds DOWN to the nearest frame
-ID_INLINE int MSEC_TO_FRAME_FLOOR(int msec) {
+inline int MSEC_TO_FRAME_FLOOR(int msec) {
   return (int)((((int64)msec * com_engineHz_denominator) +
                 (com_engineHz_denominator - 1)) /
                com_engineHz_numerator);
 }
 // Rounds UP to the nearest frame
-ID_INLINE int MSEC_TO_FRAME_CEIL(int msec) {
+inline int MSEC_TO_FRAME_CEIL(int msec) {
   return (int)((((int64)msec * com_engineHz_denominator) +
                 (com_engineHz_numerator - 1)) /
                com_engineHz_numerator);
 }
 // Aligns msec so it starts on a frame bondary
-ID_INLINE int MSEC_ALIGN_TO_FRAME(int msec) {
+inline int MSEC_ALIGN_TO_FRAME(int msec) {
   return FRAME_TO_MSEC(MSEC_TO_FRAME_CEIL(msec));
 }
 
@@ -86,11 +86,11 @@ class idMatchParameters;
 
 struct lobbyConnectInfo_t;
 
-ID_INLINE void BeginProfileNamedEventColor(
+inline void BeginProfileNamedEventColor(
     uint32 color, VERIFY_FORMAT_STRING const char* szName) {}
-ID_INLINE void EndProfileNamedEvent() {}
+inline void EndProfileNamedEvent() {}
 
-ID_INLINE void BeginProfileNamedEvent(VERIFY_FORMAT_STRING const char* szName) {
+inline void BeginProfileNamedEvent(VERIFY_FORMAT_STRING const char* szName) {
   BeginProfileNamedEventColor((uint32)0xFF00FF00, szName);
 }
 
@@ -103,9 +103,9 @@ class idScopedProfileEvent {
 #define SCOPED_PROFILE_EVENT(x) \
   idScopedProfileEvent scopedProfileEvent_##__LINE__(x)
 
-ID_INLINE bool BeginTraceRecording(const char* szName) { return false; }
+inline bool BeginTraceRecording(const char* szName) { return false; }
 
-ID_INLINE bool EndTraceRecording() { return false; }
+inline bool EndTraceRecording() { return false; }
 
 typedef enum {
   EDITOR_NONE = 0,
@@ -203,9 +203,9 @@ class idCommon {
   // DG end
 
   virtual void UpdateLevelLoadPacifier() = 0;
-  // virtual void				UpdateLevelLoadPacifier( int mProgress
-  // ) = 0; virtual void				UpdateLevelLoadPacifier(
-  // bool updateSecondary ) = 0; virtual void
+  // virtual void				UpdateLevelLoadPacifier( int
+  // mProgress ) = 0; virtual void
+  // UpdateLevelLoadPacifier( bool updateSecondary ) = 0; virtual void
   // UpdateLevelLoadPacifier( bool updateSecondary, int Progress ) = 0;
 
   // Checks for and removes command line "+set var arg" constructs.

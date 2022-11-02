@@ -109,7 +109,7 @@ class idSWFBitStream {
 idSWFBitStream::ResetBits
 ========================
 */
-ID_INLINE void idSWFBitStream::ResetBits() {
+inline void idSWFBitStream::ResetBits() {
   currentBit = 0;
   currentByte = 0;
 }
@@ -130,43 +130,43 @@ void idSWFBitStream::ReadLittle(T& val) {
 Wrappers for the most basic types
 ========================
 */
-ID_INLINE bool idSWFBitStream::ReadBool() { return (ReadU(1) != 0); }
-ID_INLINE uint8 idSWFBitStream::ReadU8() {
+inline bool idSWFBitStream::ReadBool() { return (ReadU(1) != 0); }
+inline uint8 idSWFBitStream::ReadU8() {
   ResetBits();
   return *readp++;
 }
-ID_INLINE uint16 idSWFBitStream::ReadU16() {
+inline uint16 idSWFBitStream::ReadU16() {
   ResetBits();
   readp += 2;
   return (readp[-2] | (readp[-1] << 8));
 }
-ID_INLINE uint32 idSWFBitStream::ReadU32() {
+inline uint32 idSWFBitStream::ReadU32() {
   ResetBits();
   readp += 4;
   return (readp[-4] | (readp[-3] << 8) | (readp[-2] << 16) | (readp[-1] << 24));
 }
-ID_INLINE int16 idSWFBitStream::ReadS16() {
+inline int16 idSWFBitStream::ReadS16() {
   ResetBits();
   readp += 2;
   return (readp[-2] | (readp[-1] << 8));
 }
-ID_INLINE int32 idSWFBitStream::ReadS32() {
+inline int32 idSWFBitStream::ReadS32() {
   ResetBits();
   readp += 4;
   return (readp[-4] | (readp[-3] << 8) | (readp[-2] << 16) | (readp[-1] << 24));
 }
-ID_INLINE float idSWFBitStream::ReadFixed8() {
+inline float idSWFBitStream::ReadFixed8() {
   ResetBits();
   readp += 2;
   return SWFFIXED8((readp[-2] | (readp[-1] << 8)));
 }
-ID_INLINE float idSWFBitStream::ReadFixed16() {
+inline float idSWFBitStream::ReadFixed16() {
   ResetBits();
   readp += 4;
   return SWFFIXED16(
       (readp[-4] | (readp[-3] << 8) | (readp[-2] << 16) | (readp[-1] << 24)));
 }
-ID_INLINE float idSWFBitStream::ReadFloat() {
+inline float idSWFBitStream::ReadFloat() {
   ResetBits();
   readp += 4;
   uint32 i =
@@ -174,7 +174,7 @@ ID_INLINE float idSWFBitStream::ReadFloat() {
   return (float&)i;
 }
 
-ID_INLINE double idSWFBitStream::ReadDouble() {
+inline double idSWFBitStream::ReadDouble() {
   const byte* swfIsRetarded = ReadData(8);
   byte buffer[8];
   buffer[0] = swfIsRetarded[4];

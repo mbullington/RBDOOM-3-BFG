@@ -72,7 +72,7 @@ class idSurface_SweptSpline : public idSurface {
 idSurface_SweptSpline::idSurface_SweptSpline
 ====================
 */
-ID_INLINE idSurface_SweptSpline::idSurface_SweptSpline() {
+inline idSurface_SweptSpline::idSurface_SweptSpline() {
   spline = NULL;
   sweptSpline = NULL;
 }
@@ -82,7 +82,7 @@ ID_INLINE idSurface_SweptSpline::idSurface_SweptSpline() {
 idSurface_SweptSpline::~idSurface_SweptSpline
 ====================
 */
-ID_INLINE idSurface_SweptSpline::~idSurface_SweptSpline() {
+inline idSurface_SweptSpline::~idSurface_SweptSpline() {
   delete spline;
   delete sweptSpline;
 }
@@ -92,7 +92,7 @@ ID_INLINE idSurface_SweptSpline::~idSurface_SweptSpline() {
 idSurface_SweptSpline::Clear
 ====================
 */
-ID_INLINE void idSurface_SweptSpline::Clear() {
+inline void idSurface_SweptSpline::Clear() {
   idSurface::Clear();
   delete spline;
   spline = NULL;

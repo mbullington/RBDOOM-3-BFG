@@ -249,8 +249,9 @@ class idSerializer {
       msg->ReadString(s, bufferSize);
     }
   }
-  // void	SerializeString( idAtomicString & s )		{ SanityCheck(); if (
-  // writing ) { msg->WriteString(s); } else { idStr temp; msg->ReadString( temp
+  // void	SerializeString( idAtomicString & s )		{ SanityCheck(); if
+  // ( writing ) { msg->WriteString(s); } else { idStr temp; msg->ReadString(
+  // temp
   // ); s.Set( temp ); } }
   void SerializeString(idStr& s) {
     SanityCheck();
@@ -260,8 +261,8 @@ class idSerializer {
       msg->ReadString(s);
     }
   }
-  // void	SerializeString( idStrId & s )				{ SanityCheck(); if (
-  // writing ) { msg->WriteString(s.GetKey()); } else { idStr key;
+  // void	SerializeString( idStrId & s )				{ SanityCheck(); if
+  // ( writing ) { msg->WriteString(s.GetKey()); } else { idStr key;
   // msg->ReadString( key ); s.Set( key );} }
 
   void SerializeDelta(int32& value, const int32& base) {
@@ -469,8 +470,9 @@ class idSerializer {
   //			degrees_t d( value.Get() * idMath::M_RAD2DEG );
   //			Serialize( d );
   //			if ( !writing ) {
-  //				// if reading, get the value we read in degrees and convert
-  //back to radians 				value.Set( d.Get() * idMath::M_DEG2RAD );
+  //				// if reading, get the value we read in degrees and
+  //convert back to radians 				value.Set( d.Get() *
+  // idMath::M_DEG2RAD );
   //			}
   //		}
   // void	SerializeAngle( radians_t & value ) {
@@ -480,8 +482,9 @@ class idSerializer {
   //			// serialize as normalized degrees between 0 - 360
   //			SerializeAngle( d );
   //			if ( !writing ) {
-  //				// if reading, get the value we read in degrees and convert
-  //back to radians 				value.Set( d.Get() * idMath::M_DEG2RAD );
+  //				// if reading, get the value we read in degrees and
+  //convert back to radians 				value.Set( d.Get() *
+  // idMath::M_DEG2RAD );
   //			}
   //		}
   //
@@ -591,7 +594,7 @@ idSerializer::SerializeQ
 ========================
 */
 #ifndef SERIALIZE_NO_QUANT
-ID_INLINE void idSerializer::SerializeQ(idMat3& axis, int bits) {
+inline void idSerializer::SerializeQ(idMat3& axis, int bits) {
   SanityCheck();
 
   const float scale = ((1 << (bits - 1)) - 1);
@@ -649,7 +652,7 @@ ID_INLINE void idSerializer::SerializeQ(idMat3& axis, int bits) {
 idSerializer::Serialize
 ========================
 */
-ID_INLINE void idSerializer::Serialize(idMat3& axis) {
+inline void idSerializer::Serialize(idMat3& axis) {
   SanityCheck();
 
   Serialize(axis[0]);
@@ -662,7 +665,7 @@ ID_INLINE void idSerializer::Serialize(idMat3& axis) {
 idSerializer::SerializeC
 ========================
 */
-ID_INLINE void idSerializer::SerializeC(idMat3& axis) {
+inline void idSerializer::SerializeC(idMat3& axis) {
   SanityCheck();
 
   if (IsWriting()) {
@@ -688,8 +691,8 @@ idSerializer::SerializeListElement
 ========================
 */
 template <typename _type_>
-ID_INLINE void idSerializer::SerializeListElement(const idList<_type_*>& list,
-                                                  const _type_*& element) {
+inline void idSerializer::SerializeListElement(const idList<_type_*>& list,
+                                               const _type_*& element) {
   SanityCheck();
 
   if (IsWriting()) {
@@ -712,7 +715,7 @@ NOTE - Signed values work with this function, but take up more bytes
 Use SerializeSPacked if you anticipate lots of negative values
 ========================
 */
-ID_INLINE void idSerializer::SerializePacked(int& original) {
+inline void idSerializer::SerializePacked(int& original) {
   SanityCheck();
 
   if (IsWriting()) {
@@ -752,7 +755,7 @@ NOTE - An extra bit of the first byte is used to store the sign
 than 63)
 ========================
 */
-ID_INLINE void idSerializer::SerializeSPacked(int& value) {
+inline void idSerializer::SerializeSPacked(int& value) {
   SanityCheck();
 
   if (IsWriting()) {

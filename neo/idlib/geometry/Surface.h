@@ -125,15 +125,15 @@ class idSurface {
 idSurface::idSurface
 ====================
 */
-ID_INLINE idSurface::idSurface() {}
+inline idSurface::idSurface() {}
 
 /*
 =================
 idSurface::idSurface
 =================
 */
-ID_INLINE idSurface::idSurface(const idDrawVert* verts, const int numVerts,
-                               const int* indexes, const int numIndexes) {
+inline idSurface::idSurface(const idDrawVert* verts, const int numVerts,
+                            const int* indexes, const int numIndexes) {
   assert(verts != NULL && indexes != NULL && numVerts > 0 && numIndexes > 0);
   this->verts.SetNum(numVerts);
   memcpy(this->verts.Ptr(), verts, numVerts * sizeof(verts[0]));
@@ -147,7 +147,7 @@ ID_INLINE idSurface::idSurface(const idDrawVert* verts, const int numVerts,
 idSurface::idSurface
 ====================
 */
-ID_INLINE idSurface::idSurface(const idSurface& surf) {
+inline idSurface::idSurface(const idSurface& surf) {
   this->verts = surf.verts;
   this->indexes = surf.indexes;
   this->edges = surf.edges;
@@ -159,14 +159,14 @@ ID_INLINE idSurface::idSurface(const idSurface& surf) {
 idSurface::~idSurface
 ====================
 */
-ID_INLINE idSurface::~idSurface() {}
+inline idSurface::~idSurface() {}
 
 /*
 =================
 idSurface::operator[]
 =================
 */
-ID_INLINE const idDrawVert& idSurface::operator[](const int index) const {
+inline const idDrawVert& idSurface::operator[](const int index) const {
   return verts[index];
 };
 
@@ -175,7 +175,7 @@ ID_INLINE const idDrawVert& idSurface::operator[](const int index) const {
 idSurface::operator[]
 =================
 */
-ID_INLINE idDrawVert& idSurface::operator[](const int index) {
+inline idDrawVert& idSurface::operator[](const int index) {
   return verts[index];
 };
 
@@ -184,7 +184,7 @@ ID_INLINE idDrawVert& idSurface::operator[](const int index) {
 idSurface::operator+=
 =================
 */
-ID_INLINE idSurface& idSurface::operator+=(const idSurface& surf) {
+inline idSurface& idSurface::operator+=(const idSurface& surf) {
   int i, m, n;
   n = verts.Num();
   m = indexes.Num();
@@ -202,7 +202,7 @@ ID_INLINE idSurface& idSurface::operator+=(const idSurface& surf) {
 idSurface::Clear
 =================
 */
-ID_INLINE void idSurface::Clear() {
+inline void idSurface::Clear() {
   verts.Clear();
   indexes.Clear();
   edges.Clear();
@@ -214,7 +214,7 @@ ID_INLINE void idSurface::Clear() {
 idSurface::TranslateSelf
 =================
 */
-ID_INLINE void idSurface::TranslateSelf(const idVec3& translation) {
+inline void idSurface::TranslateSelf(const idVec3& translation) {
   for (int i = 0; i < verts.Num(); i++) {
     verts[i].xyz += translation;
   }
@@ -225,7 +225,7 @@ ID_INLINE void idSurface::TranslateSelf(const idVec3& translation) {
 idSurface::RotateSelf
 =================
 */
-ID_INLINE void idSurface::RotateSelf(const idMat3& rotation) {
+inline void idSurface::RotateSelf(const idMat3& rotation) {
   for (int i = 0; i < verts.Num(); i++) {
     verts[i].xyz *= rotation;
     verts[i].SetNormal(verts[i].GetNormal() * rotation);

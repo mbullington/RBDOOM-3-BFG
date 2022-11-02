@@ -140,58 +140,58 @@ extern idBounds bounds_zero;
 extern idBounds bounds_zeroOneCube;
 extern idBounds bounds_unitCube;
 
-ID_INLINE idBounds::idBounds() {}
+inline idBounds::idBounds() {}
 
-ID_INLINE idBounds::idBounds(const idVec3& mins, const idVec3& maxs) {
+inline idBounds::idBounds(const idVec3& mins, const idVec3& maxs) {
   b[0] = mins;
   b[1] = maxs;
 }
 
-ID_INLINE idBounds::idBounds(const idVec3& point) {
+inline idBounds::idBounds(const idVec3& point) {
   b[0] = point;
   b[1] = point;
 }
 
-ID_INLINE const idVec3& idBounds::operator[](const int index) const {
+inline const idVec3& idBounds::operator[](const int index) const {
   return b[index];
 }
 
-ID_INLINE idVec3& idBounds::operator[](const int index) { return b[index]; }
+inline idVec3& idBounds::operator[](const int index) { return b[index]; }
 
-ID_INLINE idBounds idBounds::operator+(const idVec3& t) const {
+inline idBounds idBounds::operator+(const idVec3& t) const {
   return idBounds(b[0] + t, b[1] + t);
 }
 
-ID_INLINE idBounds& idBounds::operator+=(const idVec3& t) {
+inline idBounds& idBounds::operator+=(const idVec3& t) {
   b[0] += t;
   b[1] += t;
   return *this;
 }
 
-ID_INLINE idBounds idBounds::operator*(const idMat3& r) const {
+inline idBounds idBounds::operator*(const idMat3& r) const {
   idBounds bounds;
   bounds.FromTransformedBounds(*this, vec3_origin, r);
   return bounds;
 }
 
-ID_INLINE idBounds& idBounds::operator*=(const idMat3& r) {
+inline idBounds& idBounds::operator*=(const idMat3& r) {
   this->FromTransformedBounds(*this, vec3_origin, r);
   return *this;
 }
 
-ID_INLINE idBounds idBounds::operator+(const idBounds& a) const {
+inline idBounds idBounds::operator+(const idBounds& a) const {
   idBounds newBounds;
   newBounds = *this;
   newBounds.AddBounds(a);
   return newBounds;
 }
 
-ID_INLINE idBounds& idBounds::operator+=(const idBounds& a) {
+inline idBounds& idBounds::operator+=(const idBounds& a) {
   idBounds::AddBounds(a);
   return *this;
 }
 
-ID_INLINE idBounds idBounds::operator-(const idBounds& a) const {
+inline idBounds idBounds::operator-(const idBounds& a) const {
   assert(b[1][0] - b[0][0] > a.b[1][0] - a.b[0][0] &&
          b[1][1] - b[0][1] > a.b[1][1] - a.b[0][1] &&
          b[1][2] - b[0][2] > a.b[1][2] - a.b[0][2]);
@@ -200,7 +200,7 @@ ID_INLINE idBounds idBounds::operator-(const idBounds& a) const {
       idVec3(b[1][0] + a.b[0][0], b[1][1] + a.b[0][1], b[1][2] + a.b[0][2]));
 }
 
-ID_INLINE idBounds& idBounds::operator-=(const idBounds& a) {
+inline idBounds& idBounds::operator-=(const idBounds& a) {
   assert(b[1][0] - b[0][0] > a.b[1][0] - a.b[0][0] &&
          b[1][1] - b[0][1] > a.b[1][1] - a.b[0][1] &&
          b[1][2] - b[0][2] > a.b[1][2] - a.b[0][2]);
@@ -209,46 +209,44 @@ ID_INLINE idBounds& idBounds::operator-=(const idBounds& a) {
   return *this;
 }
 
-ID_INLINE bool idBounds::Compare(const idBounds& a) const {
+inline bool idBounds::Compare(const idBounds& a) const {
   return (b[0].Compare(a.b[0]) && b[1].Compare(a.b[1]));
 }
 
-ID_INLINE bool idBounds::Compare(const idBounds& a, const float epsilon) const {
+inline bool idBounds::Compare(const idBounds& a, const float epsilon) const {
   return (b[0].Compare(a.b[0], epsilon) && b[1].Compare(a.b[1], epsilon));
 }
 
-ID_INLINE bool idBounds::operator==(const idBounds& a) const {
-  return Compare(a);
-}
+inline bool idBounds::operator==(const idBounds& a) const { return Compare(a); }
 
-ID_INLINE bool idBounds::operator!=(const idBounds& a) const {
+inline bool idBounds::operator!=(const idBounds& a) const {
   return !Compare(a);
 }
 
-ID_INLINE void idBounds::Clear() {
+inline void idBounds::Clear() {
   b[0][0] = b[0][1] = b[0][2] = idMath::INFINITUM;
   b[1][0] = b[1][1] = b[1][2] = -idMath::INFINITUM;
 }
 
-ID_INLINE void idBounds::Zero() {
+inline void idBounds::Zero() {
   b[0][0] = b[0][1] = b[0][2] = b[1][0] = b[1][1] = b[1][2] = 0;
 }
 
-ID_INLINE idVec3 idBounds::GetCenter() const {
+inline idVec3 idBounds::GetCenter() const {
   return idVec3((b[1][0] + b[0][0]) * 0.5f, (b[1][1] + b[0][1]) * 0.5f,
                 (b[1][2] + b[0][2]) * 0.5f);
 }
 
-ID_INLINE float idBounds::GetVolume() const {
+inline float idBounds::GetVolume() const {
   if (b[0][0] >= b[1][0] || b[0][1] >= b[1][1] || b[0][2] >= b[1][2]) {
     return 0.0f;
   }
   return ((b[1][0] - b[0][0]) * (b[1][1] - b[0][1]) * (b[1][2] - b[0][2]));
 }
 
-ID_INLINE bool idBounds::IsCleared() const { return b[0][0] > b[1][0]; }
+inline bool idBounds::IsCleared() const { return b[0][0] > b[1][0]; }
 
-ID_INLINE bool idBounds::AddPoint(const idVec3& v) {
+inline bool idBounds::AddPoint(const idVec3& v) {
   bool expanded = false;
   if (v[0] < b[0][0]) {
     b[0][0] = v[0];
@@ -277,7 +275,7 @@ ID_INLINE bool idBounds::AddPoint(const idVec3& v) {
   return expanded;
 }
 
-ID_INLINE bool idBounds::AddBounds(const idBounds& a) {
+inline bool idBounds::AddBounds(const idBounds& a) {
   bool expanded = false;
   if (a.b[0][0] < b[0][0]) {
     b[0][0] = a.b[0][0];
@@ -306,7 +304,7 @@ ID_INLINE bool idBounds::AddBounds(const idBounds& a) {
   return expanded;
 }
 
-ID_INLINE idBounds idBounds::Intersect(const idBounds& a) const {
+inline idBounds idBounds::Intersect(const idBounds& a) const {
   idBounds n;
   n.b[0][0] = (a.b[0][0] > b[0][0]) ? a.b[0][0] : b[0][0];
   n.b[0][1] = (a.b[0][1] > b[0][1]) ? a.b[0][1] : b[0][1];
@@ -317,7 +315,7 @@ ID_INLINE idBounds idBounds::Intersect(const idBounds& a) const {
   return n;
 }
 
-ID_INLINE idBounds& idBounds::IntersectSelf(const idBounds& a) {
+inline idBounds& idBounds::IntersectSelf(const idBounds& a) {
   if (a.b[0][0] > b[0][0]) {
     b[0][0] = a.b[0][0];
   }
@@ -339,12 +337,12 @@ ID_INLINE idBounds& idBounds::IntersectSelf(const idBounds& a) {
   return *this;
 }
 
-ID_INLINE idBounds idBounds::Expand(const float d) const {
+inline idBounds idBounds::Expand(const float d) const {
   return idBounds(idVec3(b[0][0] - d, b[0][1] - d, b[0][2] - d),
                   idVec3(b[1][0] + d, b[1][1] + d, b[1][2] + d));
 }
 
-ID_INLINE idBounds& idBounds::ExpandSelf(const float d) {
+inline idBounds& idBounds::ExpandSelf(const float d) {
   b[0][0] -= d;
   b[0][1] -= d;
   b[0][2] -= d;
@@ -354,28 +352,28 @@ ID_INLINE idBounds& idBounds::ExpandSelf(const float d) {
   return *this;
 }
 
-ID_INLINE idBounds idBounds::Translate(const idVec3& translation) const {
+inline idBounds idBounds::Translate(const idVec3& translation) const {
   return idBounds(b[0] + translation, b[1] + translation);
 }
 
-ID_INLINE idBounds& idBounds::TranslateSelf(const idVec3& translation) {
+inline idBounds& idBounds::TranslateSelf(const idVec3& translation) {
   b[0] += translation;
   b[1] += translation;
   return *this;
 }
 
-ID_INLINE idBounds idBounds::Rotate(const idMat3& rotation) const {
+inline idBounds idBounds::Rotate(const idMat3& rotation) const {
   idBounds bounds;
   bounds.FromTransformedBounds(*this, vec3_origin, rotation);
   return bounds;
 }
 
-ID_INLINE idBounds& idBounds::RotateSelf(const idMat3& rotation) {
+inline idBounds& idBounds::RotateSelf(const idMat3& rotation) {
   FromTransformedBounds(*this, vec3_origin, rotation);
   return *this;
 }
 
-ID_INLINE bool idBounds::ContainsPoint(const idVec3& p) const {
+inline bool idBounds::ContainsPoint(const idVec3& p) const {
   if (p[0] < b[0][0] || p[1] < b[0][1] || p[2] < b[0][2] || p[0] > b[1][0] ||
       p[1] > b[1][1] || p[2] > b[1][2]) {
     return false;
@@ -383,7 +381,7 @@ ID_INLINE bool idBounds::ContainsPoint(const idVec3& p) const {
   return true;
 }
 
-ID_INLINE bool idBounds::IntersectsBounds(const idBounds& a) const {
+inline bool idBounds::IntersectsBounds(const idBounds& a) const {
   if (a.b[1][0] < b[0][0] || a.b[1][1] < b[0][1] || a.b[1][2] < b[0][2] ||
       a.b[0][0] > b[1][0] || a.b[0][1] > b[1][1] || a.b[0][2] > b[1][2]) {
     return false;
@@ -391,15 +389,15 @@ ID_INLINE bool idBounds::IntersectsBounds(const idBounds& a) const {
   return true;
 }
 
-ID_INLINE idSphere idBounds::ToSphere() const {
+inline idSphere idBounds::ToSphere() const {
   idSphere sphere;
   sphere.SetOrigin((b[0] + b[1]) * 0.5f);
   sphere.SetRadius((b[1] - sphere.GetOrigin()).Length());
   return sphere;
 }
 
-ID_INLINE void idBounds::AxisProjection(const idVec3& dir, float& min,
-                                        float& max) const {
+inline void idBounds::AxisProjection(const idVec3& dir, float& min,
+                                     float& max) const {
   float d1, d2;
   idVec3 center, extents;
 
@@ -414,9 +412,9 @@ ID_INLINE void idBounds::AxisProjection(const idVec3& dir, float& min,
   max = d1 + d2;
 }
 
-ID_INLINE void idBounds::AxisProjection(const idVec3& origin,
-                                        const idMat3& axis, const idVec3& dir,
-                                        float& min, float& max) const {
+inline void idBounds::AxisProjection(const idVec3& origin, const idMat3& axis,
+                                     const idVec3& dir, float& min,
+                                     float& max) const {
   float d1, d2;
   idVec3 center, extents;
 
@@ -433,10 +431,10 @@ ID_INLINE void idBounds::AxisProjection(const idVec3& origin,
   max = d1 + d2;
 }
 
-ID_INLINE int idBounds::GetDimension() const { return 6; }
+inline int idBounds::GetDimension() const { return 6; }
 
-ID_INLINE const float* idBounds::ToFloatPtr() const { return &b[0].x; }
+inline const float* idBounds::ToFloatPtr() const { return &b[0].x; }
 
-ID_INLINE float* idBounds::ToFloatPtr() { return &b[0].x; }
+inline float* idBounds::ToFloatPtr() { return &b[0].x; }
 
 #endif /* !__BV_BOUNDS_H__ */

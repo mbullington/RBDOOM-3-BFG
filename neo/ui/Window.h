@@ -451,7 +451,7 @@ class idWindow {
   idWinBool hideCursor;
 };
 
-ID_INLINE void idWindow::AddDefinedVar(idWinVar* var) {
+inline void idWindow::AddDefinedVar(idWinVar* var) {
   definedVars.AddUnique(var);
 }
 

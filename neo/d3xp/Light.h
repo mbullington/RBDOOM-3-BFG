@@ -62,9 +62,9 @@ struct rvmLightStyleState_t {
   void Reset();
 };
 
-ID_INLINE rvmLightStyleState_t::rvmLightStyleState_t() { Reset(); }
+inline rvmLightStyleState_t::rvmLightStyleState_t() { Reset(); }
 
-ID_INLINE void rvmLightStyleState_t::Reset() {
+inline void rvmLightStyleState_t::Reset() {
   dl_frame = 0;
   dl_framef = 0;
   dl_oldframe = 0;

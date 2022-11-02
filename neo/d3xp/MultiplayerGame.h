@@ -359,14 +359,13 @@ class idMultiplayerGame {
   bool IsGametypeTeamBased();
 };
 
-ID_INLINE idMultiplayerGame::gameState_t idMultiplayerGame::GetGameState()
-    const {
+inline idMultiplayerGame::gameState_t idMultiplayerGame::GetGameState() const {
   return gameState;
 }
 
-ID_INLINE bool idMultiplayerGame::IsPureReady() const { return pureReady; }
+inline bool idMultiplayerGame::IsPureReady() const { return pureReady; }
 
-ID_INLINE void idMultiplayerGame::ClearFrags(int clientNum) {
+inline void idMultiplayerGame::ClearFrags(int clientNum) {
   playerState[clientNum].fragCount = 0;
 }
 

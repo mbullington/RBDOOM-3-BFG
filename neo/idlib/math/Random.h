@@ -63,29 +63,29 @@ class idRandom {
   int seed;
 };
 
-ID_INLINE idRandom::idRandom(int seed) { this->seed = seed; }
+inline idRandom::idRandom(int seed) { this->seed = seed; }
 
-ID_INLINE void idRandom::SetSeed(int seed) { this->seed = seed; }
+inline void idRandom::SetSeed(int seed) { this->seed = seed; }
 
-ID_INLINE int idRandom::GetSeed() const { return seed; }
+inline int idRandom::GetSeed() const { return seed; }
 
-ID_INLINE int idRandom::RandomInt() {
+inline int idRandom::RandomInt() {
   seed = 69069 * seed + 1;
   return (seed & idRandom::MAX_RAND);
 }
 
-ID_INLINE int idRandom::RandomInt(int max) {
+inline int idRandom::RandomInt(int max) {
   if (max == 0) {
     return 0;  // avoid divide by zero error
   }
   return RandomInt() % max;
 }
 
-ID_INLINE float idRandom::RandomFloat() {
+inline float idRandom::RandomFloat() {
   return (RandomInt() / (float)(idRandom::MAX_RAND + 1));
 }
 
-ID_INLINE float idRandom::CRandomFloat() {
+inline float idRandom::CRandomFloat() {
   return (2.0f * (RandomFloat() - 0.5f));
 }
 
@@ -119,32 +119,32 @@ class idRandom2 {
   static const unsigned int IEEE_MASK = 0x007fffff;
 };
 
-ID_INLINE idRandom2::idRandom2(unsigned int seed) { this->seed = seed; }
+inline idRandom2::idRandom2(unsigned int seed) { this->seed = seed; }
 
-ID_INLINE void idRandom2::SetSeed(unsigned int seed) { this->seed = seed; }
+inline void idRandom2::SetSeed(unsigned int seed) { this->seed = seed; }
 
-ID_INLINE unsigned int idRandom2::GetSeed() const { return seed; }
+inline unsigned int idRandom2::GetSeed() const { return seed; }
 
-ID_INLINE int idRandom2::RandomInt() {
+inline int idRandom2::RandomInt() {
   seed = 1664525L * seed + 1013904223L;
   return ((int)seed & idRandom2::MAX_RAND);
 }
 
-ID_INLINE int idRandom2::RandomInt(int max) {
+inline int idRandom2::RandomInt(int max) {
   if (max == 0) {
     return 0;  // avoid divide by zero error
   }
   return (RandomInt() >> (16 - idMath::BitsForInteger(max))) % max;
 }
 
-ID_INLINE float idRandom2::RandomFloat() {
+inline float idRandom2::RandomFloat() {
   unsigned int i;
   seed = 1664525L * seed + 1013904223L;
   i = idRandom2::IEEE_ONE | (seed & idRandom2::IEEE_MASK);
   return ((*(float*)&i) - 1.0f);
 }
 
-ID_INLINE float idRandom2::CRandomFloat() {
+inline float idRandom2::CRandomFloat() {
   unsigned int i;
   seed = 1664525L * seed + 1013904223L;
   i = idRandom2::IEEE_ONE | (seed & idRandom2::IEEE_MASK);

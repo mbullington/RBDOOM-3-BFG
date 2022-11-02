@@ -107,43 +107,43 @@ class idComplex {
 extern idComplex complex_origin;
 #define complex_zero complex_origin
 
-ID_INLINE idComplex::idComplex() {}
+inline idComplex::idComplex() {}
 
-ID_INLINE idComplex::idComplex(const float r, const float i) {
+inline idComplex::idComplex(const float r, const float i) {
   this->r = r;
   this->i = i;
 }
 
-ID_INLINE void idComplex::Set(const float r, const float i) {
+inline void idComplex::Set(const float r, const float i) {
   this->r = r;
   this->i = i;
 }
 
-ID_INLINE void idComplex::Zero() { r = i = 0.0f; }
+inline void idComplex::Zero() { r = i = 0.0f; }
 
-ID_INLINE float idComplex::operator[](int index) const {
+inline float idComplex::operator[](int index) const {
   assert(index >= 0 && index < 2);
   return (&r)[index];
 }
 
-ID_INLINE float& idComplex::operator[](int index) {
+inline float& idComplex::operator[](int index) {
   assert(index >= 0 && index < 2);
   return (&r)[index];
 }
 
-ID_INLINE idComplex idComplex::operator-() const { return idComplex(-r, -i); }
+inline idComplex idComplex::operator-() const { return idComplex(-r, -i); }
 
-ID_INLINE idComplex& idComplex::operator=(const idComplex& a) {
+inline idComplex& idComplex::operator=(const idComplex& a) {
   r = a.r;
   i = a.i;
   return *this;
 }
 
-ID_INLINE idComplex idComplex::operator*(const idComplex& a) const {
+inline idComplex idComplex::operator*(const idComplex& a) const {
   return idComplex(r * a.r - i * a.i, i * a.r + r * a.i);
 }
 
-ID_INLINE idComplex idComplex::operator/(const idComplex& a) const {
+inline idComplex idComplex::operator/(const idComplex& a) const {
   float s, t;
   if (idMath::Fabs(a.r) >= idMath::Fabs(a.i)) {
     s = a.i / a.r;
@@ -156,20 +156,20 @@ ID_INLINE idComplex idComplex::operator/(const idComplex& a) const {
   }
 }
 
-ID_INLINE idComplex idComplex::operator+(const idComplex& a) const {
+inline idComplex idComplex::operator+(const idComplex& a) const {
   return idComplex(r + a.r, i + a.i);
 }
 
-ID_INLINE idComplex idComplex::operator-(const idComplex& a) const {
+inline idComplex idComplex::operator-(const idComplex& a) const {
   return idComplex(r - a.r, i - a.i);
 }
 
-ID_INLINE idComplex& idComplex::operator*=(const idComplex& a) {
+inline idComplex& idComplex::operator*=(const idComplex& a) {
   *this = idComplex(r * a.r - i * a.i, i * a.r + r * a.i);
   return *this;
 }
 
-ID_INLINE idComplex& idComplex::operator/=(const idComplex& a) {
+inline idComplex& idComplex::operator/=(const idComplex& a) {
   float s, t;
   if (idMath::Fabs(a.r) >= idMath::Fabs(a.i)) {
     s = a.i / a.r;
@@ -183,63 +183,63 @@ ID_INLINE idComplex& idComplex::operator/=(const idComplex& a) {
   return *this;
 }
 
-ID_INLINE idComplex& idComplex::operator+=(const idComplex& a) {
+inline idComplex& idComplex::operator+=(const idComplex& a) {
   r += a.r;
   i += a.i;
   return *this;
 }
 
-ID_INLINE idComplex& idComplex::operator-=(const idComplex& a) {
+inline idComplex& idComplex::operator-=(const idComplex& a) {
   r -= a.r;
   i -= a.i;
   return *this;
 }
 
-ID_INLINE idComplex idComplex::operator*(const float a) const {
+inline idComplex idComplex::operator*(const float a) const {
   return idComplex(r * a, i * a);
 }
 
-ID_INLINE idComplex idComplex::operator/(const float a) const {
+inline idComplex idComplex::operator/(const float a) const {
   float s = 1.0f / a;
   return idComplex(r * s, i * s);
 }
 
-ID_INLINE idComplex idComplex::operator+(const float a) const {
+inline idComplex idComplex::operator+(const float a) const {
   return idComplex(r + a, i);
 }
 
-ID_INLINE idComplex idComplex::operator-(const float a) const {
+inline idComplex idComplex::operator-(const float a) const {
   return idComplex(r - a, i);
 }
 
-ID_INLINE idComplex& idComplex::operator*=(const float a) {
+inline idComplex& idComplex::operator*=(const float a) {
   r *= a;
   i *= a;
   return *this;
 }
 
-ID_INLINE idComplex& idComplex::operator/=(const float a) {
+inline idComplex& idComplex::operator/=(const float a) {
   float s = 1.0f / a;
   r *= s;
   i *= s;
   return *this;
 }
 
-ID_INLINE idComplex& idComplex::operator+=(const float a) {
+inline idComplex& idComplex::operator+=(const float a) {
   r += a;
   return *this;
 }
 
-ID_INLINE idComplex& idComplex::operator-=(const float a) {
+inline idComplex& idComplex::operator-=(const float a) {
   r -= a;
   return *this;
 }
 
-ID_INLINE idComplex operator*(const float a, const idComplex& b) {
+inline idComplex operator*(const float a, const idComplex& b) {
   return idComplex(a * b.r, a * b.i);
 }
 
-ID_INLINE idComplex operator/(const float a, const idComplex& b) {
+inline idComplex operator/(const float a, const idComplex& b) {
   float s, t;
   if (idMath::Fabs(b.r) >= idMath::Fabs(b.i)) {
     s = b.i / b.r;
@@ -252,15 +252,15 @@ ID_INLINE idComplex operator/(const float a, const idComplex& b) {
   }
 }
 
-ID_INLINE idComplex operator+(const float a, const idComplex& b) {
+inline idComplex operator+(const float a, const idComplex& b) {
   return idComplex(a + b.r, b.i);
 }
 
-ID_INLINE idComplex operator-(const float a, const idComplex& b) {
+inline idComplex operator-(const float a, const idComplex& b) {
   return idComplex(a - b.r, -b.i);
 }
 
-ID_INLINE idComplex idComplex::Reciprocal() const {
+inline idComplex idComplex::Reciprocal() const {
   float s, t;
   if (idMath::Fabs(r) >= idMath::Fabs(i)) {
     s = i / r;
@@ -273,7 +273,7 @@ ID_INLINE idComplex idComplex::Reciprocal() const {
   }
 }
 
-ID_INLINE idComplex idComplex::Sqrt() const {
+inline idComplex idComplex::Sqrt() const {
   float x, y, w;
 
   if (r == 0.0f && i == 0.0f) {
@@ -299,7 +299,7 @@ ID_INLINE idComplex idComplex::Sqrt() const {
   }
 }
 
-ID_INLINE float idComplex::Abs() const {
+inline float idComplex::Abs() const {
   float x, y, t;
   x = idMath::Fabs(r);
   y = idMath::Fabs(i);
@@ -316,12 +316,11 @@ ID_INLINE float idComplex::Abs() const {
   }
 }
 
-ID_INLINE bool idComplex::Compare(const idComplex& a) const {
+inline bool idComplex::Compare(const idComplex& a) const {
   return ((r == a.r) && (i == a.i));
 }
 
-ID_INLINE bool idComplex::Compare(const idComplex& a,
-                                  const float epsilon) const {
+inline bool idComplex::Compare(const idComplex& a, const float epsilon) const {
   if (idMath::Fabs(r - a.r) > epsilon) {
     return false;
   }
@@ -331,18 +330,18 @@ ID_INLINE bool idComplex::Compare(const idComplex& a,
   return true;
 }
 
-ID_INLINE bool idComplex::operator==(const idComplex& a) const {
+inline bool idComplex::operator==(const idComplex& a) const {
   return Compare(a);
 }
 
-ID_INLINE bool idComplex::operator!=(const idComplex& a) const {
+inline bool idComplex::operator!=(const idComplex& a) const {
   return !Compare(a);
 }
 
-ID_INLINE int idComplex::GetDimension() const { return 2; }
+inline int idComplex::GetDimension() const { return 2; }
 
-ID_INLINE const float* idComplex::ToFloatPtr() const { return &r; }
+inline const float* idComplex::ToFloatPtr() const { return &r; }
 
-ID_INLINE float* idComplex::ToFloatPtr() { return &r; }
+inline float* idComplex::ToFloatPtr() { return &r; }
 
 #endif /* !__MATH_COMPLEX_H__ */

@@ -108,7 +108,7 @@ idExtrapolate::idExtrapolate
 ====================
 */
 template <class type>
-ID_INLINE idExtrapolate<type>::idExtrapolate() {
+inline idExtrapolate<type>::idExtrapolate() {
   extrapolationType = EXTRAPOLATION_NONE;
   startTime = duration = 0.0f;
   memset(&startValue, 0, sizeof(startValue));
@@ -122,10 +122,10 @@ idExtrapolate::Init
 ====================
 */
 template <class type>
-ID_INLINE void idExtrapolate<type>::Init(
-    const int startTime, const int duration, const type& startValue,
-    const type& baseSpeed, const type& speed,
-    const extrapolation_t extrapolationType) {
+inline void idExtrapolate<type>::Init(const int startTime, const int duration,
+                                      const type& startValue,
+                                      const type& baseSpeed, const type& speed,
+                                      const extrapolation_t extrapolationType) {
   this->extrapolationType = extrapolationType;
   this->startTime = startTime;
   this->duration = duration;
@@ -140,7 +140,7 @@ idExtrapolate::GetCurrentValue
 ====================
 */
 template <class type>
-ID_INLINE type idExtrapolate<type>::GetCurrentValue(int time) const {
+inline type idExtrapolate<type>::GetCurrentValue(int time) const {
   if (time < startTime) {
     return startValue;
   }
@@ -209,7 +209,7 @@ idExtrapolate::GetCurrentSpeed
 ====================
 */
 template <class type>
-ID_INLINE type idExtrapolate<type>::GetCurrentSpeed(int time) const {
+inline type idExtrapolate<type>::GetCurrentSpeed(int time) const {
   if (time < startTime || duration == 0) {
     return (startValue - startValue);  //-V501
   }

@@ -105,9 +105,9 @@ class idWinding2D {
   idVec2 p[MAX_POINTS_ON_WINDING_2D];
 };
 
-ID_INLINE idWinding2D::idWinding2D() { numPoints = 0; }
+inline idWinding2D::idWinding2D() { numPoints = 0; }
 
-ID_INLINE idWinding2D& idWinding2D::operator=(const idWinding2D& winding) {
+inline idWinding2D& idWinding2D::operator=(const idWinding2D& winding) {
   int i;
 
   for (i = 0; i < winding.numPoints; i++) {
@@ -117,23 +117,23 @@ ID_INLINE idWinding2D& idWinding2D::operator=(const idWinding2D& winding) {
   return *this;
 }
 
-ID_INLINE const idVec2& idWinding2D::operator[](const int index) const {
+inline const idVec2& idWinding2D::operator[](const int index) const {
   return p[index];
 }
 
-ID_INLINE idVec2& idWinding2D::operator[](const int index) { return p[index]; }
+inline idVec2& idWinding2D::operator[](const int index) { return p[index]; }
 
-ID_INLINE void idWinding2D::Clear() { numPoints = 0; }
+inline void idWinding2D::Clear() { numPoints = 0; }
 
-ID_INLINE void idWinding2D::AddPoint(const idVec2& point) {
+inline void idWinding2D::AddPoint(const idVec2& point) {
   p[numPoints++] = point;
 }
 
-ID_INLINE int idWinding2D::GetNumPoints() const { return numPoints; }
+inline int idWinding2D::GetNumPoints() const { return numPoints; }
 
-ID_INLINE idVec3 idWinding2D::Plane2DFromPoints(const idVec2& start,
-                                                const idVec2& end,
-                                                const bool normalize) {
+inline idVec3 idWinding2D::Plane2DFromPoints(const idVec2& start,
+                                             const idVec2& end,
+                                             const bool normalize) {
   idVec3 plane;
   plane.x = start.y - end.y;
   plane.y = end.x - start.x;
@@ -144,9 +144,9 @@ ID_INLINE idVec3 idWinding2D::Plane2DFromPoints(const idVec2& start,
   return plane;
 }
 
-ID_INLINE idVec3 idWinding2D::Plane2DFromVecs(const idVec2& start,
-                                              const idVec2& dir,
-                                              const bool normalize) {
+inline idVec3 idWinding2D::Plane2DFromVecs(const idVec2& start,
+                                           const idVec2& dir,
+                                           const bool normalize) {
   idVec3 plane;
   plane.x = -dir.y;
   plane.y = dir.x;
@@ -157,9 +157,9 @@ ID_INLINE idVec3 idWinding2D::Plane2DFromVecs(const idVec2& start,
   return plane;
 }
 
-ID_INLINE bool idWinding2D::Plane2DIntersection(const idVec3& plane1,
-                                                const idVec3& plane2,
-                                                idVec2& point) {
+inline bool idWinding2D::Plane2DIntersection(const idVec3& plane1,
+                                             const idVec3& plane2,
+                                             idVec2& point) {
   float n00, n01, n11, det, invDet, f0, f1;
 
   n00 = plane1.x * plane1.x + plane1.y * plane1.y;

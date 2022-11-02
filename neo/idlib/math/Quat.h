@@ -115,28 +115,28 @@ class idQuat {
 // idQuat object.
 idQuat Slerp(const idQuat& from, const idQuat& to, const float t);
 
-ID_INLINE idQuat::idQuat() {}
+inline idQuat::idQuat() {}
 
-ID_INLINE idQuat::idQuat(float x, float y, float z, float w) {
+inline idQuat::idQuat(float x, float y, float z, float w) {
   this->x = x;
   this->y = y;
   this->z = z;
   this->w = w;
 }
 
-ID_INLINE float idQuat::operator[](int index) const {
+inline float idQuat::operator[](int index) const {
   assert((index >= 0) && (index < 4));
   return (&x)[index];
 }
 
-ID_INLINE float& idQuat::operator[](int index) {
+inline float& idQuat::operator[](int index) {
   assert((index >= 0) && (index < 4));
   return (&x)[index];
 }
 
-ID_INLINE idQuat idQuat::operator-() const { return idQuat(-x, -y, -z, -w); }
+inline idQuat idQuat::operator-() const { return idQuat(-x, -y, -z, -w); }
 
-ID_INLINE idQuat& idQuat::operator=(const idQuat& a) {
+inline idQuat& idQuat::operator=(const idQuat& a) {
   x = a.x;
   y = a.y;
   z = a.z;
@@ -145,11 +145,11 @@ ID_INLINE idQuat& idQuat::operator=(const idQuat& a) {
   return *this;
 }
 
-ID_INLINE idQuat idQuat::operator+(const idQuat& a) const {
+inline idQuat idQuat::operator+(const idQuat& a) const {
   return idQuat(x + a.x, y + a.y, z + a.z, w + a.w);
 }
 
-ID_INLINE idQuat& idQuat::operator+=(const idQuat& a) {
+inline idQuat& idQuat::operator+=(const idQuat& a) {
   x += a.x;
   y += a.y;
   z += a.z;
@@ -158,11 +158,11 @@ ID_INLINE idQuat& idQuat::operator+=(const idQuat& a) {
   return *this;
 }
 
-ID_INLINE idQuat idQuat::operator-(const idQuat& a) const {
+inline idQuat idQuat::operator-(const idQuat& a) const {
   return idQuat(x - a.x, y - a.y, z - a.z, w - a.w);
 }
 
-ID_INLINE idQuat& idQuat::operator-=(const idQuat& a) {
+inline idQuat& idQuat::operator-=(const idQuat& a) {
   x -= a.x;
   y -= a.y;
   z -= a.z;
@@ -171,14 +171,14 @@ ID_INLINE idQuat& idQuat::operator-=(const idQuat& a) {
   return *this;
 }
 
-ID_INLINE idQuat idQuat::operator*(const idQuat& a) const {
+inline idQuat idQuat::operator*(const idQuat& a) const {
   return idQuat(w * a.x + x * a.w + y * a.z - z * a.y,
                 w * a.y + y * a.w + z * a.x - x * a.z,
                 w * a.z + z * a.w + x * a.y - y * a.x,
                 w * a.w - x * a.x - y * a.y - z * a.z);
 }
 
-ID_INLINE idVec3 idQuat::operator*(const idVec3& a) const {
+inline idVec3 idQuat::operator*(const idVec3& a) const {
 #if 0
 	// it's faster to do the conversion to a 3x3 matrix and multiply the vector by this 3x3 matrix
 	return ( ToMat3() * a );
@@ -201,21 +201,21 @@ ID_INLINE idVec3 idQuat::operator*(const idVec3& a) const {
 #endif
 }
 
-ID_INLINE idQuat idQuat::operator*(float a) const {
+inline idQuat idQuat::operator*(float a) const {
   return idQuat(x * a, y * a, z * a, w * a);
 }
 
-ID_INLINE idQuat operator*(const float a, const idQuat& b) { return b * a; }
+inline idQuat operator*(const float a, const idQuat& b) { return b * a; }
 
-ID_INLINE idVec3 operator*(const idVec3& a, const idQuat& b) { return b * a; }
+inline idVec3 operator*(const idVec3& a, const idQuat& b) { return b * a; }
 
-ID_INLINE idQuat& idQuat::operator*=(const idQuat& a) {
+inline idQuat& idQuat::operator*=(const idQuat& a) {
   *this = *this * a;
 
   return *this;
 }
 
-ID_INLINE idQuat& idQuat::operator*=(float a) {
+inline idQuat& idQuat::operator*=(float a) {
   x *= a;
   y *= a;
   z *= a;
@@ -224,11 +224,11 @@ ID_INLINE idQuat& idQuat::operator*=(float a) {
   return *this;
 }
 
-ID_INLINE bool idQuat::Compare(const idQuat& a) const {
+inline bool idQuat::Compare(const idQuat& a) const {
   return ((x == a.x) && (y == a.y) && (z == a.z) && (w == a.w));
 }
 
-ID_INLINE bool idQuat::Compare(const idQuat& a, const float epsilon) const {
+inline bool idQuat::Compare(const idQuat& a, const float epsilon) const {
   if (idMath::Fabs(x - a.x) > epsilon) {
     return false;
   }
@@ -244,27 +244,27 @@ ID_INLINE bool idQuat::Compare(const idQuat& a, const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idQuat::operator==(const idQuat& a) const { return Compare(a); }
+inline bool idQuat::operator==(const idQuat& a) const { return Compare(a); }
 
-ID_INLINE bool idQuat::operator!=(const idQuat& a) const { return !Compare(a); }
+inline bool idQuat::operator!=(const idQuat& a) const { return !Compare(a); }
 
-ID_INLINE void idQuat::Set(float x, float y, float z, float w) {
+inline void idQuat::Set(float x, float y, float z, float w) {
   this->x = x;
   this->y = y;
   this->z = z;
   this->w = w;
 }
 
-ID_INLINE idQuat idQuat::Inverse() const { return idQuat(-x, -y, -z, w); }
+inline idQuat idQuat::Inverse() const { return idQuat(-x, -y, -z, w); }
 
-ID_INLINE float idQuat::Length() const {
+inline float idQuat::Length() const {
   float len;
 
   len = x * x + y * y + z * z + w * w;
   return idMath::Sqrt(len);
 }
 
-ID_INLINE idQuat& idQuat::Normalize() {
+inline idQuat& idQuat::Normalize() {
   float len;
   float ilength;
 
@@ -279,17 +279,17 @@ ID_INLINE idQuat& idQuat::Normalize() {
   return *this;
 }
 
-ID_INLINE float idQuat::CalcW() const {
+inline float idQuat::CalcW() const {
   // take the absolute value because floating point rounding may cause the dot
   // of x,y,z to be larger than 1
   return sqrt(fabs(1.0f - (x * x + y * y + z * z)));
 }
 
-ID_INLINE int idQuat::GetDimension() const { return 4; }
+inline int idQuat::GetDimension() const { return 4; }
 
-ID_INLINE const float* idQuat::ToFloatPtr() const { return &x; }
+inline const float* idQuat::ToFloatPtr() const { return &x; }
 
-ID_INLINE float* idQuat::ToFloatPtr() { return &x; }
+inline float* idQuat::ToFloatPtr() { return &x; }
 
 /*
 ===============================================================================
@@ -343,35 +343,35 @@ class idCQuat {
   const char* ToString(int precision = 2) const;
 };
 
-ID_INLINE idCQuat::idCQuat() {}
+inline idCQuat::idCQuat() {}
 
-ID_INLINE idCQuat::idCQuat(float x, float y, float z) {
+inline idCQuat::idCQuat(float x, float y, float z) {
   this->x = x;
   this->y = y;
   this->z = z;
 }
 
-ID_INLINE void idCQuat::Set(float x, float y, float z) {
+inline void idCQuat::Set(float x, float y, float z) {
   this->x = x;
   this->y = y;
   this->z = z;
 }
 
-ID_INLINE float idCQuat::operator[](int index) const {
+inline float idCQuat::operator[](int index) const {
   assert((index >= 0) && (index < 3));
   return (&x)[index];
 }
 
-ID_INLINE float& idCQuat::operator[](int index) {
+inline float& idCQuat::operator[](int index) {
   assert((index >= 0) && (index < 3));
   return (&x)[index];
 }
 
-ID_INLINE bool idCQuat::Compare(const idCQuat& a) const {
+inline bool idCQuat::Compare(const idCQuat& a) const {
   return ((x == a.x) && (y == a.y) && (z == a.z));
 }
 
-ID_INLINE bool idCQuat::Compare(const idCQuat& a, const float epsilon) const {
+inline bool idCQuat::Compare(const idCQuat& a, const float epsilon) const {
   if (idMath::Fabs(x - a.x) > epsilon) {
     return false;
   }
@@ -384,25 +384,21 @@ ID_INLINE bool idCQuat::Compare(const idCQuat& a, const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idCQuat::operator==(const idCQuat& a) const {
-  return Compare(a);
-}
+inline bool idCQuat::operator==(const idCQuat& a) const { return Compare(a); }
 
-ID_INLINE bool idCQuat::operator!=(const idCQuat& a) const {
-  return !Compare(a);
-}
+inline bool idCQuat::operator!=(const idCQuat& a) const { return !Compare(a); }
 
-ID_INLINE int idCQuat::GetDimension() const { return 3; }
+inline int idCQuat::GetDimension() const { return 3; }
 
-ID_INLINE idQuat idCQuat::ToQuat() const {
+inline idQuat idCQuat::ToQuat() const {
   // take the absolute value because floating point rounding may cause the dot
   // of x,y,z to be larger than 1
   return idQuat(x, y, z, sqrt(fabs(1.0f - (x * x + y * y + z * z))));
 }
 
-ID_INLINE const float* idCQuat::ToFloatPtr() const { return &x; }
+inline const float* idCQuat::ToFloatPtr() const { return &x; }
 
-ID_INLINE float* idCQuat::ToFloatPtr() { return &x; }
+inline float* idCQuat::ToFloatPtr() { return &x; }
 
 /*
 ===============================================================================

@@ -1087,9 +1087,9 @@ const idTraceModel* idClip::TraceModelForClipModel(
 idClip::TestHugeTranslation
 ============
 */
-ID_INLINE bool TestHugeTranslation(trace_t& results, const idClipModel* mdl,
-                                   const idVec3& start, const idVec3& end,
-                                   const idMat3& trmAxis) {
+inline bool TestHugeTranslation(trace_t& results, const idClipModel* mdl,
+                                const idVec3& start, const idVec3& end,
+                                const idMat3& trmAxis) {
   if (mdl != NULL && (end - start).LengthSqr() > Square(CM_MAX_TRACE_DIST)) {
 #ifndef CTF
     // May be important: This occurs in CTF when a player connects and spawns

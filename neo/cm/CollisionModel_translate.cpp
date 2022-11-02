@@ -62,7 +62,7 @@ idCollisionModelManagerLocal::TranslateEdgeThroughEdge
   calculates fraction of the translation completed at which the edges collide
 ================
 */
-ID_INLINE int idCollisionModelManagerLocal::TranslateEdgeThroughEdge(
+inline int idCollisionModelManagerLocal::TranslateEdgeThroughEdge(
     idVec3& cross, idPluecker& l1, idPluecker& l2, float* fraction) {
   float d, t;
 
@@ -195,7 +195,7 @@ ID_INLINE int idCollisionModelManagerLocal::TranslateEdgeThroughEdge(
 CM_AddContact
 ================
 */
-ID_INLINE void CM_AddContact(cm_traceWork_t* tw) {
+inline void CM_AddContact(cm_traceWork_t* tw) {
   if (tw->numContacts >= tw->maxContacts) {
     return;
   }
@@ -214,8 +214,8 @@ CM_SetVertexSidedness
 passes
 ================
 */
-ID_INLINE void CM_SetVertexSidedness(cm_vertex_t* v, const idPluecker& vpl,
-                                     const idPluecker& epl, const int bitNum) {
+inline void CM_SetVertexSidedness(cm_vertex_t* v, const idPluecker& vpl,
+                                  const idPluecker& epl, const int bitNum) {
   const int mask = 1 << bitNum;
   if ((v->sideSet & mask) == 0) {
     const float fl = vpl.PermutedInnerProduct(epl);
@@ -231,8 +231,8 @@ CM_SetEdgeSidedness
   stores for the given model edge at which side one of the trm vertices
 ================
 */
-ID_INLINE void CM_SetEdgeSidedness(cm_edge_t* edge, const idPluecker& vpl,
-                                   const idPluecker& epl, const int bitNum) {
+inline void CM_SetEdgeSidedness(cm_edge_t* edge, const idPluecker& vpl,
+                                const idPluecker& epl, const int bitNum) {
   const int mask = 1 << bitNum;
   if ((edge->sideSet & mask) == 0) {
     const float fl = vpl.PermutedInnerProduct(epl);

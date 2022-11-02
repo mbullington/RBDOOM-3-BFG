@@ -44,7 +44,7 @@ idStrStatic
 template <int _size_>
 class idStrStatic : public idStr {
  public:
-  ID_INLINE void operator=(const idStrStatic& text) {
+  inline void operator=(const idStrStatic& text) {
     // we should only get here when the types, including the size, are identical
     len = text.Length();
     memcpy(data, text.data, len + 1);
@@ -53,65 +53,65 @@ class idStrStatic : public idStr {
   // all idStr operators are overloaded and the idStr default constructor is
   // called so that the static buffer can be initialized in the body of the
   // constructor before the data is ever copied.
-  ID_INLINE idStrStatic() {
+  inline idStrStatic() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
   }
-  ID_INLINE idStrStatic(const idStrStatic& text) : idStr() {
-    buffer[0] = '\0';
-    SetStaticBuffer(buffer, _size_);
-    idStr::operator=(text);
-  }
-
-  ID_INLINE idStrStatic(const idStr& text) : idStr() {
+  inline idStrStatic(const idStrStatic& text) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     idStr::operator=(text);
   }
 
-  ID_INLINE idStrStatic(const idStrStatic& text, int start, int end) : idStr() {
+  inline idStrStatic(const idStr& text) : idStr() {
+    buffer[0] = '\0';
+    SetStaticBuffer(buffer, _size_);
+    idStr::operator=(text);
+  }
+
+  inline idStrStatic(const idStrStatic& text, int start, int end) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     CopyRange(text.c_str(), start, end);
   }
 
-  ID_INLINE idStrStatic(const char* text) : idStr() {
+  inline idStrStatic(const char* text) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     idStr::operator=(text);
   }
 
-  ID_INLINE idStrStatic(const char* text, int start, int end) : idStr() {
+  inline idStrStatic(const char* text, int start, int end) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     CopyRange(text, start, end);
   }
 
-  ID_INLINE explicit idStrStatic(const bool b) : idStr() {
+  inline explicit idStrStatic(const bool b) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     idStr::operator=(idStr(b));
   }
 
-  ID_INLINE explicit idStrStatic(const char c) : idStr() {
+  inline explicit idStrStatic(const char c) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     idStr::operator=(idStr(c));
   }
 
-  ID_INLINE explicit idStrStatic(const int i) : idStr() {
+  inline explicit idStrStatic(const int i) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     idStr::operator=(idStr(i));
   }
 
-  ID_INLINE explicit idStrStatic(const unsigned u) : idStr() {
+  inline explicit idStrStatic(const unsigned u) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     idStr::operator=(idStr(u));
   }
 
-  ID_INLINE explicit idStrStatic(const float f) : idStr() {
+  inline explicit idStrStatic(const float f) : idStr() {
     buffer[0] = '\0';
     SetStaticBuffer(buffer, _size_);
     idStr::operator=(idStr(f));

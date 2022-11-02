@@ -61,28 +61,28 @@ enum matchFlags_t {
   MATCH_JOIN_IN_PROGRESS = BIT(7),  // Join in progress supported for this match
 };
 
-ID_INLINE bool MatchTypeIsOnline(uint8 matchFlags) {
+inline bool MatchTypeIsOnline(uint8 matchFlags) {
   return (matchFlags & MATCH_ONLINE) ? true : false;
 }
-ID_INLINE bool MatchTypeIsLocal(uint8 matchFlags) {
+inline bool MatchTypeIsLocal(uint8 matchFlags) {
   return !MatchTypeIsOnline(matchFlags);
 }
-ID_INLINE bool MatchTypeIsPrivate(uint8 matchFlags) {
+inline bool MatchTypeIsPrivate(uint8 matchFlags) {
   return (matchFlags & MATCH_PRIVATE) ? true : false;
 }
-ID_INLINE bool MatchTypeIsRanked(uint8 matchFlags) {
+inline bool MatchTypeIsRanked(uint8 matchFlags) {
   return (matchFlags & MATCH_RANKED) ? true : false;
 }
-ID_INLINE bool MatchTypeHasStats(uint8 matchFlags) {
+inline bool MatchTypeHasStats(uint8 matchFlags) {
   return (matchFlags & MATCH_STATS) ? true : false;
 }
-ID_INLINE bool MatchTypeInviteOnly(uint8 matchFlags) {
+inline bool MatchTypeInviteOnly(uint8 matchFlags) {
   return (matchFlags & MATCH_INVITE_ONLY) ? true : false;
 }
-ID_INLINE bool MatchTypeIsSearchable(uint8 matchFlags) {
+inline bool MatchTypeIsSearchable(uint8 matchFlags) {
   return !MatchTypeIsPrivate(matchFlags);
 }
-ID_INLINE bool MatchTypeIsJoinInProgress(uint8 matchFlags) {
+inline bool MatchTypeIsJoinInProgress(uint8 matchFlags) {
   return (matchFlags & MATCH_JOIN_IN_PROGRESS) ? true : false;
 }
 
@@ -737,7 +737,7 @@ class idSession {
 idSession::idGetInputRouting
 ========================
 */
-ID_INLINE int idSession::GetInputRouting(int inputRouting[MAX_INPUT_DEVICES]) {
+inline int idSession::GetInputRouting(int inputRouting[MAX_INPUT_DEVICES]) {
   for (int i = 0; i < MAX_INPUT_DEVICES; i++) {
     inputRouting[i] = -1;
   }

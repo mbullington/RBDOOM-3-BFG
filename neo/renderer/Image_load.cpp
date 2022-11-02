@@ -107,7 +107,7 @@ int BitsForFormat(textureFormat_t format) {
 idImage::DeriveOpts
 ========================
 */
-ID_INLINE void idImage::DeriveOpts() {
+inline void idImage::DeriveOpts() {
   if (opts.format == FMT_NONE) {
     opts.colorFormat = CFM_DEFAULT;
 
@@ -407,7 +407,7 @@ void idImage::ActuallyLoadImage(bool fromBackEnd) {
        && (header.format == opts.format ||
            (header.format == FMT_RGB565 && opts.format == FMT_RGBA8))
 #else
-         && (header.format == opts.format)
+       && (header.format == opts.format)
 #endif
        && (header.textureType == opts.textureType))) {
     opts.width = header.width;

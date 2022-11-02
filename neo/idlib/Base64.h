@@ -76,31 +76,31 @@ class idBase64 {
   void EnsureAlloced(int size);
 };
 
-ID_INLINE idBase64::idBase64() { Init(); }
+inline idBase64::idBase64() { Init(); }
 
-ID_INLINE idBase64::idBase64(const idStr& s) {
+inline idBase64::idBase64(const idStr& s) {
   Init();
   *this = s;
 }
 
-ID_INLINE idBase64::~idBase64() { Release(); }
+inline idBase64::~idBase64() { Release(); }
 
-ID_INLINE const char* idBase64::c_str() const { return (const char*)data; }
+inline const char* idBase64::c_str() const { return (const char*)data; }
 
-ID_INLINE void idBase64::Init() {
+inline void idBase64::Init() {
   len = 0;
   alloced = 0;
   data = NULL;
 }
 
-ID_INLINE void idBase64::Release() {
+inline void idBase64::Release() {
   if (data) {
     delete[] data;
   }
   Init();
 }
 
-ID_INLINE void idBase64::EnsureAlloced(int size) {
+inline void idBase64::EnsureAlloced(int size) {
   if (size > alloced) {
     Release();
   }
@@ -108,7 +108,7 @@ ID_INLINE void idBase64::EnsureAlloced(int size) {
   alloced = size;
 }
 
-ID_INLINE void idBase64::operator=(const idStr& s) {
+inline void idBase64::operator=(const idStr& s) {
   EnsureAlloced(s.Length() + 1);  // trailing \0 - beware, this does a Release
   strcpy((char*)data, s.c_str());
   len = s.Length();

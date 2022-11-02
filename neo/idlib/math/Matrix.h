@@ -121,68 +121,68 @@ extern idMat2 mat2_zero;
 extern idMat2 mat2_identity;
 #define mat2_default mat2_identity
 
-ID_INLINE idMat2::idMat2() {}
+inline idMat2::idMat2() {}
 
-ID_INLINE idMat2::idMat2(const idVec2& x, const idVec2& y) {
+inline idMat2::idMat2(const idVec2& x, const idVec2& y) {
   mat[0].x = x.x;
   mat[0].y = x.y;
   mat[1].x = y.x;
   mat[1].y = y.y;
 }
 
-ID_INLINE idMat2::idMat2(const float xx, const float xy, const float yx,
-                         const float yy) {
+inline idMat2::idMat2(const float xx, const float xy, const float yx,
+                      const float yy) {
   mat[0].x = xx;
   mat[0].y = xy;
   mat[1].x = yx;
   mat[1].y = yy;
 }
 
-ID_INLINE idMat2::idMat2(const float src[2][2]) {
+inline idMat2::idMat2(const float src[2][2]) {
   memcpy(mat, src, 2 * 2 * sizeof(float));
 }
 
-ID_INLINE const idVec2& idMat2::operator[](int index) const {
+inline const idVec2& idMat2::operator[](int index) const {
   // assert( ( index >= 0 ) && ( index < 2 ) );
   return mat[index];
 }
 
-ID_INLINE idVec2& idMat2::operator[](int index) {
+inline idVec2& idMat2::operator[](int index) {
   // assert( ( index >= 0 ) && ( index < 2 ) );
   return mat[index];
 }
 
-ID_INLINE idMat2 idMat2::operator-() const {
+inline idMat2 idMat2::operator-() const {
   return idMat2(-mat[0][0], -mat[0][1], -mat[1][0], -mat[1][1]);
 }
 
-ID_INLINE idVec2 idMat2::operator*(const idVec2& vec) const {
+inline idVec2 idMat2::operator*(const idVec2& vec) const {
   return idVec2(mat[0].x * vec.x + mat[0].y * vec.y,
                 mat[1].x * vec.x + mat[1].y * vec.y);
 }
 
-ID_INLINE idMat2 idMat2::operator*(const idMat2& a) const {
+inline idMat2 idMat2::operator*(const idMat2& a) const {
   return idMat2(mat[0].x * a[0].x + mat[0].y * a[1].x,
                 mat[0].x * a[0].y + mat[0].y * a[1].y,
                 mat[1].x * a[0].x + mat[1].y * a[1].x,
                 mat[1].x * a[0].y + mat[1].y * a[1].y);
 }
 
-ID_INLINE idMat2 idMat2::operator*(const float a) const {
+inline idMat2 idMat2::operator*(const float a) const {
   return idMat2(mat[0].x * a, mat[0].y * a, mat[1].x * a, mat[1].y * a);
 }
 
-ID_INLINE idMat2 idMat2::operator+(const idMat2& a) const {
+inline idMat2 idMat2::operator+(const idMat2& a) const {
   return idMat2(mat[0].x + a[0].x, mat[0].y + a[0].y, mat[1].x + a[1].x,
                 mat[1].y + a[1].y);
 }
 
-ID_INLINE idMat2 idMat2::operator-(const idMat2& a) const {
+inline idMat2 idMat2::operator-(const idMat2& a) const {
   return idMat2(mat[0].x - a[0].x, mat[0].y - a[0].y, mat[1].x - a[1].x,
                 mat[1].y - a[1].y);
 }
 
-ID_INLINE idMat2& idMat2::operator*=(const float a) {
+inline idMat2& idMat2::operator*=(const float a) {
   mat[0].x *= a;
   mat[0].y *= a;
   mat[1].x *= a;
@@ -191,7 +191,7 @@ ID_INLINE idMat2& idMat2::operator*=(const float a) {
   return *this;
 }
 
-ID_INLINE idMat2& idMat2::operator*=(const idMat2& a) {
+inline idMat2& idMat2::operator*=(const idMat2& a) {
   float x, y;
   x = mat[0].x;
   y = mat[0].y;
@@ -204,7 +204,7 @@ ID_INLINE idMat2& idMat2::operator*=(const idMat2& a) {
   return *this;
 }
 
-ID_INLINE idMat2& idMat2::operator+=(const idMat2& a) {
+inline idMat2& idMat2::operator+=(const idMat2& a) {
   mat[0].x += a[0].x;
   mat[0].y += a[0].y;
   mat[1].x += a[1].x;
@@ -213,7 +213,7 @@ ID_INLINE idMat2& idMat2::operator+=(const idMat2& a) {
   return *this;
 }
 
-ID_INLINE idMat2& idMat2::operator-=(const idMat2& a) {
+inline idMat2& idMat2::operator-=(const idMat2& a) {
   mat[0].x -= a[0].x;
   mat[0].y -= a[0].y;
   mat[1].x -= a[1].x;
@@ -222,68 +222,68 @@ ID_INLINE idMat2& idMat2::operator-=(const idMat2& a) {
   return *this;
 }
 
-ID_INLINE idVec2 operator*(const idVec2& vec, const idMat2& mat) {
+inline idVec2 operator*(const idVec2& vec, const idMat2& mat) {
   return mat * vec;
 }
 
-ID_INLINE idMat2 operator*(const float a, idMat2 const& mat) { return mat * a; }
+inline idMat2 operator*(const float a, idMat2 const& mat) { return mat * a; }
 
-ID_INLINE idVec2& operator*=(idVec2& vec, const idMat2& mat) {
+inline idVec2& operator*=(idVec2& vec, const idMat2& mat) {
   vec = mat * vec;
   return vec;
 }
 
-ID_INLINE bool idMat2::Compare(const idMat2& a) const {
+inline bool idMat2::Compare(const idMat2& a) const {
   if (mat[0].Compare(a[0]) && mat[1].Compare(a[1])) {
     return true;
   }
   return false;
 }
 
-ID_INLINE bool idMat2::Compare(const idMat2& a, const float epsilon) const {
+inline bool idMat2::Compare(const idMat2& a, const float epsilon) const {
   if (mat[0].Compare(a[0], epsilon) && mat[1].Compare(a[1], epsilon)) {
     return true;
   }
   return false;
 }
 
-ID_INLINE bool idMat2::operator==(const idMat2& a) const { return Compare(a); }
+inline bool idMat2::operator==(const idMat2& a) const { return Compare(a); }
 
-ID_INLINE bool idMat2::operator!=(const idMat2& a) const { return !Compare(a); }
+inline bool idMat2::operator!=(const idMat2& a) const { return !Compare(a); }
 
-ID_INLINE void idMat2::Zero() {
+inline void idMat2::Zero() {
   mat[0].Zero();
   mat[1].Zero();
 }
 
-ID_INLINE void idMat2::Identity() { *this = mat2_identity; }
+inline void idMat2::Identity() { *this = mat2_identity; }
 
-ID_INLINE bool idMat2::IsIdentity(const float epsilon) const {
+inline bool idMat2::IsIdentity(const float epsilon) const {
   return Compare(mat2_identity, epsilon);
 }
 
-ID_INLINE bool idMat2::IsSymmetric(const float epsilon) const {
+inline bool idMat2::IsSymmetric(const float epsilon) const {
   return (idMath::Fabs(mat[0][1] - mat[1][0]) < epsilon);
 }
 
-ID_INLINE bool idMat2::IsDiagonal(const float epsilon) const {
+inline bool idMat2::IsDiagonal(const float epsilon) const {
   if (idMath::Fabs(mat[0][1]) > epsilon || idMath::Fabs(mat[1][0]) > epsilon) {
     return false;
   }
   return true;
 }
 
-ID_INLINE float idMat2::Trace() const { return (mat[0][0] + mat[1][1]); }
+inline float idMat2::Trace() const { return (mat[0][0] + mat[1][1]); }
 
-ID_INLINE float idMat2::Determinant() const {
+inline float idMat2::Determinant() const {
   return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
 }
 
-ID_INLINE idMat2 idMat2::Transpose() const {
+inline idMat2 idMat2::Transpose() const {
   return idMat2(mat[0][0], mat[1][0], mat[0][1], mat[1][1]);
 }
 
-ID_INLINE idMat2& idMat2::TransposeSelf() {
+inline idMat2& idMat2::TransposeSelf() {
   float tmp;
 
   tmp = mat[0][1];
@@ -293,7 +293,7 @@ ID_INLINE idMat2& idMat2::TransposeSelf() {
   return *this;
 }
 
-ID_INLINE idMat2 idMat2::Inverse() const {
+inline idMat2 idMat2::Inverse() const {
   idMat2 invMat;
 
   invMat = *this;
@@ -301,7 +301,7 @@ ID_INLINE idMat2 idMat2::Inverse() const {
   return invMat;
 }
 
-ID_INLINE idMat2 idMat2::InverseFast() const {
+inline idMat2 idMat2::InverseFast() const {
   idMat2 invMat;
 
   invMat = *this;
@@ -309,13 +309,11 @@ ID_INLINE idMat2 idMat2::InverseFast() const {
   return invMat;
 }
 
-ID_INLINE int idMat2::GetDimension() const { return 4; }
+inline int idMat2::GetDimension() const { return 4; }
 
-ID_INLINE const float* idMat2::ToFloatPtr() const {
-  return mat[0].ToFloatPtr();
-}
+inline const float* idMat2::ToFloatPtr() const { return mat[0].ToFloatPtr(); }
 
-ID_INLINE float* idMat2::ToFloatPtr() { return mat[0].ToFloatPtr(); }
+inline float* idMat2::ToFloatPtr() { return mat[0].ToFloatPtr(); }
 
 //===============================================================
 //
@@ -414,9 +412,9 @@ extern idMat3 mat3_zero;
 extern idMat3 mat3_identity;
 #define mat3_default mat3_identity
 
-ID_INLINE idMat3::idMat3() {}
+inline idMat3::idMat3() {}
 
-ID_INLINE idMat3::idMat3(const idVec3& x, const idVec3& y, const idVec3& z) {
+inline idMat3::idMat3(const idVec3& x, const idVec3& y, const idVec3& z) {
   mat[0].x = x.x;
   mat[0].y = x.y;
   mat[0].z = x.z;
@@ -428,9 +426,9 @@ ID_INLINE idMat3::idMat3(const idVec3& x, const idVec3& y, const idVec3& z) {
   mat[2].z = z.z;
 }
 
-ID_INLINE idMat3::idMat3(const float xx, const float xy, const float xz,
-                         const float yx, const float yy, const float yz,
-                         const float zx, const float zy, const float zz) {
+inline idMat3::idMat3(const float xx, const float xy, const float xz,
+                      const float yx, const float yy, const float yz,
+                      const float zx, const float zy, const float zz) {
   mat[0].x = xx;
   mat[0].y = xy;
   mat[0].z = xz;
@@ -442,32 +440,32 @@ ID_INLINE idMat3::idMat3(const float xx, const float xy, const float xz,
   mat[2].z = zz;
 }
 
-ID_INLINE idMat3::idMat3(const float src[3][3]) {
+inline idMat3::idMat3(const float src[3][3]) {
   memcpy(mat, src, 3 * 3 * sizeof(float));
 }
 
-ID_INLINE const idVec3& idMat3::operator[](int index) const {
+inline const idVec3& idMat3::operator[](int index) const {
   // assert( ( index >= 0 ) && ( index < 3 ) );
   return mat[index];
 }
 
-ID_INLINE idVec3& idMat3::operator[](int index) {
+inline idVec3& idMat3::operator[](int index) {
   // assert( ( index >= 0 ) && ( index < 3 ) );
   return mat[index];
 }
 
-ID_INLINE idMat3 idMat3::operator-() const {
+inline idMat3 idMat3::operator-() const {
   return idMat3(-mat[0][0], -mat[0][1], -mat[0][2], -mat[1][0], -mat[1][1],
                 -mat[1][2], -mat[2][0], -mat[2][1], -mat[2][2]);
 }
 
-ID_INLINE idVec3 idMat3::operator*(const idVec3& vec) const {
+inline idVec3 idMat3::operator*(const idVec3& vec) const {
   return idVec3(mat[0].x * vec.x + mat[1].x * vec.y + mat[2].x * vec.z,
                 mat[0].y * vec.x + mat[1].y * vec.y + mat[2].y * vec.z,
                 mat[0].z * vec.x + mat[1].z * vec.y + mat[2].z * vec.z);
 }
 
-ID_INLINE idMat3 idMat3::operator*(const idMat3& a) const {
+inline idMat3 idMat3::operator*(const idMat3& a) const {
   int i, j;
   const float *m1Ptr, *m2Ptr;
   float* dstPtr;
@@ -488,25 +486,25 @@ ID_INLINE idMat3 idMat3::operator*(const idMat3& a) const {
   return dst;
 }
 
-ID_INLINE idMat3 idMat3::operator*(const float a) const {
+inline idMat3 idMat3::operator*(const float a) const {
   return idMat3(mat[0].x * a, mat[0].y * a, mat[0].z * a, mat[1].x * a,
                 mat[1].y * a, mat[1].z * a, mat[2].x * a, mat[2].y * a,
                 mat[2].z * a);
 }
 
-ID_INLINE idMat3 idMat3::operator+(const idMat3& a) const {
+inline idMat3 idMat3::operator+(const idMat3& a) const {
   return idMat3(mat[0].x + a[0].x, mat[0].y + a[0].y, mat[0].z + a[0].z,
                 mat[1].x + a[1].x, mat[1].y + a[1].y, mat[1].z + a[1].z,
                 mat[2].x + a[2].x, mat[2].y + a[2].y, mat[2].z + a[2].z);
 }
 
-ID_INLINE idMat3 idMat3::operator-(const idMat3& a) const {
+inline idMat3 idMat3::operator-(const idMat3& a) const {
   return idMat3(mat[0].x - a[0].x, mat[0].y - a[0].y, mat[0].z - a[0].z,
                 mat[1].x - a[1].x, mat[1].y - a[1].y, mat[1].z - a[1].z,
                 mat[2].x - a[2].x, mat[2].y - a[2].y, mat[2].z - a[2].z);
 }
 
-ID_INLINE idMat3& idMat3::operator*=(const float a) {
+inline idMat3& idMat3::operator*=(const float a) {
   mat[0].x *= a;
   mat[0].y *= a;
   mat[0].z *= a;
@@ -520,7 +518,7 @@ ID_INLINE idMat3& idMat3::operator*=(const float a) {
   return *this;
 }
 
-ID_INLINE idMat3& idMat3::operator*=(const idMat3& a) {
+inline idMat3& idMat3::operator*=(const idMat3& a) {
   int i, j;
   const float* m2Ptr;
   float *m1Ptr, dst[3];
@@ -541,7 +539,7 @@ ID_INLINE idMat3& idMat3::operator*=(const idMat3& a) {
   return *this;
 }
 
-ID_INLINE idMat3& idMat3::operator+=(const idMat3& a) {
+inline idMat3& idMat3::operator+=(const idMat3& a) {
   mat[0].x += a[0].x;
   mat[0].y += a[0].y;
   mat[0].z += a[0].z;
@@ -555,7 +553,7 @@ ID_INLINE idMat3& idMat3::operator+=(const idMat3& a) {
   return *this;
 }
 
-ID_INLINE idMat3& idMat3::operator-=(const idMat3& a) {
+inline idMat3& idMat3::operator-=(const idMat3& a) {
   mat[0].x -= a[0].x;
   mat[0].y -= a[0].y;
   mat[0].z -= a[0].z;
@@ -569,13 +567,13 @@ ID_INLINE idMat3& idMat3::operator-=(const idMat3& a) {
   return *this;
 }
 
-ID_INLINE idVec3 operator*(const idVec3& vec, const idMat3& mat) {
+inline idVec3 operator*(const idVec3& vec, const idMat3& mat) {
   return mat * vec;
 }
 
-ID_INLINE idMat3 operator*(const float a, const idMat3& mat) { return mat * a; }
+inline idMat3 operator*(const float a, const idMat3& mat) { return mat * a; }
 
-ID_INLINE idVec3& operator*=(idVec3& vec, const idMat3& mat) {
+inline idVec3& operator*=(idVec3& vec, const idMat3& mat) {
   float x = mat[0].x * vec.x + mat[1].x * vec.y + mat[2].x * vec.z;
   float y = mat[0].y * vec.x + mat[1].y * vec.y + mat[2].y * vec.z;
   vec.z = mat[0].z * vec.x + mat[1].z * vec.y + mat[2].z * vec.z;
@@ -584,14 +582,14 @@ ID_INLINE idVec3& operator*=(idVec3& vec, const idMat3& mat) {
   return vec;
 }
 
-ID_INLINE bool idMat3::Compare(const idMat3& a) const {
+inline bool idMat3::Compare(const idMat3& a) const {
   if (mat[0].Compare(a[0]) && mat[1].Compare(a[1]) && mat[2].Compare(a[2])) {
     return true;
   }
   return false;
 }
 
-ID_INLINE bool idMat3::Compare(const idMat3& a, const float epsilon) const {
+inline bool idMat3::Compare(const idMat3& a, const float epsilon) const {
   if (mat[0].Compare(a[0], epsilon) && mat[1].Compare(a[1], epsilon) &&
       mat[2].Compare(a[2], epsilon)) {
     return true;
@@ -599,19 +597,19 @@ ID_INLINE bool idMat3::Compare(const idMat3& a, const float epsilon) const {
   return false;
 }
 
-ID_INLINE bool idMat3::operator==(const idMat3& a) const { return Compare(a); }
+inline bool idMat3::operator==(const idMat3& a) const { return Compare(a); }
 
-ID_INLINE bool idMat3::operator!=(const idMat3& a) const { return !Compare(a); }
+inline bool idMat3::operator!=(const idMat3& a) const { return !Compare(a); }
 
-ID_INLINE void idMat3::Zero() { memset(mat, 0, sizeof(idMat3)); }
+inline void idMat3::Zero() { memset(mat, 0, sizeof(idMat3)); }
 
-ID_INLINE void idMat3::Identity() { *this = mat3_identity; }
+inline void idMat3::Identity() { *this = mat3_identity; }
 
-ID_INLINE bool idMat3::IsIdentity(const float epsilon) const {
+inline bool idMat3::IsIdentity(const float epsilon) const {
   return Compare(mat3_identity, epsilon);
 }
 
-ID_INLINE bool idMat3::IsSymmetric(const float epsilon) const {
+inline bool idMat3::IsSymmetric(const float epsilon) const {
   if (idMath::Fabs(mat[0][1] - mat[1][0]) > epsilon) {
     return false;
   }
@@ -624,7 +622,7 @@ ID_INLINE bool idMat3::IsSymmetric(const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat3::IsDiagonal(const float epsilon) const {
+inline bool idMat3::IsDiagonal(const float epsilon) const {
   if (idMath::Fabs(mat[0][1]) > epsilon || idMath::Fabs(mat[0][2]) > epsilon ||
       idMath::Fabs(mat[1][0]) > epsilon || idMath::Fabs(mat[1][2]) > epsilon ||
       idMath::Fabs(mat[2][0]) > epsilon || idMath::Fabs(mat[2][1]) > epsilon) {
@@ -633,37 +631,37 @@ ID_INLINE bool idMat3::IsDiagonal(const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat3::IsRotated() const { return !Compare(mat3_identity); }
+inline bool idMat3::IsRotated() const { return !Compare(mat3_identity); }
 
-ID_INLINE void idMat3::ProjectVector(const idVec3& src, idVec3& dst) const {
+inline void idMat3::ProjectVector(const idVec3& src, idVec3& dst) const {
   dst.x = src * mat[0];
   dst.y = src * mat[1];
   dst.z = src * mat[2];
 }
 
-ID_INLINE void idMat3::UnprojectVector(const idVec3& src, idVec3& dst) const {
+inline void idMat3::UnprojectVector(const idVec3& src, idVec3& dst) const {
   dst = mat[0] * src.x + mat[1] * src.y + mat[2] * src.z;
 }
 
-ID_INLINE bool idMat3::FixDegeneracies() {
+inline bool idMat3::FixDegeneracies() {
   bool r = mat[0].FixDegenerateNormal();
   r |= mat[1].FixDegenerateNormal();
   r |= mat[2].FixDegenerateNormal();
   return r;
 }
 
-ID_INLINE bool idMat3::FixDenormals() {
+inline bool idMat3::FixDenormals() {
   bool r = mat[0].FixDenormals();
   r |= mat[1].FixDenormals();
   r |= mat[2].FixDenormals();
   return r;
 }
 
-ID_INLINE float idMat3::Trace() const {
+inline float idMat3::Trace() const {
   return (mat[0][0] + mat[1][1] + mat[2][2]);
 }
 
-ID_INLINE idMat3 idMat3::OrthoNormalize() const {
+inline idMat3 idMat3::OrthoNormalize() const {
   idMat3 ortho;
 
   ortho = *this;
@@ -675,7 +673,7 @@ ID_INLINE idMat3 idMat3::OrthoNormalize() const {
   return ortho;
 }
 
-ID_INLINE idMat3& idMat3::OrthoNormalizeSelf() {
+inline idMat3& idMat3::OrthoNormalizeSelf() {
   mat[0].Normalize();
   mat[2].Cross(mat[0], mat[1]);
   mat[2].Normalize();
@@ -684,12 +682,12 @@ ID_INLINE idMat3& idMat3::OrthoNormalizeSelf() {
   return *this;
 }
 
-ID_INLINE idMat3 idMat3::Transpose() const {
+inline idMat3 idMat3::Transpose() const {
   return idMat3(mat[0][0], mat[1][0], mat[2][0], mat[0][1], mat[1][1],
                 mat[2][1], mat[0][2], mat[1][2], mat[2][2]);
 }
 
-ID_INLINE idMat3& idMat3::TransposeSelf() {
+inline idMat3& idMat3::TransposeSelf() {
   float tmp0, tmp1, tmp2;
 
   tmp0 = mat[0][1];
@@ -705,7 +703,7 @@ ID_INLINE idMat3& idMat3::TransposeSelf() {
   return *this;
 }
 
-ID_INLINE idMat3 idMat3::Inverse() const {
+inline idMat3 idMat3::Inverse() const {
   idMat3 invMat;
 
   invMat = *this;
@@ -713,7 +711,7 @@ ID_INLINE idMat3 idMat3::Inverse() const {
   return invMat;
 }
 
-ID_INLINE idMat3 idMat3::InverseFast() const {
+inline idMat3 idMat3::InverseFast() const {
   idMat3 invMat;
 
   invMat = *this;
@@ -721,7 +719,7 @@ ID_INLINE idMat3 idMat3::InverseFast() const {
   return invMat;
 }
 
-ID_INLINE idMat3 idMat3::TransposeMultiply(const idMat3& b) const {
+inline idMat3 idMat3::TransposeMultiply(const idMat3& b) const {
   return idMat3(mat[0].x * b[0].x + mat[1].x * b[1].x + mat[2].x * b[2].x,
                 mat[0].x * b[0].y + mat[1].x * b[1].y + mat[2].x * b[2].y,
                 mat[0].x * b[0].z + mat[1].x * b[1].z + mat[2].x * b[2].z,
@@ -733,8 +731,8 @@ ID_INLINE idMat3 idMat3::TransposeMultiply(const idMat3& b) const {
                 mat[0].z * b[0].z + mat[1].z * b[1].z + mat[2].z * b[2].z);
 }
 
-ID_INLINE void TransposeMultiply(const idMat3& transpose, const idMat3& b,
-                                 idMat3& dst) {
+inline void TransposeMultiply(const idMat3& transpose, const idMat3& b,
+                              idMat3& dst) {
   dst[0].x = transpose[0].x * b[0].x + transpose[1].x * b[1].x +
              transpose[2].x * b[2].x;
   dst[0].y = transpose[0].x * b[0].y + transpose[1].x * b[1].y +
@@ -755,17 +753,15 @@ ID_INLINE void TransposeMultiply(const idMat3& transpose, const idMat3& b,
              transpose[2].z * b[2].z;
 }
 
-ID_INLINE idMat3 SkewSymmetric(idVec3 const& src) {
+inline idMat3 SkewSymmetric(idVec3 const& src) {
   return idMat3(0.0f, -src.z, src.y, src.z, 0.0f, -src.x, -src.y, src.x, 0.0f);
 }
 
-ID_INLINE int idMat3::GetDimension() const { return 9; }
+inline int idMat3::GetDimension() const { return 9; }
 
-ID_INLINE const float* idMat3::ToFloatPtr() const {
-  return mat[0].ToFloatPtr();
-}
+inline const float* idMat3::ToFloatPtr() const { return mat[0].ToFloatPtr(); }
 
-ID_INLINE float* idMat3::ToFloatPtr() { return mat[0].ToFloatPtr(); }
+inline float* idMat3::ToFloatPtr() { return mat[0].ToFloatPtr(); }
 
 //===============================================================
 //
@@ -850,7 +846,7 @@ extern idMat4 mat4_identity;
 #define mat4_default mat4_identity
 
 // jmarshall
-ID_INLINE idMat3 idMat4::ToMat3(void) const {
+inline idMat3 idMat4::ToMat3(void) const {
   idMat3 m;
 
   m[0][0] = mat[0][0];
@@ -867,22 +863,22 @@ ID_INLINE idMat3 idMat4::ToMat3(void) const {
 }
 // jmarshall end
 
-ID_INLINE idMat4::idMat4() {}
+inline idMat4::idMat4() {}
 
-ID_INLINE idMat4::idMat4(const idVec4& x, const idVec4& y, const idVec4& z,
-                         const idVec4& w) {
+inline idMat4::idMat4(const idVec4& x, const idVec4& y, const idVec4& z,
+                      const idVec4& w) {
   mat[0] = x;
   mat[1] = y;
   mat[2] = z;
   mat[3] = w;
 }
 
-ID_INLINE idMat4::idMat4(const float xx, const float xy, const float xz,
-                         const float xw, const float yx, const float yy,
-                         const float yz, const float yw, const float zx,
-                         const float zy, const float zz, const float zw,
-                         const float wx, const float wy, const float wz,
-                         const float ww) {
+inline idMat4::idMat4(const float xx, const float xy, const float xz,
+                      const float xw, const float yx, const float yy,
+                      const float yz, const float yw, const float zx,
+                      const float zy, const float zz, const float zw,
+                      const float wx, const float wy, const float wz,
+                      const float ww) {
   mat[0][0] = xx;
   mat[0][1] = xy;
   mat[0][2] = xz;
@@ -901,7 +897,7 @@ ID_INLINE idMat4::idMat4(const float xx, const float xy, const float xz,
   mat[3][3] = ww;
 }
 
-ID_INLINE idMat4::idMat4(const idMat3& rotation, const idVec3& translation) {
+inline idMat4::idMat4(const idMat3& rotation, const idVec3& translation) {
   // NOTE: idMat3 is transposed because it is column-major
   mat[0][0] = rotation[0][0];
   mat[0][1] = rotation[1][0];
@@ -921,28 +917,28 @@ ID_INLINE idMat4::idMat4(const idMat3& rotation, const idVec3& translation) {
   mat[3][3] = 1.0f;
 }
 
-ID_INLINE idMat4::idMat4(const float src[4][4]) {
+inline idMat4::idMat4(const float src[4][4]) {
   memcpy(mat, src, 4 * 4 * sizeof(float));
 }
 
-ID_INLINE const idVec4& idMat4::operator[](int index) const {
+inline const idVec4& idMat4::operator[](int index) const {
   // assert( ( index >= 0 ) && ( index < 4 ) );
   return mat[index];
 }
 
-ID_INLINE idVec4& idMat4::operator[](int index) {
+inline idVec4& idMat4::operator[](int index) {
   // assert( ( index >= 0 ) && ( index < 4 ) );
   return mat[index];
 }
 
-ID_INLINE idMat4 idMat4::operator*(const float a) const {
+inline idMat4 idMat4::operator*(const float a) const {
   return idMat4(mat[0].x * a, mat[0].y * a, mat[0].z * a, mat[0].w * a,
                 mat[1].x * a, mat[1].y * a, mat[1].z * a, mat[1].w * a,
                 mat[2].x * a, mat[2].y * a, mat[2].z * a, mat[2].w * a,
                 mat[3].x * a, mat[3].y * a, mat[3].z * a, mat[3].w * a);
 }
 
-ID_INLINE idVec4 idMat4::operator*(const idVec4& vec) const {
+inline idVec4 idMat4::operator*(const idVec4& vec) const {
   return idVec4(
       mat[0].x * vec.x + mat[0].y * vec.y + mat[0].z * vec.z + mat[0].w * vec.w,
       mat[1].x * vec.x + mat[1].y * vec.y + mat[1].z * vec.z + mat[1].w * vec.w,
@@ -951,7 +947,7 @@ ID_INLINE idVec4 idMat4::operator*(const idVec4& vec) const {
           mat[3].w * vec.w);
 }
 
-ID_INLINE idVec3 idMat4::operator*(const idVec3& vec) const {
+inline idVec3 idMat4::operator*(const idVec3& vec) const {
   float s = mat[3].x * vec.x + mat[3].y * vec.y + mat[3].z * vec.z + mat[3].w;
   if (s == 0.0f) {
     return idVec3(0.0f, 0.0f, 0.0f);
@@ -973,7 +969,7 @@ ID_INLINE idVec3 idMat4::operator*(const idVec3& vec) const {
   }
 }
 
-ID_INLINE idMat4 idMat4::operator*(const idMat4& a) const {
+inline idMat4 idMat4::operator*(const idMat4& a) const {
   int i, j;
   const float *m1Ptr, *m2Ptr;
   float* dstPtr;
@@ -994,7 +990,7 @@ ID_INLINE idMat4 idMat4::operator*(const idMat4& a) const {
   return dst;
 }
 
-ID_INLINE idMat4 idMat4::operator+(const idMat4& a) const {
+inline idMat4 idMat4::operator+(const idMat4& a) const {
   return idMat4(mat[0].x + a[0].x, mat[0].y + a[0].y, mat[0].z + a[0].z,
                 mat[0].w + a[0].w, mat[1].x + a[1].x, mat[1].y + a[1].y,
                 mat[1].z + a[1].z, mat[1].w + a[1].w, mat[2].x + a[2].x,
@@ -1003,7 +999,7 @@ ID_INLINE idMat4 idMat4::operator+(const idMat4& a) const {
                 mat[3].w + a[3].w);
 }
 
-ID_INLINE idMat4 idMat4::operator-(const idMat4& a) const {
+inline idMat4 idMat4::operator-(const idMat4& a) const {
   return idMat4(mat[0].x - a[0].x, mat[0].y - a[0].y, mat[0].z - a[0].z,
                 mat[0].w - a[0].w, mat[1].x - a[1].x, mat[1].y - a[1].y,
                 mat[1].z - a[1].z, mat[1].w - a[1].w, mat[2].x - a[2].x,
@@ -1012,7 +1008,7 @@ ID_INLINE idMat4 idMat4::operator-(const idMat4& a) const {
                 mat[3].w - a[3].w);
 }
 
-ID_INLINE idMat4& idMat4::operator*=(const float a) {
+inline idMat4& idMat4::operator*=(const float a) {
   mat[0].x *= a;
   mat[0].y *= a;
   mat[0].z *= a;
@@ -1032,12 +1028,12 @@ ID_INLINE idMat4& idMat4::operator*=(const float a) {
   return *this;
 }
 
-ID_INLINE idMat4& idMat4::operator*=(const idMat4& a) {
+inline idMat4& idMat4::operator*=(const idMat4& a) {
   *this = (*this) * a;
   return *this;
 }
 
-ID_INLINE idMat4& idMat4::operator+=(const idMat4& a) {
+inline idMat4& idMat4::operator+=(const idMat4& a) {
   mat[0].x += a[0].x;
   mat[0].y += a[0].y;
   mat[0].z += a[0].z;
@@ -1057,7 +1053,7 @@ ID_INLINE idMat4& idMat4::operator+=(const idMat4& a) {
   return *this;
 }
 
-ID_INLINE idMat4& idMat4::operator-=(const idMat4& a) {
+inline idMat4& idMat4::operator-=(const idMat4& a) {
   mat[0].x -= a[0].x;
   mat[0].y -= a[0].y;
   mat[0].z -= a[0].z;
@@ -1077,27 +1073,27 @@ ID_INLINE idMat4& idMat4::operator-=(const idMat4& a) {
   return *this;
 }
 
-ID_INLINE idMat4 operator*(const float a, const idMat4& mat) { return mat * a; }
+inline idMat4 operator*(const float a, const idMat4& mat) { return mat * a; }
 
-ID_INLINE idVec4 operator*(const idVec4& vec, const idMat4& mat) {
+inline idVec4 operator*(const idVec4& vec, const idMat4& mat) {
   return mat * vec;
 }
 
-ID_INLINE idVec3 operator*(const idVec3& vec, const idMat4& mat) {
+inline idVec3 operator*(const idVec3& vec, const idMat4& mat) {
   return mat * vec;
 }
 
-ID_INLINE idVec4& operator*=(idVec4& vec, const idMat4& mat) {
+inline idVec4& operator*=(idVec4& vec, const idMat4& mat) {
   vec = mat * vec;
   return vec;
 }
 
-ID_INLINE idVec3& operator*=(idVec3& vec, const idMat4& mat) {
+inline idVec3& operator*=(idVec3& vec, const idMat4& mat) {
   vec = mat * vec;
   return vec;
 }
 
-ID_INLINE bool idMat4::Compare(const idMat4& a) const {
+inline bool idMat4::Compare(const idMat4& a) const {
   dword i;
   const float *ptr1, *ptr2;
 
@@ -1111,7 +1107,7 @@ ID_INLINE bool idMat4::Compare(const idMat4& a) const {
   return true;
 }
 
-ID_INLINE bool idMat4::Compare(const idMat4& a, const float epsilon) const {
+inline bool idMat4::Compare(const idMat4& a, const float epsilon) const {
   dword i;
   const float *ptr1, *ptr2;
 
@@ -1125,19 +1121,19 @@ ID_INLINE bool idMat4::Compare(const idMat4& a, const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat4::operator==(const idMat4& a) const { return Compare(a); }
+inline bool idMat4::operator==(const idMat4& a) const { return Compare(a); }
 
-ID_INLINE bool idMat4::operator!=(const idMat4& a) const { return !Compare(a); }
+inline bool idMat4::operator!=(const idMat4& a) const { return !Compare(a); }
 
-ID_INLINE void idMat4::Zero() { memset(mat, 0, sizeof(idMat4)); }
+inline void idMat4::Zero() { memset(mat, 0, sizeof(idMat4)); }
 
-ID_INLINE void idMat4::Identity() { *this = mat4_identity; }
+inline void idMat4::Identity() { *this = mat4_identity; }
 
-ID_INLINE bool idMat4::IsIdentity(const float epsilon) const {
+inline bool idMat4::IsIdentity(const float epsilon) const {
   return Compare(mat4_identity, epsilon);
 }
 
-ID_INLINE bool idMat4::IsSymmetric(const float epsilon) const {
+inline bool idMat4::IsSymmetric(const float epsilon) const {
   for (int i = 1; i < 4; i++) {
     for (int j = 0; j < i; j++) {
       if (idMath::Fabs(mat[i][j] - mat[j][i]) > epsilon) {
@@ -1148,7 +1144,7 @@ ID_INLINE bool idMat4::IsSymmetric(const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat4::IsDiagonal(const float epsilon) const {
+inline bool idMat4::IsDiagonal(const float epsilon) const {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       if (i != j && idMath::Fabs(mat[i][j]) > epsilon) {
@@ -1159,7 +1155,7 @@ ID_INLINE bool idMat4::IsDiagonal(const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat4::IsRotated() const {
+inline bool idMat4::IsRotated() const {
   if (!mat[0][1] && !mat[0][2] && !mat[1][0] && !mat[1][2] && !mat[2][0] &&
       !mat[2][1]) {
     return false;
@@ -1167,22 +1163,22 @@ ID_INLINE bool idMat4::IsRotated() const {
   return true;
 }
 
-ID_INLINE void idMat4::ProjectVector(const idVec4& src, idVec4& dst) const {
+inline void idMat4::ProjectVector(const idVec4& src, idVec4& dst) const {
   dst.x = src * mat[0];
   dst.y = src * mat[1];
   dst.z = src * mat[2];
   dst.w = src * mat[3];
 }
 
-ID_INLINE void idMat4::UnprojectVector(const idVec4& src, idVec4& dst) const {
+inline void idMat4::UnprojectVector(const idVec4& src, idVec4& dst) const {
   dst = mat[0] * src.x + mat[1] * src.y + mat[2] * src.z + mat[3] * src.w;
 }
 
-ID_INLINE float idMat4::Trace() const {
+inline float idMat4::Trace() const {
   return (mat[0][0] + mat[1][1] + mat[2][2] + mat[3][3]);
 }
 
-ID_INLINE idMat4 idMat4::Inverse() const {
+inline idMat4 idMat4::Inverse() const {
   idMat4 invMat;
 
   invMat = *this;
@@ -1190,7 +1186,7 @@ ID_INLINE idMat4 idMat4::Inverse() const {
   return invMat;
 }
 
-ID_INLINE idMat4 idMat4::InverseFast() const {
+inline idMat4 idMat4::InverseFast() const {
   idMat4 invMat;
 
   invMat = *this;
@@ -1198,20 +1194,18 @@ ID_INLINE idMat4 idMat4::InverseFast() const {
   return invMat;
 }
 
-ID_INLINE idMat4 idMat3::ToMat4() const {
+inline idMat4 idMat3::ToMat4() const {
   // NOTE: idMat3 is transposed because it is column-major
   return idMat4(mat[0][0], mat[1][0], mat[2][0], 0.0f, mat[0][1], mat[1][1],
                 mat[2][1], 0.0f, mat[0][2], mat[1][2], mat[2][2], 0.0f, 0.0f,
                 0.0f, 0.0f, 1.0f);
 }
 
-ID_INLINE int idMat4::GetDimension() const { return 16; }
+inline int idMat4::GetDimension() const { return 16; }
 
-ID_INLINE const float* idMat4::ToFloatPtr() const {
-  return mat[0].ToFloatPtr();
-}
+inline const float* idMat4::ToFloatPtr() const { return mat[0].ToFloatPtr(); }
 
-ID_INLINE float* idMat4::ToFloatPtr() { return mat[0].ToFloatPtr(); }
+inline float* idMat4::ToFloatPtr() { return mat[0].ToFloatPtr(); }
 
 //===============================================================
 //
@@ -1278,14 +1272,14 @@ extern idMat5 mat5_zero;
 extern idMat5 mat5_identity;
 #define mat5_default mat5_identity
 
-ID_INLINE idMat5::idMat5() {}
+inline idMat5::idMat5() {}
 
-ID_INLINE idMat5::idMat5(const float src[5][5]) {
+inline idMat5::idMat5(const float src[5][5]) {
   memcpy(mat, src, 5 * 5 * sizeof(float));
 }
 
-ID_INLINE idMat5::idMat5(const idVec5& v0, const idVec5& v1, const idVec5& v2,
-                         const idVec5& v3, const idVec5& v4) {
+inline idMat5::idMat5(const idVec5& v0, const idVec5& v1, const idVec5& v2,
+                      const idVec5& v3, const idVec5& v4) {
   mat[0] = v0;
   mat[1] = v1;
   mat[2] = v2;
@@ -1293,17 +1287,17 @@ ID_INLINE idMat5::idMat5(const idVec5& v0, const idVec5& v1, const idVec5& v2,
   mat[4] = v4;
 }
 
-ID_INLINE const idVec5& idMat5::operator[](int index) const {
+inline const idVec5& idMat5::operator[](int index) const {
   // assert( ( index >= 0 ) && ( index < 5 ) );
   return mat[index];
 }
 
-ID_INLINE idVec5& idMat5::operator[](int index) {
+inline idVec5& idMat5::operator[](int index) {
   // assert( ( index >= 0 ) && ( index < 5 ) );
   return mat[index];
 }
 
-ID_INLINE idMat5 idMat5::operator*(const idMat5& a) const {
+inline idMat5 idMat5::operator*(const idMat5& a) const {
   int i, j;
   const float *m1Ptr, *m2Ptr;
   float* dstPtr;
@@ -1325,7 +1319,7 @@ ID_INLINE idMat5 idMat5::operator*(const idMat5& a) const {
   return dst;
 }
 
-ID_INLINE idMat5 idMat5::operator*(const float a) const {
+inline idMat5 idMat5::operator*(const float a) const {
   return idMat5(idVec5(mat[0][0] * a, mat[0][1] * a, mat[0][2] * a,
                        mat[0][3] * a, mat[0][4] * a),
                 idVec5(mat[1][0] * a, mat[1][1] * a, mat[1][2] * a,
@@ -1338,7 +1332,7 @@ ID_INLINE idMat5 idMat5::operator*(const float a) const {
                        mat[4][3] * a, mat[4][4] * a));
 }
 
-ID_INLINE idVec5 idMat5::operator*(const idVec5& vec) const {
+inline idVec5 idMat5::operator*(const idVec5& vec) const {
   return idVec5(mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] +
                     mat[0][3] * vec[3] + mat[0][4] * vec[4],
                 mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2] +
@@ -1351,7 +1345,7 @@ ID_INLINE idVec5 idMat5::operator*(const idVec5& vec) const {
                     mat[4][3] * vec[3] + mat[4][4] * vec[4]);
 }
 
-ID_INLINE idMat5 idMat5::operator+(const idMat5& a) const {
+inline idMat5 idMat5::operator+(const idMat5& a) const {
   return idMat5(
       idVec5(mat[0][0] + a[0][0], mat[0][1] + a[0][1], mat[0][2] + a[0][2],
              mat[0][3] + a[0][3], mat[0][4] + a[0][4]),
@@ -1365,7 +1359,7 @@ ID_INLINE idMat5 idMat5::operator+(const idMat5& a) const {
              mat[4][3] + a[4][3], mat[4][4] + a[4][4]));
 }
 
-ID_INLINE idMat5 idMat5::operator-(const idMat5& a) const {
+inline idMat5 idMat5::operator-(const idMat5& a) const {
   return idMat5(
       idVec5(mat[0][0] - a[0][0], mat[0][1] - a[0][1], mat[0][2] - a[0][2],
              mat[0][3] - a[0][3], mat[0][4] - a[0][4]),
@@ -1379,7 +1373,7 @@ ID_INLINE idMat5 idMat5::operator-(const idMat5& a) const {
              mat[4][3] - a[4][3], mat[4][4] - a[4][4]));
 }
 
-ID_INLINE idMat5& idMat5::operator*=(const float a) {
+inline idMat5& idMat5::operator*=(const float a) {
   mat[0][0] *= a;
   mat[0][1] *= a;
   mat[0][2] *= a;
@@ -1408,12 +1402,12 @@ ID_INLINE idMat5& idMat5::operator*=(const float a) {
   return *this;
 }
 
-ID_INLINE idMat5& idMat5::operator*=(const idMat5& a) {
+inline idMat5& idMat5::operator*=(const idMat5& a) {
   *this = *this * a;
   return *this;
 }
 
-ID_INLINE idMat5& idMat5::operator+=(const idMat5& a) {
+inline idMat5& idMat5::operator+=(const idMat5& a) {
   mat[0][0] += a[0][0];
   mat[0][1] += a[0][1];
   mat[0][2] += a[0][2];
@@ -1442,7 +1436,7 @@ ID_INLINE idMat5& idMat5::operator+=(const idMat5& a) {
   return *this;
 }
 
-ID_INLINE idMat5& idMat5::operator-=(const idMat5& a) {
+inline idMat5& idMat5::operator-=(const idMat5& a) {
   mat[0][0] -= a[0][0];
   mat[0][1] -= a[0][1];
   mat[0][2] -= a[0][2];
@@ -1471,18 +1465,18 @@ ID_INLINE idMat5& idMat5::operator-=(const idMat5& a) {
   return *this;
 }
 
-ID_INLINE idVec5 operator*(const idVec5& vec, const idMat5& mat) {
+inline idVec5 operator*(const idVec5& vec, const idMat5& mat) {
   return mat * vec;
 }
 
-ID_INLINE idMat5 operator*(const float a, idMat5 const& mat) { return mat * a; }
+inline idMat5 operator*(const float a, idMat5 const& mat) { return mat * a; }
 
-ID_INLINE idVec5& operator*=(idVec5& vec, const idMat5& mat) {
+inline idVec5& operator*=(idVec5& vec, const idMat5& mat) {
   vec = mat * vec;
   return vec;
 }
 
-ID_INLINE bool idMat5::Compare(const idMat5& a) const {
+inline bool idMat5::Compare(const idMat5& a) const {
   dword i;
   const float *ptr1, *ptr2;
 
@@ -1496,7 +1490,7 @@ ID_INLINE bool idMat5::Compare(const idMat5& a) const {
   return true;
 }
 
-ID_INLINE bool idMat5::Compare(const idMat5& a, const float epsilon) const {
+inline bool idMat5::Compare(const idMat5& a, const float epsilon) const {
   dword i;
   const float *ptr1, *ptr2;
 
@@ -1510,19 +1504,19 @@ ID_INLINE bool idMat5::Compare(const idMat5& a, const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat5::operator==(const idMat5& a) const { return Compare(a); }
+inline bool idMat5::operator==(const idMat5& a) const { return Compare(a); }
 
-ID_INLINE bool idMat5::operator!=(const idMat5& a) const { return !Compare(a); }
+inline bool idMat5::operator!=(const idMat5& a) const { return !Compare(a); }
 
-ID_INLINE void idMat5::Zero() { memset(mat, 0, sizeof(idMat5)); }
+inline void idMat5::Zero() { memset(mat, 0, sizeof(idMat5)); }
 
-ID_INLINE void idMat5::Identity() { *this = mat5_identity; }
+inline void idMat5::Identity() { *this = mat5_identity; }
 
-ID_INLINE bool idMat5::IsIdentity(const float epsilon) const {
+inline bool idMat5::IsIdentity(const float epsilon) const {
   return Compare(mat5_identity, epsilon);
 }
 
-ID_INLINE bool idMat5::IsSymmetric(const float epsilon) const {
+inline bool idMat5::IsSymmetric(const float epsilon) const {
   for (int i = 1; i < 5; i++) {
     for (int j = 0; j < i; j++) {
       if (idMath::Fabs(mat[i][j] - mat[j][i]) > epsilon) {
@@ -1533,7 +1527,7 @@ ID_INLINE bool idMat5::IsSymmetric(const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat5::IsDiagonal(const float epsilon) const {
+inline bool idMat5::IsDiagonal(const float epsilon) const {
   for (int i = 0; i < 5; i++) {
     for (int j = 0; j < 5; j++) {
       if (i != j && idMath::Fabs(mat[i][j]) > epsilon) {
@@ -1544,11 +1538,11 @@ ID_INLINE bool idMat5::IsDiagonal(const float epsilon) const {
   return true;
 }
 
-ID_INLINE float idMat5::Trace() const {
+inline float idMat5::Trace() const {
   return (mat[0][0] + mat[1][1] + mat[2][2] + mat[3][3] + mat[4][4]);
 }
 
-ID_INLINE idMat5 idMat5::Inverse() const {
+inline idMat5 idMat5::Inverse() const {
   idMat5 invMat;
 
   invMat = *this;
@@ -1556,7 +1550,7 @@ ID_INLINE idMat5 idMat5::Inverse() const {
   return invMat;
 }
 
-ID_INLINE idMat5 idMat5::InverseFast() const {
+inline idMat5 idMat5::InverseFast() const {
   idMat5 invMat;
 
   invMat = *this;
@@ -1564,13 +1558,11 @@ ID_INLINE idMat5 idMat5::InverseFast() const {
   return invMat;
 }
 
-ID_INLINE int idMat5::GetDimension() const { return 25; }
+inline int idMat5::GetDimension() const { return 25; }
 
-ID_INLINE const float* idMat5::ToFloatPtr() const {
-  return mat[0].ToFloatPtr();
-}
+inline const float* idMat5::ToFloatPtr() const { return mat[0].ToFloatPtr(); }
 
-ID_INLINE float* idMat5::ToFloatPtr() { return mat[0].ToFloatPtr(); }
+inline float* idMat5::ToFloatPtr() { return mat[0].ToFloatPtr(); }
 
 //===============================================================
 //
@@ -1640,10 +1632,10 @@ extern idMat6 mat6_zero;
 extern idMat6 mat6_identity;
 #define mat6_default mat6_identity
 
-ID_INLINE idMat6::idMat6() {}
+inline idMat6::idMat6() {}
 
-ID_INLINE idMat6::idMat6(const idMat3& m0, const idMat3& m1, const idMat3& m2,
-                         const idMat3& m3) {
+inline idMat6::idMat6(const idMat3& m0, const idMat3& m1, const idMat3& m2,
+                      const idMat3& m3) {
   mat[0] = idVec6(m0[0][0], m0[0][1], m0[0][2], m1[0][0], m1[0][1], m1[0][2]);
   mat[1] = idVec6(m0[1][0], m0[1][1], m0[1][2], m1[1][0], m1[1][1], m1[1][2]);
   mat[2] = idVec6(m0[2][0], m0[2][1], m0[2][2], m1[2][0], m1[2][1], m1[2][2]);
@@ -1652,8 +1644,8 @@ ID_INLINE idMat6::idMat6(const idMat3& m0, const idMat3& m1, const idMat3& m2,
   mat[5] = idVec6(m2[2][0], m2[2][1], m2[2][2], m3[2][0], m3[2][1], m3[2][2]);
 }
 
-ID_INLINE idMat6::idMat6(const idVec6& v0, const idVec6& v1, const idVec6& v2,
-                         const idVec6& v3, const idVec6& v4, const idVec6& v5) {
+inline idMat6::idMat6(const idVec6& v0, const idVec6& v1, const idVec6& v2,
+                      const idVec6& v3, const idVec6& v4, const idVec6& v5) {
   mat[0] = v0;
   mat[1] = v1;
   mat[2] = v2;
@@ -1662,21 +1654,21 @@ ID_INLINE idMat6::idMat6(const idVec6& v0, const idVec6& v1, const idVec6& v2,
   mat[5] = v5;
 }
 
-ID_INLINE idMat6::idMat6(const float src[6][6]) {
+inline idMat6::idMat6(const float src[6][6]) {
   memcpy(mat, src, 6 * 6 * sizeof(float));
 }
 
-ID_INLINE const idVec6& idMat6::operator[](int index) const {
+inline const idVec6& idMat6::operator[](int index) const {
   // assert( ( index >= 0 ) && ( index < 6 ) );
   return mat[index];
 }
 
-ID_INLINE idVec6& idMat6::operator[](int index) {
+inline idVec6& idMat6::operator[](int index) {
   // assert( ( index >= 0 ) && ( index < 6 ) );
   return mat[index];
 }
 
-ID_INLINE idMat6 idMat6::operator*(const idMat6& a) const {
+inline idMat6 idMat6::operator*(const idMat6& a) const {
   int i, j;
   const float *m1Ptr, *m2Ptr;
   float* dstPtr;
@@ -1698,7 +1690,7 @@ ID_INLINE idMat6 idMat6::operator*(const idMat6& a) const {
   return dst;
 }
 
-ID_INLINE idMat6 idMat6::operator*(const float a) const {
+inline idMat6 idMat6::operator*(const float a) const {
   return idMat6(idVec6(mat[0][0] * a, mat[0][1] * a, mat[0][2] * a,
                        mat[0][3] * a, mat[0][4] * a, mat[0][5] * a),
                 idVec6(mat[1][0] * a, mat[1][1] * a, mat[1][2] * a,
@@ -1713,7 +1705,7 @@ ID_INLINE idMat6 idMat6::operator*(const float a) const {
                        mat[5][3] * a, mat[5][4] * a, mat[5][5] * a));
 }
 
-ID_INLINE idVec6 idMat6::operator*(const idVec6& vec) const {
+inline idVec6 idMat6::operator*(const idVec6& vec) const {
   return idVec6(
       mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2] +
           mat[0][3] * vec[3] + mat[0][4] * vec[4] + mat[0][5] * vec[5],
@@ -1729,7 +1721,7 @@ ID_INLINE idVec6 idMat6::operator*(const idVec6& vec) const {
           mat[5][3] * vec[3] + mat[5][4] * vec[4] + mat[5][5] * vec[5]);
 }
 
-ID_INLINE idMat6 idMat6::operator+(const idMat6& a) const {
+inline idMat6 idMat6::operator+(const idMat6& a) const {
   return idMat6(
       idVec6(mat[0][0] + a[0][0], mat[0][1] + a[0][1], mat[0][2] + a[0][2],
              mat[0][3] + a[0][3], mat[0][4] + a[0][4], mat[0][5] + a[0][5]),
@@ -1745,7 +1737,7 @@ ID_INLINE idMat6 idMat6::operator+(const idMat6& a) const {
              mat[5][3] + a[5][3], mat[5][4] + a[5][4], mat[5][5] + a[5][5]));
 }
 
-ID_INLINE idMat6 idMat6::operator-(const idMat6& a) const {
+inline idMat6 idMat6::operator-(const idMat6& a) const {
   return idMat6(
       idVec6(mat[0][0] - a[0][0], mat[0][1] - a[0][1], mat[0][2] - a[0][2],
              mat[0][3] - a[0][3], mat[0][4] - a[0][4], mat[0][5] - a[0][5]),
@@ -1761,7 +1753,7 @@ ID_INLINE idMat6 idMat6::operator-(const idMat6& a) const {
              mat[5][3] - a[5][3], mat[5][4] - a[5][4], mat[5][5] - a[5][5]));
 }
 
-ID_INLINE idMat6& idMat6::operator*=(const float a) {
+inline idMat6& idMat6::operator*=(const float a) {
   mat[0][0] *= a;
   mat[0][1] *= a;
   mat[0][2] *= a;
@@ -1801,12 +1793,12 @@ ID_INLINE idMat6& idMat6::operator*=(const float a) {
   return *this;
 }
 
-ID_INLINE idMat6& idMat6::operator*=(const idMat6& a) {
+inline idMat6& idMat6::operator*=(const idMat6& a) {
   *this = *this * a;
   return *this;
 }
 
-ID_INLINE idMat6& idMat6::operator+=(const idMat6& a) {
+inline idMat6& idMat6::operator+=(const idMat6& a) {
   mat[0][0] += a[0][0];
   mat[0][1] += a[0][1];
   mat[0][2] += a[0][2];
@@ -1846,7 +1838,7 @@ ID_INLINE idMat6& idMat6::operator+=(const idMat6& a) {
   return *this;
 }
 
-ID_INLINE idMat6& idMat6::operator-=(const idMat6& a) {
+inline idMat6& idMat6::operator-=(const idMat6& a) {
   mat[0][0] -= a[0][0];
   mat[0][1] -= a[0][1];
   mat[0][2] -= a[0][2];
@@ -1886,18 +1878,18 @@ ID_INLINE idMat6& idMat6::operator-=(const idMat6& a) {
   return *this;
 }
 
-ID_INLINE idVec6 operator*(const idVec6& vec, const idMat6& mat) {
+inline idVec6 operator*(const idVec6& vec, const idMat6& mat) {
   return mat * vec;
 }
 
-ID_INLINE idMat6 operator*(const float a, idMat6 const& mat) { return mat * a; }
+inline idMat6 operator*(const float a, idMat6 const& mat) { return mat * a; }
 
-ID_INLINE idVec6& operator*=(idVec6& vec, const idMat6& mat) {
+inline idVec6& operator*=(idVec6& vec, const idMat6& mat) {
   vec = mat * vec;
   return vec;
 }
 
-ID_INLINE bool idMat6::Compare(const idMat6& a) const {
+inline bool idMat6::Compare(const idMat6& a) const {
   dword i;
   const float *ptr1, *ptr2;
 
@@ -1911,7 +1903,7 @@ ID_INLINE bool idMat6::Compare(const idMat6& a) const {
   return true;
 }
 
-ID_INLINE bool idMat6::Compare(const idMat6& a, const float epsilon) const {
+inline bool idMat6::Compare(const idMat6& a, const float epsilon) const {
   dword i;
   const float *ptr1, *ptr2;
 
@@ -1925,19 +1917,19 @@ ID_INLINE bool idMat6::Compare(const idMat6& a, const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat6::operator==(const idMat6& a) const { return Compare(a); }
+inline bool idMat6::operator==(const idMat6& a) const { return Compare(a); }
 
-ID_INLINE bool idMat6::operator!=(const idMat6& a) const { return !Compare(a); }
+inline bool idMat6::operator!=(const idMat6& a) const { return !Compare(a); }
 
-ID_INLINE void idMat6::Zero() { memset(mat, 0, sizeof(idMat6)); }
+inline void idMat6::Zero() { memset(mat, 0, sizeof(idMat6)); }
 
-ID_INLINE void idMat6::Identity() { *this = mat6_identity; }
+inline void idMat6::Identity() { *this = mat6_identity; }
 
-ID_INLINE bool idMat6::IsIdentity(const float epsilon) const {
+inline bool idMat6::IsIdentity(const float epsilon) const {
   return Compare(mat6_identity, epsilon);
 }
 
-ID_INLINE bool idMat6::IsSymmetric(const float epsilon) const {
+inline bool idMat6::IsSymmetric(const float epsilon) const {
   for (int i = 1; i < 6; i++) {
     for (int j = 0; j < i; j++) {
       if (idMath::Fabs(mat[i][j] - mat[j][i]) > epsilon) {
@@ -1948,7 +1940,7 @@ ID_INLINE bool idMat6::IsSymmetric(const float epsilon) const {
   return true;
 }
 
-ID_INLINE bool idMat6::IsDiagonal(const float epsilon) const {
+inline bool idMat6::IsDiagonal(const float epsilon) const {
   for (int i = 0; i < 6; i++) {
     for (int j = 0; j < 6; j++) {
       if (i != j && idMath::Fabs(mat[i][j]) > epsilon) {
@@ -1959,7 +1951,7 @@ ID_INLINE bool idMat6::IsDiagonal(const float epsilon) const {
   return true;
 }
 
-ID_INLINE idMat3 idMat6::SubMat3(int n) const {
+inline idMat3 idMat6::SubMat3(int n) const {
   assert(n >= 0 && n < 4);
   int b0 = ((n & 2) >> 1) * 3;
   int b1 = (n & 1) * 3;
@@ -1968,12 +1960,12 @@ ID_INLINE idMat3 idMat6::SubMat3(int n) const {
                 mat[b0 + 2][b1 + 0], mat[b0 + 2][b1 + 1], mat[b0 + 2][b1 + 2]);
 }
 
-ID_INLINE float idMat6::Trace() const {
+inline float idMat6::Trace() const {
   return (mat[0][0] + mat[1][1] + mat[2][2] + mat[3][3] + mat[4][4] +
           mat[5][5]);
 }
 
-ID_INLINE idMat6 idMat6::Inverse() const {
+inline idMat6 idMat6::Inverse() const {
   idMat6 invMat;
 
   invMat = *this;
@@ -1981,7 +1973,7 @@ ID_INLINE idMat6 idMat6::Inverse() const {
   return invMat;
 }
 
-ID_INLINE idMat6 idMat6::InverseFast() const {
+inline idMat6 idMat6::InverseFast() const {
   idMat6 invMat;
 
   invMat = *this;
@@ -1989,12 +1981,10 @@ ID_INLINE idMat6 idMat6::InverseFast() const {
   return invMat;
 }
 
-ID_INLINE int idMat6::GetDimension() const { return 36; }
+inline int idMat6::GetDimension() const { return 36; }
 
-ID_INLINE const float* idMat6::ToFloatPtr() const {
-  return mat[0].ToFloatPtr();
-}
+inline const float* idMat6::ToFloatPtr() const { return mat[0].ToFloatPtr(); }
 
-ID_INLINE float* idMat6::ToFloatPtr() { return mat[0].ToFloatPtr(); }
+inline float* idMat6::ToFloatPtr() { return mat[0].ToFloatPtr(); }
 
 #endif /* !__MATH_MATRIX_H__ */

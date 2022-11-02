@@ -54,7 +54,7 @@ const int ANIMCHANNEL_HEAD = 3;
 const int ANIMCHANNEL_EYELIDS = 4;
 
 // for converting from 24 frames per second to milliseconds
-ID_INLINE int FRAME2MS(int framenum) { return (framenum * 1000) / 24; }
+inline int FRAME2MS(int framenum) { return (framenum * 1000) / 24; }
 
 class idRenderModel;
 class idAnimator;
@@ -472,7 +472,7 @@ class idAFPoseJointMod {
   idVec3 origin;
 };
 
-ID_INLINE idAFPoseJointMod::idAFPoseJointMod() {
+inline idAFPoseJointMod::idAFPoseJointMod() {
   mod = AF_JOINTMOD_AXIS;
   axis.Identity();
   origin.Zero();

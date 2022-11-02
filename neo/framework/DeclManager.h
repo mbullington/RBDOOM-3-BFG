@@ -255,7 +255,7 @@ class idDecl {
 };
 
 template <class type>
-ID_INLINE idDecl* idDeclAllocator() {
+inline idDecl* idDeclAllocator() {
   return new (TAG_DECL) type;
 }
 
@@ -355,12 +355,12 @@ class idDeclManager {
 extern idDeclManager* declManager;
 
 template <declType_t type>
-ID_INLINE void idListDecls_f(const idCmdArgs& args) {
+inline void idListDecls_f(const idCmdArgs& args) {
   declManager->ListType(args, type);
 }
 
 template <declType_t type>
-ID_INLINE void idPrintDecls_f(const idCmdArgs& args) {
+inline void idPrintDecls_f(const idCmdArgs& args) {
   declManager->PrintType(args, type);
 }
 

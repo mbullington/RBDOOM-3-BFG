@@ -405,33 +405,31 @@ class idRenderBackend {
   void GL_Scissor(int x /* left*/, int y /* bottom */, int w, int h);
   void GL_Viewport(int x /* left */, int y /* bottom */, int w, int h);
 
-  ID_INLINE void GL_Scissor(const idScreenRect& rect) {
+  inline void GL_Scissor(const idScreenRect& rect) {
     GL_Scissor(rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1);
   }
-  ID_INLINE void GL_Viewport(const idScreenRect& rect) {
+  inline void GL_Viewport(const idScreenRect& rect) {
     GL_Viewport(rect.x1, rect.y1, rect.x2 - rect.x1 + 1, rect.y2 - rect.y1 + 1);
   }
 
-  ID_INLINE void GL_ViewportAndScissor(int x, int y, int w, int h) {
+  inline void GL_ViewportAndScissor(int x, int y, int w, int h) {
     GL_Viewport(x, y, w, h);
     GL_Scissor(x, y, w, h);
   }
 
-  ID_INLINE void GL_ViewportAndScissor(const idScreenRect& rect) {
+  inline void GL_ViewportAndScissor(const idScreenRect& rect) {
     GL_Viewport(rect);
     GL_Scissor(rect);
   }
 
   void GL_Color(float r, float g, float b, float a);
-  ID_INLINE void GL_Color(float r, float g, float b) {
-    GL_Color(r, g, b, 1.0f);
-  }
+  inline void GL_Color(float r, float g, float b) { GL_Color(r, g, b, 1.0f); }
 
-  ID_INLINE void GL_Color(const idVec3& color) {
+  inline void GL_Color(const idVec3& color) {
     GL_Color(color[0], color[1], color[2], 1.0f);
   }
 
-  ID_INLINE void GL_Color(const idVec4& color) {
+  inline void GL_Color(const idVec4& color) {
     GL_Color(color[0], color[1], color[2], color[3]);
   }
 

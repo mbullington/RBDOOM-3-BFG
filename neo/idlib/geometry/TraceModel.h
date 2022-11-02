@@ -170,32 +170,32 @@ class idTraceModel {
       int silEdges[MAX_TRACEMODEL_EDGES]) const;
 };
 
-ID_INLINE idTraceModel::idTraceModel() {
+inline idTraceModel::idTraceModel() {
   type = TRM_INVALID;
   numVerts = numEdges = numPolys = 0;
   bounds.Zero();
 }
 
-ID_INLINE idTraceModel::idTraceModel(const idBounds& boxBounds) {
+inline idTraceModel::idTraceModel(const idBounds& boxBounds) {
   InitBox();
   SetupBox(boxBounds);
 }
 
-ID_INLINE idTraceModel::idTraceModel(const idBounds& cylBounds,
-                                     const int numSides) {
+inline idTraceModel::idTraceModel(const idBounds& cylBounds,
+                                  const int numSides) {
   SetupCylinder(cylBounds, numSides);
 }
 
-ID_INLINE idTraceModel::idTraceModel(const float length, const float width) {
+inline idTraceModel::idTraceModel(const float length, const float width) {
   InitBone();
   SetupBone(length, width);
 }
 
-ID_INLINE bool idTraceModel::operator==(const idTraceModel& trm) const {
+inline bool idTraceModel::operator==(const idTraceModel& trm) const {
   return Compare(trm);
 }
 
-ID_INLINE bool idTraceModel::operator!=(const idTraceModel& trm) const {
+inline bool idTraceModel::operator!=(const idTraceModel& trm) const {
   return !Compare(trm);
 }
 

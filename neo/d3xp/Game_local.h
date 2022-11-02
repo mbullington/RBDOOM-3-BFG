@@ -764,22 +764,22 @@ class idGameError : public idException {
 //============================================================================
 
 template <class type>
-ID_INLINE idEntityPtr<type>::idEntityPtr() {
+inline idEntityPtr<type>::idEntityPtr() {
   spawnId = 0;
 }
 
 template <class type>
-ID_INLINE void idEntityPtr<type>::Save(idSaveGame* savefile) const {
+inline void idEntityPtr<type>::Save(idSaveGame* savefile) const {
   savefile->WriteInt(spawnId);
 }
 
 template <class type>
-ID_INLINE void idEntityPtr<type>::Restore(idRestoreGame* savefile) {
+inline void idEntityPtr<type>::Restore(idRestoreGame* savefile) {
   savefile->ReadInt(spawnId);
 }
 
 template <class type>
-ID_INLINE idEntityPtr<type>& idEntityPtr<type>::operator=(const type* ent) {
+inline idEntityPtr<type>& idEntityPtr<type>::operator=(const type* ent) {
   if (ent == NULL) {
     spawnId = 0;
   } else {
@@ -790,14 +790,13 @@ ID_INLINE idEntityPtr<type>& idEntityPtr<type>::operator=(const type* ent) {
 }
 
 template <class type>
-ID_INLINE idEntityPtr<type>& idEntityPtr<type>::operator=(
-    const idEntityPtr& ep) {
+inline idEntityPtr<type>& idEntityPtr<type>::operator=(const idEntityPtr& ep) {
   spawnId = ep.spawnId;
   return *this;
 }
 
 template <class type>
-ID_INLINE bool idEntityPtr<type>::SetSpawnId(int id) {
+inline bool idEntityPtr<type>::SetSpawnId(int id) {
   // the reason for this first check is unclear:
   // the function returning false may mean the spawnId is already set right, or
   // the entity is missing
@@ -813,13 +812,13 @@ ID_INLINE bool idEntityPtr<type>::SetSpawnId(int id) {
 }
 
 template <class type>
-ID_INLINE bool idEntityPtr<type>::IsValid() const {
+inline bool idEntityPtr<type>::IsValid() const {
   return (gameLocal.spawnIds[spawnId & ((1 << GENTITYNUM_BITS) - 1)] ==
           (spawnId >> GENTITYNUM_BITS));
 }
 
 template <class type>
-ID_INLINE type* idEntityPtr<type>::GetEntity() const {
+inline type* idEntityPtr<type>::GetEntity() const {
   int entityNum = spawnId & ((1 << GENTITYNUM_BITS) - 1);
   // DG: removed extraneous parenthesis to shut up clang
   if (gameLocal.spawnIds[entityNum] == (spawnId >> GENTITYNUM_BITS)) {
@@ -829,7 +828,7 @@ ID_INLINE type* idEntityPtr<type>::GetEntity() const {
 }
 
 template <class type>
-ID_INLINE int idEntityPtr<type>::GetEntityNum() const {
+inline int idEntityPtr<type>::GetEntityNum() const {
   return (spawnId & ((1 << GENTITYNUM_BITS) - 1));
 }
 

@@ -300,50 +300,48 @@ class idThread : public idClass {
 idThread::WaitingOnThread
 ================
 */
-ID_INLINE idThread* idThread::WaitingOnThread() { return waitingForThread; }
+inline idThread* idThread::WaitingOnThread() { return waitingForThread; }
 
 /*
 ================
 idThread::SetThreadNum
 ================
 */
-ID_INLINE void idThread::SetThreadNum(int num) { threadNum = num; }
+inline void idThread::SetThreadNum(int num) { threadNum = num; }
 
 /*
 ================
 idThread::GetThreadNum
 ================
 */
-ID_INLINE int idThread::GetThreadNum() { return threadNum; }
+inline int idThread::GetThreadNum() { return threadNum; }
 
 /*
 ================
 idThread::GetThreadName
 ================
 */
-ID_INLINE const char* idThread::GetThreadName() { return threadName.c_str(); }
+inline const char* idThread::GetThreadName() { return threadName.c_str(); }
 
 /*
 ================
 idThread::GetThreads
 ================
 */
-ID_INLINE idList<idThread*>& idThread::GetThreads() { return threadList; }
+inline idList<idThread*>& idThread::GetThreads() { return threadList; }
 
 /*
 ================
 idThread::IsDoneProcessing
 ================
 */
-ID_INLINE bool idThread::IsDoneProcessing() {
-  return interpreter.doneProcessing;
-}
+inline bool idThread::IsDoneProcessing() { return interpreter.doneProcessing; }
 
 /*
 ================
 idThread::IsDying
 ================
 */
-ID_INLINE bool idThread::IsDying() { return interpreter.threadDying; }
+inline bool idThread::IsDying() { return interpreter.threadDying; }
 
 #endif /* !__SCRIPT_THREAD_H__ */

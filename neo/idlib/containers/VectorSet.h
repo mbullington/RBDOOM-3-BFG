@@ -78,7 +78,7 @@ class idVectorSet : public idList<type> {
 };
 
 template <class type, int dimension>
-ID_INLINE idVectorSet<type, dimension>::idVectorSet() {
+inline idVectorSet<type, dimension>::idVectorSet() {
   hash.Clear(idMath::IPow(boxHashSize, dimension), 128);
   boxHashSize = 16;
   memset(boxInvSize, 0, dimension * sizeof(boxInvSize[0]));
@@ -86,18 +86,18 @@ ID_INLINE idVectorSet<type, dimension>::idVectorSet() {
 }
 
 template <class type, int dimension>
-ID_INLINE idVectorSet<type, dimension>::idVectorSet(const type& mins,
-                                                    const type& maxs,
-                                                    const int boxHashSize,
-                                                    const int initialSize) {
+inline idVectorSet<type, dimension>::idVectorSet(const type& mins,
+                                                 const type& maxs,
+                                                 const int boxHashSize,
+                                                 const int initialSize) {
   Init(mins, maxs, boxHashSize, initialSize);
 }
 
 template <class type, int dimension>
-ID_INLINE void idVectorSet<type, dimension>::Init(const type& mins,
-                                                  const type& maxs,
-                                                  const int boxHashSize,
-                                                  const int initialSize) {
+inline void idVectorSet<type, dimension>::Init(const type& mins,
+                                               const type& maxs,
+                                               const int boxHashSize,
+                                               const int initialSize) {
   int i;
   float boxSize;
 
@@ -118,20 +118,20 @@ ID_INLINE void idVectorSet<type, dimension>::Init(const type& mins,
 }
 
 template <class type, int dimension>
-ID_INLINE void idVectorSet<type, dimension>::ResizeIndex(const int newSize) {
+inline void idVectorSet<type, dimension>::ResizeIndex(const int newSize) {
   idList<type>::Resize(newSize);
   hash.ResizeIndex(newSize);
 }
 
 template <class type, int dimension>
-ID_INLINE void idVectorSet<type, dimension>::Clear() {
+inline void idVectorSet<type, dimension>::Clear() {
   idList<type>::Clear();
   hash.Clear();
 }
 
 template <class type, int dimension>
-ID_INLINE int idVectorSet<type, dimension>::FindVector(const type& v,
-                                                       const float epsilon) {
+inline int idVectorSet<type, dimension>::FindVector(const type& v,
+                                                    const float epsilon) {
   int i, j, k, hashKey, partialHashKey[dimension];
 
   for (i = 0; i < dimension; i++) {
@@ -217,7 +217,7 @@ class idVectorSubset {
 };
 
 template <class type, int dimension>
-ID_INLINE idVectorSubset<type, dimension>::idVectorSubset() {
+inline idVectorSubset<type, dimension>::idVectorSubset() {
   hash.Clear(idMath::IPow(boxHashSize, dimension), 128);
   boxHashSize = 16;
   memset(boxInvSize, 0, dimension * sizeof(boxInvSize[0]));
@@ -225,17 +225,18 @@ ID_INLINE idVectorSubset<type, dimension>::idVectorSubset() {
 }
 
 template <class type, int dimension>
-ID_INLINE idVectorSubset<type, dimension>::idVectorSubset(
-    const type& mins, const type& maxs, const int boxHashSize,
-    const int initialSize) {
+inline idVectorSubset<type, dimension>::idVectorSubset(const type& mins,
+                                                       const type& maxs,
+                                                       const int boxHashSize,
+                                                       const int initialSize) {
   Init(mins, maxs, boxHashSize, initialSize);
 }
 
 template <class type, int dimension>
-ID_INLINE void idVectorSubset<type, dimension>::Init(const type& mins,
-                                                     const type& maxs,
-                                                     const int boxHashSize,
-                                                     const int initialSize) {
+inline void idVectorSubset<type, dimension>::Init(const type& mins,
+                                                  const type& maxs,
+                                                  const int boxHashSize,
+                                                  const int initialSize) {
   int i;
   float boxSize;
 
@@ -253,14 +254,15 @@ ID_INLINE void idVectorSubset<type, dimension>::Init(const type& mins,
 }
 
 template <class type, int dimension>
-ID_INLINE void idVectorSubset<type, dimension>::Clear() {
+inline void idVectorSubset<type, dimension>::Clear() {
   idList<type>::Clear();
   hash.Clear();
 }
 
 template <class type, int dimension>
-ID_INLINE int idVectorSubset<type, dimension>::FindVector(
-    const type* vectorList, const int vectorNum, const float epsilon) {
+inline int idVectorSubset<type, dimension>::FindVector(const type* vectorList,
+                                                       const int vectorNum,
+                                                       const float epsilon) {
   int i, j, k, hashKey, partialHashKey[dimension];
   const type& v = vectorList[vectorNum];
 

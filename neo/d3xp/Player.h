@@ -944,21 +944,21 @@ class idPlayer : public idActor {
   void Event_SetBloomParms(float speed, float intensity);
 };
 
-ID_INLINE bool idPlayer::IsRespawning() { return respawning; }
+inline bool idPlayer::IsRespawning() { return respawning; }
 
-ID_INLINE idPhysics* idPlayer::GetPlayerPhysics() { return &physicsObj; }
+inline idPhysics* idPlayer::GetPlayerPhysics() { return &physicsObj; }
 
-ID_INLINE bool idPlayer::IsInTeleport() {
+inline bool idPlayer::IsInTeleport() {
   return (teleportEntity.GetEntity() != NULL);
 }
 
-ID_INLINE void idPlayer::SetLeader(bool lead) { leader = lead; }
+inline void idPlayer::SetLeader(bool lead) { leader = lead; }
 
-ID_INLINE bool idPlayer::IsLeader() { return leader; }
+inline bool idPlayer::IsLeader() { return leader; }
 
-ID_INLINE bool idPlayer::SelfSmooth() { return selfSmooth; }
+inline bool idPlayer::SelfSmooth() { return selfSmooth; }
 
-ID_INLINE void idPlayer::SetSelfSmooth(bool b) { selfSmooth = b; }
+inline void idPlayer::SetSelfSmooth(bool b) { selfSmooth = b; }
 
 extern idCVar g_infiniteAmmo;
 

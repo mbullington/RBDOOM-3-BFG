@@ -51,8 +51,8 @@ class idSWFScriptString : public idStr {
   static idSWFScriptString* Alloc(const idStr& s) {
     return new (TAG_SWF) idSWFScriptString(s);
   }
-  ID_INLINE void AddRef() { refCount++; }
-  ID_INLINE void Release() {
+  inline void AddRef() { refCount++; }
+  inline void Release() {
     if (--refCount == 0) {
       delete this;
     }

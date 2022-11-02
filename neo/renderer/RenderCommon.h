@@ -1564,9 +1564,9 @@ TR_FRONTEND_ADDLIGHTS
 void R_ShadowBounds(const idBounds& modelBounds, const idBounds& lightBounds,
                     const idVec3& lightOrigin, idBounds& shadowBounds);
 
-ID_INLINE bool R_CullModelBoundsToLight(
-    const idRenderLightLocal* light, const idBounds& localBounds,
-    const idRenderMatrix& modelRenderMatrix) {
+inline bool R_CullModelBoundsToLight(const idRenderLightLocal* light,
+                                     const idBounds& localBounds,
+                                     const idRenderMatrix& modelRenderMatrix) {
   idRenderMatrix modelLightProject;
   idRenderMatrix::Multiply(light->baseLightProject, modelRenderMatrix,
                            modelLightProject);

@@ -49,8 +49,8 @@ idWaveFile is used for reading generic RIFF WAVE files.
 */
 class idWaveFile {
  public:
-  ID_INLINE idWaveFile();
-  ID_INLINE ~idWaveFile();
+  inline idWaveFile();
+  inline ~idWaveFile();
 
   bool Open(const char* filename);
   void Close();
@@ -232,13 +232,13 @@ class idWaveFile {
 idWaveFile::idWaveFile
 ========================
 */
-ID_INLINE idWaveFile::idWaveFile() : file(NULL) {}
+inline idWaveFile::idWaveFile() : file(NULL) {}
 
 /*
 ========================
 idWaveFile::~idWaveFile
 ========================
 */
-ID_INLINE idWaveFile::~idWaveFile() { Close(); }
+inline idWaveFile::~idWaveFile() { Close(); }
 
 #endif  // !__WAVEFILE_H__

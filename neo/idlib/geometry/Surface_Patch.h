@@ -105,7 +105,7 @@ class idSurface_Patch : public idSurface {
 idSurface_Patch::idSurface_Patch
 =================
 */
-ID_INLINE idSurface_Patch::idSurface_Patch() {
+inline idSurface_Patch::idSurface_Patch() {
   height = width = maxHeight = maxWidth = 0;
   expanded = false;
 }
@@ -115,8 +115,7 @@ ID_INLINE idSurface_Patch::idSurface_Patch() {
 idSurface_Patch::idSurface_Patch
 =================
 */
-ID_INLINE idSurface_Patch::idSurface_Patch(int maxPatchWidth,
-                                           int maxPatchHeight) {
+inline idSurface_Patch::idSurface_Patch(int maxPatchWidth, int maxPatchHeight) {
   width = height = 0;
   maxWidth = maxPatchWidth;
   maxHeight = maxPatchHeight;
@@ -129,7 +128,7 @@ ID_INLINE idSurface_Patch::idSurface_Patch(int maxPatchWidth,
 idSurface_Patch::idSurface_Patch
 =================
 */
-ID_INLINE idSurface_Patch::idSurface_Patch(const idSurface_Patch& patch) {
+inline idSurface_Patch::idSurface_Patch(const idSurface_Patch& patch) {
   (*this) = patch;
 }
 
@@ -138,20 +137,20 @@ ID_INLINE idSurface_Patch::idSurface_Patch(const idSurface_Patch& patch) {
 idSurface_Patch::~idSurface_Patch
 =================
 */
-ID_INLINE idSurface_Patch::~idSurface_Patch() {}
+inline idSurface_Patch::~idSurface_Patch() {}
 
 /*
 =================
 idSurface_Patch::GetWidth
 =================
 */
-ID_INLINE int idSurface_Patch::GetWidth() const { return width; }
+inline int idSurface_Patch::GetWidth() const { return width; }
 
 /*
 =================
 idSurface_Patch::GetHeight
 =================
 */
-ID_INLINE int idSurface_Patch::GetHeight() const { return height; }
+inline int idSurface_Patch::GetHeight() const { return height; }
 
 #endif /* !__SURFACE_PATCH_H__ */

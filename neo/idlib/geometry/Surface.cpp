@@ -42,8 +42,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 UpdateVertexIndex
 =================
 */
-ID_INLINE int UpdateVertexIndex(int vertexIndexNum[2], int* vertexRemap,
-                                int* vertexCopyIndex, int vertNum) {
+inline int UpdateVertexIndex(int vertexIndexNum[2], int* vertexRemap,
+                             int* vertexCopyIndex, int vertNum) {
   int s = INT32_SIGNBITSET(vertexRemap[vertNum]);
   vertexIndexNum[0] = vertexRemap[vertNum];
   vertexRemap[vertNum] = vertexIndexNum[s];

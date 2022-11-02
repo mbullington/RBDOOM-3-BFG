@@ -47,8 +47,8 @@ static const float old_scale1 = 0.3f;
 Old_SelectValueForScale
 ==============================
 */
-ID_INLINE float Old_SelectValueForScale(float scale, float v0, float v1,
-                                        float v2) {
+inline float Old_SelectValueForScale(float scale, float v0, float v1,
+                                     float v2) {
   return (scale >= old_scale2) ? v2 : (scale >= old_scale1) ? v1 : v0;
 }
 

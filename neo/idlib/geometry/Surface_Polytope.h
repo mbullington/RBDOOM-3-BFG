@@ -74,6 +74,6 @@ class idSurface_Polytope : public idSurface {
 idSurface_Polytope::idSurface_Polytope
 ====================
 */
-ID_INLINE idSurface_Polytope::idSurface_Polytope() {}
+inline idSurface_Polytope::idSurface_Polytope() {}
 
 #endif /* !__SURFACE_POLYTOPE_H__ */

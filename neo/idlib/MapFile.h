@@ -126,7 +126,7 @@ class idMapBrushSide {
   idVec2i texSize;
 };
 
-ID_INLINE idMapBrushSide::idMapBrushSide() {
+inline idMapBrushSide::idMapBrushSide() {
   plane.Zero();
   texMat[0].Zero();
   texMat[1].Zero();
@@ -194,7 +194,7 @@ class idMapPatch : public idMapPrimitive, public idSurface_Patch {
   bool explicitSubdivisions;
 };
 
-ID_INLINE idMapPatch::idMapPatch() {
+inline idMapPatch::idMapPatch() {
   type = TYPE_PATCH;
   horzSubdivisions = vertSubdivisions = 0;
   explicitSubdivisions = false;
@@ -203,7 +203,7 @@ ID_INLINE idMapPatch::idMapPatch() {
   expanded = false;
 }
 
-ID_INLINE idMapPatch::idMapPatch(int maxPatchWidth, int maxPatchHeight) {
+inline idMapPatch::idMapPatch(int maxPatchWidth, int maxPatchHeight) {
   type = TYPE_PATCH;
   horzSubdivisions = vertSubdivisions = 0;
   explicitSubdivisions = false;
@@ -244,9 +244,9 @@ class MapPolygon {
   idList<int> indexes;  // [3..n] references to vertices for each face
 };
 
-ID_INLINE MapPolygon::MapPolygon() {}
+inline MapPolygon::MapPolygon() {}
 
-ID_INLINE MapPolygon::MapPolygon(int numIndexes) {
+inline MapPolygon::MapPolygon(int numIndexes) {
   // indexes.AssureSize( 3 );
 }
 
@@ -276,7 +276,8 @@ class MapPolygonMesh : public idMapPrimitive {
 
   int GetNumPolygons() const { return polygons.Num(); }
 
-  // int						AddPolygon( MapPolygon* face
+  // int						AddPolygon( MapPolygon*
+  // face
   // )
   //{
   //	return polygons.Append( face );
@@ -405,7 +406,7 @@ class idMapFile {
   const char* GetUniqueEntityName(const char* classname) const;  // RB
 };
 
-ID_INLINE idMapFile::idMapFile() {
+inline idMapFile::idMapFile() {
   version = CURRENT_MAP_VERSION;
   fileTime = 0;
   geometryCRC = 0;

@@ -151,28 +151,28 @@ class idEvent {
 idEvent::GetData
 ================
 */
-ID_INLINE byte* idEvent::GetData() { return data; }
+inline byte* idEvent::GetData() { return data; }
 
 /*
 ================
 idEventDef::GetName
 ================
 */
-ID_INLINE const char* idEventDef::GetName() const { return name; }
+inline const char* idEventDef::GetName() const { return name; }
 
 /*
 ================
 idEventDef::GetArgFormat
 ================
 */
-ID_INLINE const char* idEventDef::GetArgFormat() const { return formatspec; }
+inline const char* idEventDef::GetArgFormat() const { return formatspec; }
 
 /*
 ================
 idEventDef::GetFormatspecIndex
 ================
 */
-ID_INLINE unsigned int idEventDef::GetFormatspecIndex() const {
+inline unsigned int idEventDef::GetFormatspecIndex() const {
   return formatspecIndex;
 }
 
@@ -181,28 +181,28 @@ ID_INLINE unsigned int idEventDef::GetFormatspecIndex() const {
 idEventDef::GetReturnType
 ================
 */
-ID_INLINE char idEventDef::GetReturnType() const { return returnType; }
+inline char idEventDef::GetReturnType() const { return returnType; }
 
 /*
 ================
 idEventDef::GetNumArgs
 ================
 */
-ID_INLINE int idEventDef::GetNumArgs() const { return numargs; }
+inline int idEventDef::GetNumArgs() const { return numargs; }
 
 /*
 ================
 idEventDef::GetArgSize
 ================
 */
-ID_INLINE size_t idEventDef::GetArgSize() const { return argsize; }
+inline size_t idEventDef::GetArgSize() const { return argsize; }
 
 /*
 ================
 idEventDef::GetArgOffset
 ================
 */
-ID_INLINE int idEventDef::GetArgOffset(int arg) const {
+inline int idEventDef::GetArgOffset(int arg) const {
   assert((arg >= 0) && (arg < D_EVENT_MAXARGS));
   return argOffset[arg];
 }
@@ -212,6 +212,6 @@ ID_INLINE int idEventDef::GetArgOffset(int arg) const {
 idEventDef::GetEventNum
 ================
 */
-ID_INLINE int idEventDef::GetEventNum() const { return eventnum; }
+inline int idEventDef::GetEventNum() const { return eventnum; }
 
 #endif /* !__SYS_EVENT_H__ */

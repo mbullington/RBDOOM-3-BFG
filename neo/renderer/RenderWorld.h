@@ -83,10 +83,8 @@ const int MAX_RENDERENTITY_GUI = 3;
 
 // the renderEntity_s::joints array needs to point at enough memory to store the
 // number of joints rounded up to two for SIMD
-ID_INLINE int SIMD_ROUND_JOINTS(int numJoints) {
-  return ((numJoints + 1) & ~1);
-}
-ID_INLINE void SIMD_INIT_LAST_JOINT(idJointMat* joints, int numJoints) {
+inline int SIMD_ROUND_JOINTS(int numJoints) { return ((numJoints + 1) & ~1); }
+inline void SIMD_INIT_LAST_JOINT(idJointMat* joints, int numJoints) {
   if (numJoints & 1) {
     joints[numJoints] = joints[numJoints - 1];
   }

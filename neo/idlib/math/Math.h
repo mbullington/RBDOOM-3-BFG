@@ -106,13 +106,13 @@ compile_time_assert(sizeof(unsigned int) == 4);
 // either 0 or 1, so this extra wrapper is needed to avoid the static
 // alaysis warning.
 
-ID_INLINE_EXTERN int INT32_SIGNBITSET(int i) {
+extern inline int INT32_SIGNBITSET(int i) {
   int r = OLD_INT32_SIGNBITSET(i);
   assert(r == 0 || r == 1);
   return r;
 }
 
-ID_INLINE_EXTERN int INT32_SIGNBITNOTSET(int i) {
+extern inline int INT32_SIGNBITNOTSET(int i) {
   int r = OLD_INT32_SIGNBITNOTSET(i);
   assert(r == 0 || r == 1);
   return r;
@@ -178,30 +178,28 @@ standard
 IEEE_FLT_IS_NAN
 ========================
 */
-ID_INLINE_EXTERN bool IEEE_FLT_IS_NAN(float x) { return x != x; }
+extern inline bool IEEE_FLT_IS_NAN(float x) { return x != x; }
 
 /*
 ========================
 IEEE_FLT_IS_INF
 ========================
 */
-ID_INLINE_EXTERN bool IEEE_FLT_IS_INF(float x) {
-  return x == x && x * 0 != x * 0;
-}
+extern inline bool IEEE_FLT_IS_INF(float x) { return x == x && x * 0 != x * 0; }
 
 /*
 ========================
 IEEE_FLT_IS_INF_NAN
 ========================
 */
-ID_INLINE_EXTERN bool IEEE_FLT_IS_INF_NAN(float x) { return x * 0 != x * 0; }
+extern inline bool IEEE_FLT_IS_INF_NAN(float x) { return x * 0 != x * 0; }
 
 /*
 ========================
 IEEE_FLT_IS_IND
 ========================
 */
-ID_INLINE_EXTERN bool IEEE_FLT_IS_IND(float x) {
+extern inline bool IEEE_FLT_IS_IND(float x) {
   return (reinterpret_cast<const unsigned int&>(x) == 0xffc00000);
 }
 
@@ -210,7 +208,7 @@ ID_INLINE_EXTERN bool IEEE_FLT_IS_IND(float x) {
 IEEE_FLT_IS_DENORMAL
 ========================
 */
-ID_INLINE_EXTERN bool IEEE_FLT_IS_DENORMAL(float x) {
+extern inline bool IEEE_FLT_IS_DENORMAL(float x) {
   return (
       (reinterpret_cast<const unsigned int&>(x) & 0x7f800000) == 0x00000000 &&
       (reinterpret_cast<const unsigned int&>(x) & 0x007fffff) != 0x00000000);
@@ -222,7 +220,7 @@ IsNAN
 ========================
 */
 template <class type>
-ID_INLINE_EXTERN bool IsNAN(const type& v) {
+extern inline bool IsNAN(const type& v) {
   for (int i = 0; i < v.GetDimension(); i++) {
     const float f = v.ToFloatPtr()[i];
     if (IEEE_FLT_IS_NAN(f) || IEEE_FLT_IS_INF(f) || IEEE_FLT_IS_IND(f)) {
@@ -238,7 +236,7 @@ IsValid
 ========================
 */
 template <class type>
-ID_INLINE_EXTERN bool IsValid(const type& v) {
+extern inline bool IsValid(const type& v) {
   for (int i = 0; i < v.GetDimension(); i++) {
     const float f = v.ToFloatPtr()[i];
     if (IEEE_FLT_IS_NAN(f) || IEEE_FLT_IS_INF(f) || IEEE_FLT_IS_IND(f) ||
@@ -255,7 +253,7 @@ IsValid
 ========================
 */
 template <>
-ID_INLINE bool IsValid(
+inline bool IsValid(
     const float& f)  // these parameter must be a reference for the function to
                      // be considered a specialization
 {
@@ -269,7 +267,7 @@ IsNAN
 ========================
 */
 template <>
-ID_INLINE bool IsNAN(
+inline bool IsNAN(
     const float& f)  // these parameter must be a reference for the function to
                      // be considered a specialization
 {
@@ -288,7 +286,7 @@ range.
 ========================
 */
 template <class type>
-ID_INLINE bool IsInRange(const type& v, const float range) {
+inline bool IsInRange(const type& v, const float range) {
   for (int i = 0; i < v.GetDimension(); i++) {
     const float f = v.ToFloatPtr()[i];
     if (f > range || f < -range) {
@@ -306,28 +304,28 @@ ID_INLINE bool IsInRange(const type& v, const float range) {
 ================================================================================================
 */
 template <class T>
-ID_INLINE int MaxIndex(T x, T y) {
+inline int MaxIndex(T x, T y) {
   return (x > y) ? 0 : 1;
 }
 template <class T>
-ID_INLINE int MinIndex(T x, T y) {
+inline int MinIndex(T x, T y) {
   return (x < y) ? 0 : 1;
 }
 
 template <class T>
-ID_INLINE T Max3(T x, T y, T z) {
+inline T Max3(T x, T y, T z) {
   return (x > y) ? ((x > z) ? x : z) : ((y > z) ? y : z);
 }
 template <class T>
-ID_INLINE T Min3(T x, T y, T z) {
+inline T Min3(T x, T y, T z) {
   return (x < y) ? ((x < z) ? x : z) : ((y < z) ? y : z);
 }
 template <class T>
-ID_INLINE int Max3Index(T x, T y, T z) {
+inline int Max3Index(T x, T y, T z) {
   return (x > y) ? ((x > z) ? 0 : 2) : ((y > z) ? 1 : 2);
 }
 template <class T>
-ID_INLINE int Min3Index(T x, T y, T z) {
+inline int Min3Index(T x, T y, T z) {
   return (x < y) ? ((x < z) ? 0 : 2) : ((y < z) ? 1 : 2);
 }
 
@@ -339,15 +337,15 @@ ID_INLINE int Min3Index(T x, T y, T z) {
 ================================================================================================
 */
 template <class T>
-ID_INLINE T Sign(T f) {
+inline T Sign(T f) {
   return (f > 0) ? 1 : ((f < 0) ? -1 : 0);
 }
 template <class T>
-ID_INLINE T Square(T x) {
+inline T Square(T x) {
   return x * x;
 }
 template <class T>
-ID_INLINE T Cube(T x) {
+inline T Cube(T x) {
   return x * x * x;
 }
 
@@ -522,7 +520,7 @@ class idMath {
   static bool initialized;
 };
 
-ID_INLINE byte CLAMP_BYTE(int x) {
+inline byte CLAMP_BYTE(int x) {
   return ((x) < 0 ? (0) : ((x) > 255 ? 255 : (byte)(x)));
 }
 
@@ -531,7 +529,7 @@ ID_INLINE byte CLAMP_BYTE(int x) {
 idMath::InvSqrt
 ========================
 */
-ID_INLINE float idMath::InvSqrt(float x) {
+inline float idMath::InvSqrt(float x) {
   return (x > FLT_SMALLEST_NON_DENORMAL) ? sqrtf(1.0f / x) : INFINITUM;
 }
 
@@ -540,7 +538,7 @@ ID_INLINE float idMath::InvSqrt(float x) {
 idMath::InvSqrt16
 ========================
 */
-ID_INLINE float idMath::InvSqrt16(float x) {
+inline float idMath::InvSqrt16(float x) {
   return (x > FLT_SMALLEST_NON_DENORMAL) ? sqrtf(1.0f / x) : INFINITUM;
 }
 
@@ -549,7 +547,7 @@ ID_INLINE float idMath::InvSqrt16(float x) {
 idMath::Sqrt
 ========================
 */
-ID_INLINE float idMath::Sqrt(float x) {
+inline float idMath::Sqrt(float x) {
   return (x >= 0.0f) ? x * InvSqrt(x) : 0.0f;
 }
 
@@ -558,7 +556,7 @@ ID_INLINE float idMath::Sqrt(float x) {
 idMath::Sqrt16
 ========================
 */
-ID_INLINE float idMath::Sqrt16(float x) {
+inline float idMath::Sqrt16(float x) {
   return (x >= 0.0f) ? x * InvSqrt16(x) : 0.0f;
 }
 
@@ -567,21 +565,21 @@ ID_INLINE float idMath::Sqrt16(float x) {
 idMath::Frac
 ========================
 */
-ID_INLINE float idMath::Frac(float f) { return f - floorf(f); }
+inline float idMath::Frac(float f) { return f - floorf(f); }
 
 /*
 ========================
 idMath::Sin
 ========================
 */
-ID_INLINE float idMath::Sin(float a) { return sinf(a); }
+inline float idMath::Sin(float a) { return sinf(a); }
 
 /*
 ========================
 idMath::Sin16
 ========================
 */
-ID_INLINE float idMath::Sin16(float a) {
+inline float idMath::Sin16(float a) {
   float s;
 
   if ((a < 0.0f) || (a >= TWO_PI)) {
@@ -619,14 +617,14 @@ ID_INLINE float idMath::Sin16(float a) {
 idMath::Cos
 ========================
 */
-ID_INLINE float idMath::Cos(float a) { return cosf(a); }
+inline float idMath::Cos(float a) { return cosf(a); }
 
 /*
 ========================
 idMath::Cos16
 ========================
 */
-ID_INLINE float idMath::Cos16(float a) {
+inline float idMath::Cos16(float a) {
   float s, d;
 
   if ((a < 0.0f) || (a >= TWO_PI)) {
@@ -672,7 +670,7 @@ ID_INLINE float idMath::Cos16(float a) {
 idMath::SinCos
 ========================
 */
-ID_INLINE void idMath::SinCos(float a, float& s, float& c) {
+inline void idMath::SinCos(float a, float& s, float& c) {
 #if defined(_MSC_VER) && defined(_M_IX86)
   _asm
   {
@@ -696,7 +694,7 @@ ID_INLINE void idMath::SinCos(float a, float& s, float& c) {
 idMath::SinCos16
 ========================
 */
-ID_INLINE void idMath::SinCos16(float a, float& s, float& c) {
+inline void idMath::SinCos16(float a, float& s, float& c) {
   float t, d;
 
   if ((a < 0.0f) || (a >= TWO_PI)) {
@@ -748,14 +746,14 @@ ID_INLINE void idMath::SinCos16(float a, float& s, float& c) {
 idMath::Tan
 ========================
 */
-ID_INLINE float idMath::Tan(float a) { return tanf(a); }
+inline float idMath::Tan(float a) { return tanf(a); }
 
 /*
 ========================
 idMath::Tan16
 ========================
 */
-ID_INLINE float idMath::Tan16(float a) {
+inline float idMath::Tan16(float a) {
   float s;
   bool reciprocal;
 
@@ -809,7 +807,7 @@ ID_INLINE float idMath::Tan16(float a) {
 idMath::ASin
 ========================
 */
-ID_INLINE float idMath::ASin(float a) {
+inline float idMath::ASin(float a) {
   if (a <= -1.0f) {
     return -HALF_PI;
   }
@@ -824,7 +822,7 @@ ID_INLINE float idMath::ASin(float a) {
 idMath::ASin16
 ========================
 */
-ID_INLINE float idMath::ASin16(float a) {
+inline float idMath::ASin16(float a) {
   if (a < 0.0f) {
     if (a <= -1.0f) {
       return -HALF_PI;
@@ -849,7 +847,7 @@ ID_INLINE float idMath::ASin16(float a) {
 idMath::ACos
 ========================
 */
-ID_INLINE float idMath::ACos(float a) {
+inline float idMath::ACos(float a) {
   if (a <= -1.0f) {
     return PI;
   }
@@ -864,7 +862,7 @@ ID_INLINE float idMath::ACos(float a) {
 idMath::ACos16
 ========================
 */
-ID_INLINE float idMath::ACos16(float a) {
+inline float idMath::ACos16(float a) {
   if (a < 0.0f) {
     if (a <= -1.0f) {
       return PI;
@@ -888,14 +886,14 @@ ID_INLINE float idMath::ACos16(float a) {
 idMath::ATan
 ========================
 */
-ID_INLINE float idMath::ATan(float a) { return atanf(a); }
+inline float idMath::ATan(float a) { return atanf(a); }
 
 /*
 ========================
 idMath::ATan16
 ========================
 */
-ID_INLINE float idMath::ATan16(float a) {
+inline float idMath::ATan16(float a) {
   float s;
   if (fabsf(a) > 1.0f) {
     a = 1.0f / a;
@@ -942,7 +940,7 @@ ID_INLINE float idMath::ATan16(float a) {
 idMath::ATan
 ========================
 */
-ID_INLINE float idMath::ATan(float y, float x) {
+inline float idMath::ATan(float y, float x) {
   // SRS - Don't need this assertion since atan2f(y,x) handles x=0, y=0 and x=0,
   // y>0 or y<0 cases properly SRS - This assertion can cause game to stop
   // prematurely when _DEBUG is defined and asserts are enabled
@@ -956,7 +954,7 @@ ID_INLINE float idMath::ATan(float y, float x) {
 idMath::ATan16
 ========================
 */
-ID_INLINE float idMath::ATan16(float y, float x) {
+inline float idMath::ATan16(float y, float x) {
   assert(fabs(y) > idMath::FLT_SMALLEST_NON_DENORMAL ||
          fabs(x) > idMath::FLT_SMALLEST_NON_DENORMAL);
 
@@ -1007,28 +1005,28 @@ ID_INLINE float idMath::ATan16(float y, float x) {
 idMath::Pow
 ========================
 */
-ID_INLINE float idMath::Pow(float x, float y) { return powf(x, y); }
+inline float idMath::Pow(float x, float y) { return powf(x, y); }
 
 /*
 ========================
 idMath::Pow16
 ========================
 */
-ID_INLINE float idMath::Pow16(float x, float y) { return Exp16(y * Log16(x)); }
+inline float idMath::Pow16(float x, float y) { return Exp16(y * Log16(x)); }
 
 /*
 ========================
 idMath::Exp
 ========================
 */
-ID_INLINE float idMath::Exp(float f) { return expf(f); }
+inline float idMath::Exp(float f) { return expf(f); }
 
 /*
 ========================
 idMath::Exp16
 ========================
 */
-ID_INLINE float idMath::Exp16(float f) {
+inline float idMath::Exp16(float f) {
   float x = f * 1.44269504088896340f;  // multiply with ( 1 / log( 2 ) )
 #if 1
   int i = *reinterpret_cast<int*>(&x);
@@ -1064,14 +1062,14 @@ ID_INLINE float idMath::Exp16(float f) {
 idMath::Log
 ========================
 */
-ID_INLINE float idMath::Log(float f) { return logf(f); }
+inline float idMath::Log(float f) { return logf(f); }
 
 /*
 ========================
 idMath::Log16
 ========================
 */
-ID_INLINE float idMath::Log16(float f) {
+inline float idMath::Log16(float f) {
   int i = *reinterpret_cast<int*>(&f);
   int exponent =
       ((i >> IEEE_FLT_MANTISSA_BITS) & ((1 << IEEE_FLT_EXPONENT_BITS) - 1)) -
@@ -1095,7 +1093,7 @@ ID_INLINE float idMath::Log16(float f) {
 idMath::IPow
 ========================
 */
-ID_INLINE int idMath::IPow(int x, int y) {
+inline int idMath::IPow(int x, int y) {
   int r;
   for (r = x; y > 1; y--) {
     r *= x;
@@ -1108,7 +1106,7 @@ ID_INLINE int idMath::IPow(int x, int y) {
 idMath::ILog2
 ========================
 */
-ID_INLINE int idMath::ILog2(float f) {
+inline int idMath::ILog2(float f) {
   return (((*reinterpret_cast<int*>(&f)) >> IEEE_FLT_MANTISSA_BITS) &
           ((1 << IEEE_FLT_EXPONENT_BITS) - 1)) -
          IEEE_FLT_EXPONENT_BIAS;
@@ -1119,28 +1117,28 @@ ID_INLINE int idMath::ILog2(float f) {
 idMath::ILog2
 ========================
 */
-ID_INLINE int idMath::ILog2(int i) { return ILog2((float)i); }
+inline int idMath::ILog2(int i) { return ILog2((float)i); }
 
 /*
 ========================
 idMath::BitsForFloat
 ========================
 */
-ID_INLINE int idMath::BitsForFloat(float f) { return ILog2(f) + 1; }
+inline int idMath::BitsForFloat(float f) { return ILog2(f) + 1; }
 
 /*
 ========================
 idMath::BitsForInteger
 ========================
 */
-ID_INLINE int idMath::BitsForInteger(int i) { return ILog2((float)i) + 1; }
+inline int idMath::BitsForInteger(int i) { return ILog2((float)i) + 1; }
 
 /*
 ========================
 idMath::MaskForFloatSign
 ========================
 */
-ID_INLINE int idMath::MaskForFloatSign(float f) {
+inline int idMath::MaskForFloatSign(float f) {
   return ((*reinterpret_cast<int*>(&f)) >> IEEE_FLT_SIGN_BIT);
 }
 
@@ -1149,16 +1147,14 @@ ID_INLINE int idMath::MaskForFloatSign(float f) {
 idMath::MaskForIntegerSign
 ========================
 */
-ID_INLINE int idMath::MaskForIntegerSign(int i) {
-  return (i >> INT32_SIGN_BIT);
-}
+inline int idMath::MaskForIntegerSign(int i) { return (i >> INT32_SIGN_BIT); }
 
 /*
 ========================
 idMath::FloorPowerOfTwo
 ========================
 */
-ID_INLINE int idMath::FloorPowerOfTwo(int x) {
+inline int idMath::FloorPowerOfTwo(int x) {
   x |= x >> 1;
   x |= x >> 2;
   x |= x >> 4;
@@ -1173,7 +1169,7 @@ ID_INLINE int idMath::FloorPowerOfTwo(int x) {
 idMath::CeilPowerOfTwo
 ========================
 */
-ID_INLINE int idMath::CeilPowerOfTwo(int x) {
+inline int idMath::CeilPowerOfTwo(int x) {
   x--;
   x |= x >> 1;
   x |= x >> 2;
@@ -1189,16 +1185,14 @@ ID_INLINE int idMath::CeilPowerOfTwo(int x) {
 idMath::IsPowerOfTwo
 ========================
 */
-ID_INLINE bool idMath::IsPowerOfTwo(int x) {
-  return (x & (x - 1)) == 0 && x > 0;
-}
+inline bool idMath::IsPowerOfTwo(int x) { return (x & (x - 1)) == 0 && x > 0; }
 
 /*
 ========================
 idMath::BitCount
 ========================
 */
-ID_INLINE int idMath::BitCount(int x) {
+inline int idMath::BitCount(int x) {
   x -= ((x >> 1) & 0x55555555);
   x = (((x >> 2) & 0x33333333) + (x & 0x33333333));
   x = (((x >> 4) + x) & 0x0f0f0f0f);
@@ -1211,7 +1205,7 @@ ID_INLINE int idMath::BitCount(int x) {
 idMath::BitReverse
 ========================
 */
-ID_INLINE int idMath::BitReverse(int x) {
+inline int idMath::BitReverse(int x) {
   x = (((x >> 1) & 0x55555555) | ((x & 0x55555555) << 1));
   x = (((x >> 2) & 0x33333333) | ((x & 0x33333333) << 2));
   x = (((x >> 4) & 0x0f0f0f0f) | ((x & 0x0f0f0f0f) << 4));
@@ -1224,7 +1218,7 @@ ID_INLINE int idMath::BitReverse(int x) {
 idMath::Abs
 ========================
 */
-ID_INLINE int idMath::Abs(int x) {
+inline int idMath::Abs(int x) {
 #if 1
   return abs(x);
 #else
@@ -1238,7 +1232,7 @@ ID_INLINE int idMath::Abs(int x) {
 idMath::Fabs
 ========================
 */
-ID_INLINE float idMath::Fabs(float f) {
+inline float idMath::Fabs(float f) {
 #if 1
   return fabsf(f);
 #else
@@ -1253,28 +1247,28 @@ ID_INLINE float idMath::Fabs(float f) {
 idMath::Floor
 ========================
 */
-ID_INLINE float idMath::Floor(float f) { return floorf(f); }
+inline float idMath::Floor(float f) { return floorf(f); }
 
 /*
 ========================
 idMath::Ceil
 ========================
 */
-ID_INLINE float idMath::Ceil(float f) { return ceilf(f); }
+inline float idMath::Ceil(float f) { return ceilf(f); }
 
 /*
 ========================
 idMath::Rint
 ========================
 */
-ID_INLINE float idMath::Rint(float f) { return floorf(f + 0.5f); }
+inline float idMath::Rint(float f) { return floorf(f + 0.5f); }
 
 /*
 ========================
 idMath::Ftoi
 ========================
 */
-ID_INLINE int idMath::Ftoi(float f) {
+inline int idMath::Ftoi(float f) {
   // If a converted result is larger than the maximum signed doubleword integer,
   // the floating-point invalid exception is raised, and if this exception is
   // masked, the indefinite integer value (80000000H) is returned.
@@ -1302,7 +1296,7 @@ ID_INLINE int idMath::Ftoi(float f) {
 idMath::Ftoi8
 ========================
 */
-ID_INLINE char idMath::Ftoi8(float f) {
+inline char idMath::Ftoi8(float f) {
 #if defined(USE_INTRINSICS_SSE)
   __m128 x = _mm_load_ss(&f);
   x = _mm_max_ss(x, SIMD_SP_min_char);
@@ -1325,7 +1319,7 @@ ID_INLINE char idMath::Ftoi8(float f) {
 idMath::Ftoi16
 ========================
 */
-ID_INLINE short idMath::Ftoi16(float f) {
+inline short idMath::Ftoi16(float f) {
 #if defined(USE_INTRINSICS_SSE)
   __m128 x = _mm_load_ss(&f);
   x = _mm_max_ss(x, SIMD_SP_min_short);
@@ -1348,7 +1342,7 @@ ID_INLINE short idMath::Ftoi16(float f) {
 idMath::Ftoui16
 ========================
 */
-ID_INLINE unsigned short idMath::Ftoui16(float f) {
+inline unsigned short idMath::Ftoui16(float f) {
   // TO DO - SSE ??
 
   // The converted result is clamped to the range [-32768,32767].
@@ -1366,7 +1360,7 @@ ID_INLINE unsigned short idMath::Ftoui16(float f) {
 idMath::Ftob
 ========================
 */
-ID_INLINE byte idMath::Ftob(float f) {
+inline byte idMath::Ftob(float f) {
   // If a converted result is negative the value (0) is returned and if the
   // converted result is larger than the maximum byte the value (255) is
   // returned.
@@ -1393,7 +1387,7 @@ ID_INLINE byte idMath::Ftob(float f) {
 idMath::ClampChar
 ========================
 */
-ID_INLINE signed char idMath::ClampChar(int i) {
+inline signed char idMath::ClampChar(int i) {
   if (i < -128) {
     return -128;
   }
@@ -1408,7 +1402,7 @@ ID_INLINE signed char idMath::ClampChar(int i) {
 idMath::ClampShort
 ========================
 */
-ID_INLINE signed short idMath::ClampShort(int i) {
+inline signed short idMath::ClampShort(int i) {
   if (i < -32768) {
     return -32768;
   }
@@ -1423,7 +1417,7 @@ ID_INLINE signed short idMath::ClampShort(int i) {
 idMath::ClampInt
 ========================
 */
-ID_INLINE int idMath::ClampInt(int min, int max, int value) {
+inline int idMath::ClampInt(int min, int max, int value) {
   if (value < min) {
     return min;
   }
@@ -1438,7 +1432,7 @@ ID_INLINE int idMath::ClampInt(int min, int max, int value) {
 idMath::ClampFloat
 ========================
 */
-ID_INLINE float idMath::ClampFloat(float min, float max, float value) {
+inline float idMath::ClampFloat(float min, float max, float value) {
   return Max(min, Min(max, value));
 }
 
@@ -1447,7 +1441,7 @@ ID_INLINE float idMath::ClampFloat(float min, float max, float value) {
 idMath::AngleNormalize360
 ========================
 */
-ID_INLINE float idMath::AngleNormalize360(float angle) {
+inline float idMath::AngleNormalize360(float angle) {
   if ((angle >= 360.0f) || (angle < 0.0f)) {
     angle -= floorf(angle * (1.0f / 360.0f)) * 360.0f;
   }
@@ -1459,7 +1453,7 @@ ID_INLINE float idMath::AngleNormalize360(float angle) {
 idMath::AngleNormalize180
 ========================
 */
-ID_INLINE float idMath::AngleNormalize180(float angle) {
+inline float idMath::AngleNormalize180(float angle) {
   angle = AngleNormalize360(angle);
   if (angle > 180.0f) {
     angle -= 360.0f;
@@ -1472,7 +1466,7 @@ ID_INLINE float idMath::AngleNormalize180(float angle) {
 idMath::AngleDelta
 ========================
 */
-ID_INLINE float idMath::AngleDelta(float angle1, float angle2) {
+inline float idMath::AngleDelta(float angle1, float angle2) {
   return AngleNormalize180(angle1 - angle2);
 }
 
@@ -1481,7 +1475,7 @@ ID_INLINE float idMath::AngleDelta(float angle1, float angle2) {
 idMath::FloatHash
 ========================
 */
-ID_INLINE int idMath::FloatHash(const float* array, const int numFloats) {
+inline int idMath::FloatHash(const float* array, const int numFloats) {
   int i, hash = 0;
   const int* ptr;
 
@@ -1493,12 +1487,12 @@ ID_INLINE int idMath::FloatHash(const float* array, const int numFloats) {
 }
 
 template <typename T>
-ID_INLINE T Lerp(const T from, const T to, float f) {
+inline T Lerp(const T from, const T to, float f) {
   return from + ((to - from) * f);
 }
 
 template <>
-ID_INLINE int Lerp(const int from, const int to, float f) {
+inline int Lerp(const int from, const int to, float f) {
   return idMath::Ftoi((float)from + (((float)to - (float)from) * f));
 }
 

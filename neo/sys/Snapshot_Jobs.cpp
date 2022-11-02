@@ -47,7 +47,7 @@ uint32 SnapObjChecksum(const uint8* data, int length) {
 ObjectsSame
 ========================
 */
-ID_INLINE bool ObjectsSame(objJobState_t& newState, objJobState_t& oldState) {
+inline bool ObjectsSame(objJobState_t& newState, objJobState_t& oldState) {
   assert(newState.valid && oldState.valid);
   assert(newState.objectNum == oldState.objectNum);
 
