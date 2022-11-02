@@ -42,6 +42,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "../renderer/Color/ColorSpace.h"
 #include "../renderer/CmdlineProgressbar.h"
 
+using id::XXHash_Checksum;
+
 /*
 
 GUIs and script remain separately parsed
@@ -702,7 +704,7 @@ int idDeclFile::LoadAndParse() {
 
   src.SetFlags(DECL_LEXER_FLAGS);
 
-  checksum = MD5_BlockChecksum(buffer, length);
+  checksum = XXHash_Checksum(buffer, length);
 
   fileSize = length;
 
@@ -1221,7 +1223,7 @@ int idDeclManagerLocal::GetChecksum() const {
   }
 
   LittleRevBytes(checksumData, sizeof(int), total * 2);
-  return MD5_BlockChecksum(checksumData, total * 2 * sizeof(int));
+  return XXHash_Checksum(checksumData, total * 2 * sizeof(int));
 }
 
 /*
@@ -4194,7 +4196,7 @@ idDeclLocal::SetTextLocal
 void idDeclLocal::SetTextLocal(const char* text, const int length) {
   Mem_Free(textSource);
 
-  checksum = MD5_BlockChecksum(text, length);
+  checksum = XXHash_Checksum(text, length);
 
 #ifdef GET_HUFFMAN_FREQUENCIES
   for (int i = 0; i < length; i++) {
@@ -4258,7 +4260,7 @@ bool idDeclLocal::ReplaceSourceFileText() {
     file->Read(buffer.Ptr(), oldFileLength);
     fileSystem->CloseFile(file);
 
-    if (MD5_BlockChecksum(buffer.Ptr(), oldFileLength) !=
+    if (XXHash_Checksum(buffer.Ptr(), oldFileLength) !=
         (unsigned int)sourceFile->checksum) {
       common->Warning("The file %s has been modified outside of the engine.",
                       GetFileName());
@@ -4285,7 +4287,7 @@ bool idDeclLocal::ReplaceSourceFileText() {
 
   // set new file size, checksum and timestamp
   sourceFile->fileSize = newFileLength;
-  sourceFile->checksum = MD5_BlockChecksum(buffer.Ptr(), newFileLength);
+  sourceFile->checksum = XXHash_Checksum(buffer.Ptr(), newFileLength);
   fileSystem->ReadFile(GetFileName(), NULL, &sourceFile->timestamp);
 
   // move all decls in the same file

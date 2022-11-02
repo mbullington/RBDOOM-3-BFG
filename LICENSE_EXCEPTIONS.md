@@ -90,58 +90,6 @@ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
-IO for (un)compress .zip files using zlib
----------------------------------------------------------------------------
-vendor/zlib/minizip/*
-
-Copyright (C) 1998-2010 Gilles Vollant (minizip) ( http://www.winimage.com/zLibDll/minizip.html )
-
-Modifications of Unzip for Zip64
-Copyright (C) 2007-2008 Even Rouault
-
-Modifications for Zip64 support
-Copyright (C) 2009-2010 Mathias Svensson ( http://result42.com )
-
-This software is provided 'as-is', without any express or implied
-warranty.  In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
-
-MD4 Message-Digest Algorithm
------------------------------------------------------------------------------
-neo/idlib/hashing/MD4.cpp
-Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
-rights reserved.
-
-License to copy and use this software is granted provided that it
-is identified as the "RSA Data Security, Inc. MD4 Message-Digest
-Algorithm" in all material mentioning or referencing this software
-or this function.
-
-License is also granted to make and use derivative works provided
-that such works are identified as "derived from the RSA Data
-Security, Inc. MD4 Message-Digest Algorithm" in all material
-mentioning or referencing the derived work.
-
-RSA Data Security, Inc. makes no representations concerning either
-the merchantability of this software or the suitability of this
-software for any particular purpose. It is provided "as is"
-without express or implied warranty of any kind.
-
-These notices must be retained in any copies of any part of this
-documentation and/or software.
-
 MD5 Message-Digest Algorithm
 -----------------------------------------------------------------------------
 neo/idlib/hashing/MD5.cpp
@@ -149,11 +97,6 @@ This code implements the MD5 message-digest algorithm.
 The algorithm is due to Ron Rivest.  This code was
 written by Colin Plumb in 1993, no copyright is claimed.
 This code is in the public domain; do with it what you wish.
-
-CRC32 Checksum
------------------------------------------------------------------------------
-neo/idlib/hashing/CRC32.cpp
-Copyright (C) 1995-1998 Mark Adler
 
 The OpenGL Extension Wrangler Library (GLEW)
 ---------------------------------------------------------------------------

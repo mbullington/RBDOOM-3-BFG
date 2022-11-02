@@ -136,12 +136,9 @@ unsigned int NetGetVersionChecksum() {
 #if 0
 	return idStr( com_version.GetString() ).Hash();
 #else
-  unsigned int ret = 0;
 
-  CRC32_InitChecksum(ret);
-  CRC32_UpdateChecksum(ret, netVersion.string,
-                       idStr::Length(netVersion.string));
-  CRC32_FinishChecksum(ret);
+  unsigned int ret =
+      id::XXHash_Checksum(netVersion.string, idStr::Length(netVersion.string));
 
   NET_VERBOSE_PRINT("NetGetVersionChecksum - string   : %s\n",
                     netVersion.string);

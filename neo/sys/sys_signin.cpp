@@ -36,6 +36,9 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
+using id::HashAccum;
+using id::XXHash_Checksum;
+
 idCVar com_requireNonProductionSignIn(
     "com_requireNonProductionSignIn", "1", CVAR_BOOL | CVAR_ARCHIVE,
     "If true, will require sign in, even on non production builds.");
@@ -237,33 +240,12 @@ Uniquely generate a handle based on name and time
 */
 localUserHandle_t idSignInManagerBase::GetUniqueLocalUserHandle(
     const char* name) {
-  MD5_CTX ctx;
-  unsigned char digest[16];
   int64 clockTicks = Sys_GetClockTicks();
+  HashAccum accum(XXHash_Checksum);
 
-  MD5_Init(&ctx);
-  MD5_Update(&ctx, (const unsigned char*)name, idStr::Length(name));
-  MD5_Update(&ctx, (const unsigned char*)&clockTicks, sizeof(clockTicks));
-  MD5_Final(&ctx, (unsigned char*)digest);
+  accum.Update(name, idStr::Length(name));
+  accum.Update(&clockTicks, sizeof(clockTicks));
 
-  // Quantize the 128 bit hash down to the number of bits needed for a
-  // localUserHandle_t
-  const int STRIDE_BYTES = sizeof(localUserHandle_t::userHandleType_t);
-  const int NUM_LOOPS = 16 / STRIDE_BYTES;
-
-  localUserHandle_t::userHandleType_t handle = 0;
-
-  for (int i = 0; i < NUM_LOOPS; i++) {
-    localUserHandle_t::userHandleType_t tempHandle = 0;
-
-    for (int j = 0; j < STRIDE_BYTES; j++) {
-      tempHandle |=
-          ((localUserHandle_t::userHandleType_t)digest[(i * STRIDE_BYTES) + j])
-          << (j * 8);
-    }
-
-    handle ^= tempHandle;
-  }
-
+  localUserHandle_t::userHandleType_t handle = accum.Checksum();
   return localUserHandle_t(handle);
 }

@@ -43,6 +43,12 @@ Contains the MD5BlockChecksum implementation.
 ================================================================================================
 */
 
+struct MD5_CTX {
+  unsigned int state[4];
+  unsigned int bits[2];
+  unsigned char in[64];
+};
+
 // POINTER defines a generic pointer type
 typedef unsigned char* POINTER;
 

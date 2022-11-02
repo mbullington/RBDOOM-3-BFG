@@ -39,11 +39,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "Snapshot_Jobs.h"
 
 uint32 SnapObjChecksum(const uint8* data, int length) {
-  // RB: 64 bit fixes, changed long to int
-  extern unsigned int CRC32_BlockChecksum(const void* data, int length);
-  // RB end
-
-  return CRC32_BlockChecksum(data, length);
+  return id::XXHash_Checksum(data, length);
 }
 
 /*

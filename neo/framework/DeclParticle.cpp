@@ -37,6 +37,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
+using id::XXHash_Checksum;
+
 idCVar binaryLoadParticles("binaryLoadParticles", "1", 0,
                            "enable binary load/write of particle decls");
 
@@ -448,14 +450,14 @@ bool idDeclParticle::Parse(const char* text, const int textLength,
   if (allowBinaryVersion) {
     // Try to load the generated version of it
     // If successful,
-    // - Create an MD5 of the hash of the source
-    // - Load the MD5 of the generated, if they differ, create a new generated
+    // - Create a hash of the source
+    // - Load the generated, if they differ, create a new generated
     generatedFileName = "generated/particles/";
     generatedFileName.AppendPath(GetName());
     generatedFileName.SetFileExtension(".bprt");
 
     idFileLocal file(fileSystem->OpenFileReadMemory(generatedFileName));
-    sourceChecksum = MD5_BlockChecksum(text, textLength);
+    sourceChecksum = XXHash_Checksum(text, textLength);
 
     if (binaryLoadParticles.GetBool() && LoadBinary(file, sourceChecksum)) {
       return true;

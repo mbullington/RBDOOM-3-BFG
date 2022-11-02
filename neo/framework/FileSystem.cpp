@@ -52,6 +52,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include <unistd.h>
 #endif
 
+using id::XXHash_Checksum_64;
+
 /*
 =============================================================================
 
@@ -254,8 +256,8 @@ class idFileSystemLocal : public idFileSystem {
   static void WriteResourceFile_f(const idCmdArgs& args);
   static void ExtractResourceFile_f(const idCmdArgs& args);
   static void UpdateResourceFile_f(const idCmdArgs& args);
-  static void GenerateResourceCRCs_f(const idCmdArgs& args);
-  static void CreateCRCsForResourceFileList(const idFileList& list);
+  static void GenerateResourceHashes_f(const idCmdArgs& args);
+  static void CreateHashesForResourceFileList(const idFileList& list);
 
   void BuildOrderedStartupContainer();
 
@@ -2537,35 +2539,36 @@ void idFileSystemLocal::TouchFileList_f(const idCmdArgs& args) {
 
 /*
 ============
-idFileSystemLocal::GenerateResourceCRCs_f
+idFileSystemLocal::GenerateResourceHashes_f
 
-Generates a CRC checksum file for each .resources file.
+Generates a .xxhash64 checksum file for each .resources file.
 ============
 */
-void idFileSystemLocal::GenerateResourceCRCs_f(const idCmdArgs& args) {
-  idLib::Printf("Generating CRCs for resource files...\n");
+void idFileSystemLocal::GenerateResourceHashes_f(const idCmdArgs& args) {
+  idLib::Printf("Generating hashes for resource files...\n");
 
   std::unique_ptr<idFileList> baseResourceFileList(
       fileSystem->ListFiles(".", ".resources"));
   if (baseResourceFileList.get() != NULL) {
-    CreateCRCsForResourceFileList(*baseResourceFileList);
+    CreateHashesForResourceFileList(*baseResourceFileList);
   }
 
   std::unique_ptr<idFileList> mapResourceFileList(
       fileSystem->ListFilesTree("maps", ".resources"));
   if (mapResourceFileList.get() != NULL) {
-    CreateCRCsForResourceFileList(*mapResourceFileList);
+    CreateHashesForResourceFileList(*mapResourceFileList);
   }
 
-  idLib::Printf("Done generating CRCs for resource files.\n");
+  idLib::Printf("Done generating hashes for resource files.\n");
 }
 
 /*
 ================
-idFileSystemLocal::CreateCRCsForResourceFileList
+idFileSystemLocal::CreateHashesForResourceFileList
 ================
 */
-void idFileSystemLocal::CreateCRCsForResourceFileList(const idFileList& list) {
+void idFileSystemLocal::CreateHashesForResourceFileList(
+    const idFileList& list) {
   for (int fileIndex = 0; fileIndex < list.GetNumFiles(); ++fileIndex) {
     idLib::Printf(" Processing %s.\n", list.GetFile(fileIndex));
 
@@ -2606,8 +2609,8 @@ void idFileSystemLocal::CreateCRCsForResourceFileList(const idFileList& list) {
       cacheEntries[innerFileIndex].Read(currentFile.get());
     }
 
-    // All tables read, now seek to each one and calculate the CRC.
-    idTempArray<unsigned int> innerFileCRCs(
+    // All tables read, now seek to each one and calculate the hash.
+    idTempArray<uint64_t> innerFileHashes(
         numFileResources);  // DG: use int instead of long for 64bit
                             // compatibility
     for (int innerFileIndex = 0; innerFileIndex < numFileResources;
@@ -2615,37 +2618,36 @@ void idFileSystemLocal::CreateCRCsForResourceFileList(const idFileList& list) {
       const char* innerFileDataBegin =
           currentFile->GetDataPtr() + cacheEntries[innerFileIndex].offset;
 
-      innerFileCRCs[innerFileIndex] = CRC32_BlockChecksum(
+      innerFileHashes[innerFileIndex] = XXHash_Checksum_64(
           innerFileDataBegin, cacheEntries[innerFileIndex].length);
     }
 
-    // Get the CRC for all the CRCs.
-    const unsigned int totalCRC = CRC32_BlockChecksum(
-        innerFileCRCs.Ptr(),
-        innerFileCRCs
+    const unsigned int totalHash = XXHash_Checksum_64(
+        innerFileHashes.Ptr(),
+        innerFileHashes
             .Size());  // DG: use int instead of long for 64bit compatibility
 
-    // Write the .crc file corresponding to the .resources file.
-    idStr crcFilename = list.GetFile(fileIndex);
-    crcFilename.SetFileExtension(".crc");
-    std::unique_ptr<idFile> crcOutputFile(
-        fileSystem->OpenFileWrite(crcFilename, "fs_basepath"));
-    if (crcOutputFile.get() == NULL) {
+    // Write the .xxhash64 file corresponding to the .resources file.
+    idStr hashFilename = list.GetFile(fileIndex);
+    hashFilename.SetFileExtension(".xxhash64");
+    std::unique_ptr<idFile> hashOutputFile(
+        fileSystem->OpenFileWrite(hashFilename, "fs_basepath"));
+    if (hashOutputFile.get() == NULL) {
       // RB: fixed potential crash because of "cannot pass objects of
       // non-trivially-copyable type 'class idStr' through '...'"
-      idLib::Printf("Error writing CRC file %s.\n", crcFilename.c_str());
+      idLib::Printf("Error writing hash file %s.\n", hashFilename.c_str());
       // RB end
       continue;
     }
 
-    const uint32 CRC_FILE_MAGIC =
+    const uint32 FILE_MAGIC =
         0xCC00CC00;  // I just made this up, it has no meaning.
-    const uint32 CRC_FILE_VERSION = 1;
-    crcOutputFile->WriteBig(CRC_FILE_MAGIC);
-    crcOutputFile->WriteBig(CRC_FILE_VERSION);
-    crcOutputFile->WriteBig(totalCRC);
-    crcOutputFile->WriteBig(numFileResources);
-    crcOutputFile->WriteBigArray(innerFileCRCs.Ptr(), numFileResources);
+    const uint32 FILE_VERSION = 1;
+    hashOutputFile->WriteBig(FILE_MAGIC);
+    hashOutputFile->WriteBig(FILE_VERSION);
+    hashOutputFile->WriteBig(totalHash);
+    hashOutputFile->WriteBig(numFileResources);
+    hashOutputFile->WriteBigArray(innerFileHashes.Ptr(), numFileResources);
   }
 }
 
@@ -2888,9 +2890,9 @@ void idFileSystemLocal::Startup() {
       "updateResourceFile", UpdateResourceFile_f, CMD_FL_SYSTEM,
       "updates or appends the supplied files in the supplied resource file");
 
-  cmdSystem->AddCommand("generateResourceCRCs", GenerateResourceCRCs_f,
-                        CMD_FL_SYSTEM,
-                        "Generates CRC checksums for all the resource files.");
+  cmdSystem->AddCommand(
+      "generateResourceHashes", GenerateResourceHashes_f, CMD_FL_SYSTEM,
+      "Generates xxHash-64 hashes for all the resource files.");
 
   // print the current search paths
   Path_f(idCmdArgs());

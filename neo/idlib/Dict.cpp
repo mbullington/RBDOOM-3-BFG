@@ -37,6 +37,9 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
+using id::HashAccum;
+using id::XXHash_Checksum;
+
 idStrPool idDict::globalKeys;
 idStrPool idDict::globalValues;
 
@@ -249,23 +252,20 @@ idDict::Checksum
 ================
 */
 int idDict::Checksum() const {
-  // RB: 64 bit fixes, changed long to int
-  unsigned int ret;
-  // RB end
   int i, n;
 
   idList<idKeyValue> sorted = args;
   sorted.SortWithTemplate(idSort_KeyValue());
   n = sorted.Num();
-  CRC32_InitChecksum(ret);
+
+  HashAccum accum(XXHash_Checksum);
+
   for (i = 0; i < n; i++) {
-    CRC32_UpdateChecksum(ret, sorted[i].GetKey().c_str(),
-                         sorted[i].GetKey().Length());
-    CRC32_UpdateChecksum(ret, sorted[i].GetValue().c_str(),
-                         sorted[i].GetValue().Length());
+    accum.Update(sorted[i].GetKey().c_str(), sorted[i].GetKey().Length());
+    accum.Update(sorted[i].GetValue().c_str(), sorted[i].GetValue().Length());
   }
-  CRC32_FinishChecksum(ret);
-  return ret;
+
+  return accum.Checksum();
 }
 
 /*
