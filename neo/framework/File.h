@@ -292,35 +292,6 @@ class idFile_Cached : public idFile_Permanent {
   byte* buffered;
 };
 
-class idFile_InZip : public idFile {
-  friend class idFileSystemLocal;
-
- public:
-  idFile_InZip();
-  virtual ~idFile_InZip();
-
-  virtual const char* GetName() const { return name.c_str(); }
-  virtual const char* GetFullPath() const { return fullPath.c_str(); }
-  virtual int Read(void* buffer, int len);
-  virtual int Write(const void* buffer, int len);
-  virtual int Length() const;
-  virtual ID_TIME_T Timestamp() const;
-  virtual int Tell() const;
-  virtual void ForceFlush();
-  virtual void Flush();
-  virtual int Seek(long offset, fsOrigin_t origin);
-
- private:
-  idStr name;      // name of the file in the pak
-  idStr fullPath;  // full file path including pak file name
-  // DG: use ZPOS64_T, it's the type minizip uses and should also work with
-  // zip64 files > 2GB
-  ZPOS64_T zipFilePos;  // zip file info position in pak
-  // DG end
-  int fileSize;  // size of the file
-  void* z;       // unzip info
-};
-
 #if 1
 class idFile_InnerResource : public idFile {
   friend class idFileSystemLocal;

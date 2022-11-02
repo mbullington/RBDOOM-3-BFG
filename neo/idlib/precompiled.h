@@ -64,8 +64,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "../framework/CmdSystem.h"
 #include "../framework/CVarSystem.h"
 #include "../framework/Common.h"
-// DG: needed for idFile_InZip in File.h
-#include "../framework/Unzip.h"
 // DG end
 #include "../framework/File.h"
 #include "../framework/File_Manifest.h"

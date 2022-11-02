@@ -39,9 +39,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #pragma hdrstop
 
-#include "Unzip.h"
-#include "Zip.h"
-
 #ifdef WIN32
 #include <io.h>  // for _read
 #else
@@ -109,7 +106,6 @@ following places:
 for save path, base path:
         for current game, base game:
                 search directory
-                search zip files
 
 downloaded files, to be written to save path + current game's directory
 
