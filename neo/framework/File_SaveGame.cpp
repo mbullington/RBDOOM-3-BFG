@@ -38,6 +38,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #include "File_SaveGame.h"
 
+using id::XXHash_Checksum;
+
 /*
 
 TODO: CRC on each block
@@ -585,7 +587,7 @@ void idFile_SaveGamePipelined::CompressBlock() {
         size_t blockSize = zStream.total_out + numChecksums * sizeof(uint32) -
                            compressedProducedBytes;
         uint32 checksum =
-            MD5_BlockChecksum(zStream.next_out - blockSize, blockSize);
+            XXHash_Checksum(zStream.next_out - blockSize, blockSize);
         zStream.next_out[0] = ((checksum >> 0) & 0xFF);
         zStream.next_out[1] = ((checksum >> 8) & 0xFF);
         zStream.next_out[2] = ((checksum >> 16) & 0xFF);
@@ -988,7 +990,7 @@ void idFile_SaveGamePipelined::DecompressBlock() {
           zStream.next_in[0] ^= 0xFF;
         }
         zStream.avail_in -= sizeof(uint32);
-        uint32 checksum = MD5_BlockChecksum(zStream.next_in, zStream.avail_in);
+        uint32 checksum = XXHash_Checksum(zStream.next_in, zStream.avail_in);
         if (!verify(zStream.next_in[zStream.avail_in + 0] ==
                     ((checksum >> 0) & 0xFF)) ||
             !verify(zStream.next_in[zStream.avail_in + 1] ==

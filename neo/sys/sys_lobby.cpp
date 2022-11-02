@@ -3850,7 +3850,7 @@ void idLobby::ServerUpdateBandwidthTest() {
       msg.WriteByte(random.RandomInt(255));
     }
 
-    unsigned int checksum = MD5_BlockChecksum(&buffer[8], randomSize);
+    unsigned int checksum = id::XXHash_Checksum(&buffer[8], randomSize);
     msg.WriteLong(checksum);
 
     NET_VERBOSE_PRINT(

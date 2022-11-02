@@ -90,14 +90,6 @@ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
-MD5 Message-Digest Algorithm
------------------------------------------------------------------------------
-neo/idlib/hashing/MD5.cpp
-This code implements the MD5 message-digest algorithm.
-The algorithm is due to Ron Rivest.  This code was
-written by Colin Plumb in 1993, no copyright is claimed.
-This code is in the public domain; do with it what you wish.
-
 The OpenGL Extension Wrangler Library (GLEW)
 ---------------------------------------------------------------------------
 Copyright (C) 2002-2007, Milan Ikits <milan ikits[]ieee org>

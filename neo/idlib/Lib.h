@@ -311,7 +311,6 @@ class idNetworkLoadException : public idException {
 // hashing
 #include "hashing/Hash.h"
 #include "hashing/XXHash.h"
-#include "hashing/MD5.h"
 
 // misc
 #include "Dict.h"

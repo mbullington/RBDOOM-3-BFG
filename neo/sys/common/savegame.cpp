@@ -39,6 +39,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "../sys_session_local.h"
 #include "../sys_savegame.h"
 
+using id::XXHash_Checksum;
+
 idCVar savegame_winInduceDelay(
     "savegame_winInduceDelay", "0", CVAR_INTEGER,
     "on windows, this is a delay induced before any file operation occurs");
@@ -229,7 +231,7 @@ int idSaveGameThread::Save() {
           (file->type & SAVEGAMEFILE_COMPRESSED)) {
         if (saveGame_checksum.GetBool()) {
           unsigned int checksum =
-              MD5_BlockChecksum(file->GetDataPtr(), file->Length());
+              XXHash_Checksum(file->GetDataPtr(), file->Length());
           size_t size = outputFile->WriteBig(checksum);
           if (size != sizeof(checksum)) {
 #ifdef _WIN32  // DG: unify windows and posix savegames => replace GetLastError
@@ -387,7 +389,7 @@ int idSaveGameThread::Load() {
           (file->type & SAVEGAMEFILE_COMPRESSED) != 0) {
         if (saveGame_checksum.GetBool()) {
           unsigned int checksum =
-              MD5_BlockChecksum(file->GetDataPtr(), file->Length());
+              XXHash_Checksum(file->GetDataPtr(), file->Length());
           if (checksum != originalChecksum) {
             file->error = true;
             callback->errorCode = SAVEGAME_E_CORRUPTED;
@@ -516,9 +518,10 @@ int idSaveGameThread::Enumerate() {
 
       // populate the game details struct
       directory = directory.StripFilename();
-      details->slotName = directory.c_str() + saveFolder.Length() +
-                          1;  // Strip off the prefix too
-                              // JDC: I hit this all the time			assert(
+      details->slotName =
+          directory.c_str() + saveFolder.Length() +
+          1;  // Strip off the prefix too
+              // JDC: I hit this all the time			assert(
       // fileSystem->IsFolder( directory.c_str(), "fs_savePath" ) == FOLDER_YES
       // );
     }
