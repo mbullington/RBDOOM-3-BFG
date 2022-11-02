@@ -421,6 +421,8 @@ file(GLOB MESA_INCLUDES ../vendor/mesa/*.h)
 
 file(GLOB TINYEXR_INCLUDES ../vendor/tinyexr/*.h)
 
+file(GLOB PDQSORT_INCLUDES ../vendor/pdqsort/*.h)
+
 file(GLOB MIKKTSPACE_INCLUDES ../vendor/mikktspace/*.h)
 file(GLOB MIKKTSPACE_SOURCES ../vendor/mikktspace/*.c)
 
@@ -766,6 +768,7 @@ set(RBDOOM3_INCLUDES
 			${STB_INCLUDES}
 			${MESA_INCLUDES}
 			${TINYEXR_INCLUDES}
+			${PDQSORT_INCLUDES}
 			${MIKKTSPACE_INCLUDES}
 			${JPEG_INCLUDES}
 			${PNG_INCLUDES}

@@ -10,3 +10,6 @@
 [submodule "vendor/zlib"]
 	path = vendor/zlib
 	url = git@github.com:cloudflare/zlib.git
+[submodule "vendor/pdqsort"]
+	path = vendor/pdqsort
+	url = git@github.com:orlp/pdqsort.git
