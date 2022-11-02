@@ -328,10 +328,10 @@ idRenderModel* idRenderModelManagerLocal::GetModel(const char* _modelName,
 
   idRenderModel* model = NULL;
 
-  // RB: Collada DAE and Wavefront OBJ
-  if ((extension.Icmp("dae") == 0) || (extension.Icmp("obj") == 0) ||
-      (extension.Icmp("ase") == 0) || (extension.Icmp("lwo") == 0) ||
-      (extension.Icmp("flt") == 0) || (extension.Icmp("ma") == 0)) {
+  // RB: Wavefront OBJ
+  if ((extension.Icmp("obj") == 0) || (extension.Icmp("ase") == 0) ||
+      (extension.Icmp("lwo") == 0) || (extension.Icmp("flt") == 0) ||
+      (extension.Icmp("ma") == 0)) {
     model = new (TAG_MODEL) idRenderModelStatic;
   } else if (extension.Icmp(MD5_MESH_EXT) == 0) {
     model = new (TAG_MODEL) idRenderModelMD5;
