@@ -40,6 +40,26 @@ const char* Sys_EXEPath() {
 }
 ```
 
+## Classes 
+
+
+Old class names start with "id" and each successive word starts with an
+upper case.
+
+```c++
+class idVec3;
+```
+
+New code should be written using the `id` namespace instead, like so:
+
+```c++
+namespace id {
+
+class Vec3;
+
+} // namespace id
+```
+
 ## Copied from id Tech 4 coding guide
 
 Typedef names use the same naming convention as variables, however
@@ -75,13 +95,6 @@ Names of recursive functions end with "_r"
 void WalkBSP_r( int node );
 ```
 
-Class names start with "id" and each successive word starts with an
-upper case.
-
-```c++
-class idVec3;
-```
-
 Class methods have the same naming convention as functions.
 
 ```c++
@@ -89,3 +102,4 @@ class idVec3 {
 float Length( void ) const;
 }
 ```
+
