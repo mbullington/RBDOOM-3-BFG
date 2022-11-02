@@ -262,7 +262,6 @@ if(STANDALONE)
 	add_definitions(-DSTANDALONE)
 endif()
 
-include_directories("../vendor/zlib")
 include_directories("../vendor/jpeg-6")
 
 macro(SET_OPTION option value)
@@ -279,6 +278,11 @@ include_directories(${SX_DIR}/include)
 set(YYJSON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/yyjson)
 add_subdirectory(${YYJSON_DIR} yyjson)
 include_directories(${YYJSON_DIR}/src/include)
+
+# include zlib
+set(ZLIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/zlib)
+add_subdirectory(${ZLIB_DIR} zlib)
+include_directories(${ZLIB_DIR})
 
 if(USE_VULKAN)
 
@@ -482,9 +486,6 @@ set(JPEG_SOURCES
 	../vendor/jpeg-6/jquant1.cpp
 	../vendor/jpeg-6/jquant2.cpp
 	../vendor/jpeg-6/jutils.cpp)
-
-file(GLOB ZLIB_INCLUDES ../vendor/zlib/*.h)
-file(GLOB ZLIB_SOURCES ../vendor/zlib/*.c)
 
 file(GLOB BINKDEC_INCLUDES ../vendor/libbinkdec/include/*.h)
 file(GLOB BINKDEC_SOURCES ../vendor/libbinkdec/src/*.c ../vendor/libbinkdec/src/*.cpp)
@@ -768,7 +769,6 @@ set(RBDOOM3_INCLUDES
 			${MIKKTSPACE_INCLUDES}
 			${JPEG_INCLUDES}
 			${PNG_INCLUDES}
-			${ZLIB_INCLUDES}
 			${BINKDEC_INCLUDES}
 			${GLEW_INCLUDES}
 			${SOUND_INCLUDES}
@@ -810,7 +810,6 @@ set(RBDOOM3_SOURCES
 			${MIKKTSPACE_SOURCES}
 			${JPEG_SOURCES}
 			${PNG_SOURCES}
-			${ZLIB_SOURCES}
 			${BINKDEC_SOURCES}
 			${GLEW_SOURCES}
 			${SOUND_SOURCES}
@@ -902,7 +901,7 @@ if(MSVC)
 	
 	if(USE_PRECOMPILED_HEADERS) 
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder_SSE2.cpp)
@@ -1028,7 +1027,7 @@ else()
 	
 	if(USE_PRECOMPILED_HEADERS) 	
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${PNG_SOURCES} ${ZLIB_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${JPEG_SOURCES} ${PNG_SOURCES} ${GLEW_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder_SSE2.cpp)
@@ -1053,7 +1052,10 @@ else()
 			set(RT_LIBRARY rt)
 		endif()
 
-		set(LIBRARIES idlib sx yyjson
+		set(LIBRARIES idlib
+			sx
+			yyjson
+			zlib
 			${Vulkan_LIBRARIES}
 			${OPENGL_LIBRARIES}
 			pthread

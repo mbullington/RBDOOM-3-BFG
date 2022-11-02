@@ -7,3 +7,6 @@
 [submodule "vendor/yyjson"]
 	path = vendor/yyjson
 	url = git@github.com:ibireme/yyjson.git
+[submodule "vendor/zlib"]
+	path = vendor/zlib
+	url = git@github.com:cloudflare/zlib.git
