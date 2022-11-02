@@ -275,6 +275,11 @@ set(SX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/sx)
 add_subdirectory(${SX_DIR} sx)
 include_directories(${SX_DIR}/include)
 
+# include yyjson
+set(YYJSON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/yyjson)
+add_subdirectory(${YYJSON_DIR} yyjson)
+include_directories(${YYJSON_DIR}/src/include)
+
 if(USE_VULKAN)
 
 	# RB: moved this above the general Vulkan part so glslang does not include Vulkan SDK headers
@@ -363,8 +368,6 @@ else()
 	endif()
 
 endif()
-
-include_directories("../vendor/rapidjson/include")
 
 add_subdirectory(idlib)
 
@@ -516,9 +519,7 @@ set(OPENAL_SOURCES
 	sound/OpenAL/AL_SoundSample.cpp
 	sound/OpenAL/AL_SoundVoice.cpp
 	sound/OpenAL/AL_CinematicAudio.cpp)
-	
-file(GLOB RAPIDJSON_INCLUDES ../vendor/rapidjson/include/rapidjson/*.h)
-	
+		
 file(GLOB SYS_INCLUDES sys/*.h)
 file(GLOB SYS_SOURCES sys/*.cpp)
 
@@ -774,7 +775,6 @@ set(RBDOOM3_INCLUDES
 			${MINIZIP_INCLUDES}
 			${BINKDEC_INCLUDES}
 			${GLEW_INCLUDES}
-			${RAPIDJSON_INCLUDES}
 			${SOUND_INCLUDES}
 			${UI_INCLUDES}
 			${SWF_INCLUDES}
@@ -1060,7 +1060,7 @@ else()
 			set(RT_LIBRARY rt)
 		endif()
 
-		set(LIBRARIES idlib sx
+		set(LIBRARIES idlib sx yyjson
 			${Vulkan_LIBRARIES}
 			${OPENGL_LIBRARIES}
 			pthread

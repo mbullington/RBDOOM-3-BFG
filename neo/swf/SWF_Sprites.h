@@ -38,7 +38,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #define __SWF_SPRITES_H__
 
 #undef Bool
-#include "rapidjson/document.h"
 
 /*
 ================================================
@@ -58,7 +57,7 @@ class idSWFSprite {
   void Write(idFile* f);
 
   // RB begin
-  void ReadJSON(rapidjson::Value& entry);
+  void ReadJSON(const id::JSON& entry);
 
   void WriteJSON(idFile* f, int characterID);
   void WriteJSON_PlaceObject2(idFile* f, idSWFBitStream& bitstream,
@@ -110,7 +109,7 @@ class idSWFSprite {
   idList<swfSpriteCommand_t, TAG_SWF> commands;
 
   //// [ES-BrianBugh 1/16/10] - There can be multiple DoInitAction tags, and all
-  ///need to be executed.
+  /// need to be executed.
   idList<idSWFBitStream, TAG_SWF> doInitActions;
 
   byte* commandBuffer;

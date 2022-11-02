@@ -483,7 +483,7 @@ void ModifyProjectionMatrix(viewDef_t* viewDef, const idPlane& clipPlane) {
   idVec4 c = newPlane.ToVec4() * (2.0f / (q * newPlane.ToVec4()));
 
   float matrix[16];
-  std::memcpy(matrix, viewDef->projectionMatrix, sizeof(float) * 16);
+  memcpy(matrix, viewDef->projectionMatrix, sizeof(float) * 16);
 
   // Replace the third row of the projection matrix
   matrix[2] = c[0];

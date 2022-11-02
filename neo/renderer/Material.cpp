@@ -430,7 +430,7 @@ void idMaterial::ParseSort(idLexer& src) {
   } else if (!token.Icmp("portalSky")) {
     sort = SS_PORTAL_SKY;
   } else {
-    sort = atof(token);
+    sort = token.GetIntValue();
   }
 }
 

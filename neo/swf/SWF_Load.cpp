@@ -34,13 +34,11 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 ===========================================================================
 */
+
 #include "precompiled.h"
 #pragma hdrstop
 #include "../renderer/Font.h"
 #include "../renderer/Image.h"
-//#include "../../vendor/rapidjson/include/rapidjson/document.h"
-
-using namespace rapidjson;
 
 #pragma warning( \
     disable : 4355)  // 'this' : used in base member initializer list
@@ -802,13 +800,11 @@ bool idSWF::LoadJSON(const char* filename) {
   size_t fileSize = f->Read((byte*)fileData, fileLength);
   delete f;
 
-  rapidjson::Document d;
-  d.Parse(fileData);
-
+  id::JSON d(fileData, fileSize);
   assert(d.IsObject());
 
   if (d.HasMember("version")) {
-    Value& s = d["version"];
+    id::JSON s = d["version"];
     int version = s.GetInt();
 
     // idLib::Printf( "version = %i", version );
@@ -830,14 +826,14 @@ bool idSWF::LoadJSON(const char* filename) {
     mouseY = (frameHeight / 2);
   }
 
-  Value& a = d["dict"];
+  id::JSON a = d["dict"];
   assert(a.IsArray());
 
   // do not include the last item which is the main sprite
   dictionary.SetNum(a.Size() - 1);
 
-  for (SizeType i = 0; i < a.Size(); i++) {
-    Value& entry = a[i];
+  for (size_t i = 0; i < a.Size(); i++) {
+    id::JSON entry = a[i];
     idStr type = entry["type"].GetString();
 
     if (type == "IMAGE") {
@@ -895,9 +891,9 @@ bool idSWF::LoadJSON(const char* filename) {
         shape->fillDraws.SetNum(entry["fillDraws"].Size());
         for (int d = 0; d < shape->fillDraws.Num(); d++) {
           idSWFShapeDrawFill& fillDraw = shape->fillDraws[d];
-          Value& jsonDraw = entry["fillDraws"][d];
+          id::JSON jsonDraw = entry["fillDraws"][d];
 
-          Value& style = jsonDraw["style"];
+          id::JSON style = jsonDraw["style"];
           idStr type = style["type"].GetString();
 
           // 0 = solid, 1 = gradient, 4 = bitmap
@@ -929,7 +925,7 @@ bool idSWF::LoadJSON(const char* filename) {
 
           if (fillDraw.style.type == 0)  // style.HasMember["startColor"] )// )
           {
-            Value& startColor = style["startColor"];
+            id::JSON startColor = style["startColor"];
             fillDraw.style.startColor.r =
                 (uint8)(startColor[0].GetDouble() * 255) & 0xFF;
             fillDraw.style.startColor.g =
@@ -940,7 +936,7 @@ bool idSWF::LoadJSON(const char* filename) {
                 (uint8)(startColor[3].GetDouble() * 255) & 0xFF;
 
             if (style.HasMember("endColor")) {
-              Value& endColor = style["endColor"];
+              id::JSON endColor = style["endColor"];
               fillDraw.style.endColor.r =
                   (uint8)(startColor[0].GetDouble() * 255) & 0xFF;
               fillDraw.style.endColor.g =
@@ -955,7 +951,7 @@ bool idSWF::LoadJSON(const char* filename) {
           }
 
           if (fillDraw.style.type > 0) {
-            Value& startMatrix = style["startMatrix"];
+            id::JSON startMatrix = style["startMatrix"];
             fillDraw.style.startMatrix.xx = startMatrix[0].GetDouble();
             fillDraw.style.startMatrix.yy = startMatrix[1].GetDouble();
             fillDraw.style.startMatrix.xy = startMatrix[2].GetDouble();
@@ -964,7 +960,7 @@ bool idSWF::LoadJSON(const char* filename) {
             fillDraw.style.startMatrix.ty = startMatrix[5].GetDouble();
 
             if (style.HasMember("endMatrix")) {
-              Value& endMatrix = style["endMatrix"];
+              id::JSON endMatrix = style["endMatrix"];
               fillDraw.style.endMatrix.xx = endMatrix[0].GetDouble();
               fillDraw.style.endMatrix.yy = endMatrix[1].GetDouble();
               fillDraw.style.endMatrix.xy = endMatrix[2].GetDouble();
@@ -978,25 +974,25 @@ bool idSWF::LoadJSON(const char* filename) {
 
           // gradient
           if (fillDraw.style.type == 1) {
-            Value& gradients = style["gradients"];
+            id::JSON gradients = style["gradients"];
             fillDraw.style.gradient.numGradients = gradients.Size();
 
             for (int g = 0; g < fillDraw.style.gradient.numGradients; g++) {
               swfGradientRecord_t gr =
                   fillDraw.style.gradient.gradientRecords[g];
 
-              Value& gradientRecord = gradients[g];
+              id::JSON gradientRecord = gradients[g];
 
               gr.startRatio = gradientRecord["startRatio"].GetUint() & 0xFF;
               gr.endRatio = gradientRecord["endRatio"].GetUint() & 0xFF;
 
-              Value& startColor = gradientRecord["startColor"];
+              id::JSON startColor = gradientRecord["startColor"];
               gr.startColor.r = (uint8)(startColor[0].GetDouble() * 255) & 0xFF;
               gr.startColor.g = (uint8)(startColor[1].GetDouble() * 255) & 0xFF;
               gr.startColor.b = (uint8)(startColor[2].GetDouble() * 255) & 0xFF;
               gr.startColor.a = (uint8)(startColor[3].GetDouble() * 255) & 0xFF;
 
-              Value& endColor = gradientRecord["endColor"];
+              id::JSON endColor = gradientRecord["endColor"];
               gr.endColor.r = (uint8)(startColor[0].GetDouble() * 255) & 0xFF;
               gr.endColor.g = (uint8)(startColor[1].GetDouble() * 255) & 0xFF;
               gr.endColor.b = (uint8)(startColor[2].GetDouble() * 255) & 0xFF;
@@ -1018,7 +1014,7 @@ bool idSWF::LoadJSON(const char* filename) {
           }
 
           if (jsonDraw.HasMember("startVerts")) {
-            Value& startVerts = jsonDraw["startVerts"];
+            id::JSON startVerts = jsonDraw["startVerts"];
 
             fillDraw.startVerts.SetNum(startVerts.Size());
             for (int v = 0; v < fillDraw.startVerts.Num(); v++) {
@@ -1032,7 +1028,7 @@ bool idSWF::LoadJSON(const char* filename) {
           if (jsonDraw.HasMember("endVerts")) {
             // this is a morph shape
 
-            Value& endVerts = jsonDraw["endVerts"];
+            id::JSON endVerts = jsonDraw["endVerts"];
 
             fillDraw.endVerts.SetNum(endVerts.Size());
             for (int v = 0; v < fillDraw.endVerts.Num(); v++) {
@@ -1044,7 +1040,7 @@ bool idSWF::LoadJSON(const char* filename) {
           }
 
           if (jsonDraw.HasMember("indices")) {
-            Value& indices = jsonDraw["indices"];
+            id::JSON indices = jsonDraw["indices"];
             fillDraw.indices.SetNum(indices.Size());
 
 #if 1
@@ -1068,13 +1064,13 @@ bool idSWF::LoadJSON(const char* filename) {
         shape->lineDraws.SetNum(entry["lineDraws"].Size());
         for (int d = 0; d < shape->lineDraws.Num(); d++) {
           idSWFShapeDrawLine& lineDraw = shape->lineDraws[d];
-          Value& jsonDraw = entry["lineDraw"][d];
+          id::JSON jsonDraw = entry["lineDraw"][d];
 
-          Value& style = jsonDraw["style"];
+          id::JSON style = jsonDraw["style"];
           lineDraw.style.startWidth = style["startWidth"].GetUint();
           lineDraw.style.endWidth = style["endWidth"].GetUint();
 
-          Value& startColor = style["startColor"];
+          id::JSON startColor = style["startColor"];
           lineDraw.style.startColor.r =
               (uint8)(startColor[0].GetDouble() * 255) & 0xFF;
           lineDraw.style.startColor.g =
@@ -1085,7 +1081,7 @@ bool idSWF::LoadJSON(const char* filename) {
               (uint8)(startColor[3].GetDouble() * 255) & 0xFF;
 
           if (style.HasMember("endColor")) {
-            Value& endColor = style["endColor"];
+            id::JSON endColor = style["endColor"];
             lineDraw.style.endColor.r =
                 (uint8)(startColor[0].GetDouble() * 255) & 0xFF;
             lineDraw.style.endColor.g =
@@ -1098,7 +1094,7 @@ bool idSWF::LoadJSON(const char* filename) {
             lineDraw.style.endColor = lineDraw.style.startColor;
           }
 
-          Value& startVerts = jsonDraw["startVerts"];
+          id::JSON startVerts = jsonDraw["startVerts"];
 
           lineDraw.startVerts.SetNum(startVerts.Size());
           for (int v = 0; v < lineDraw.startVerts.Num(); v++) {
@@ -1111,7 +1107,7 @@ bool idSWF::LoadJSON(const char* filename) {
           if (jsonDraw.HasMember("endVerts")) {
             // this is a morph shape
 
-            Value& endVerts = jsonDraw["endVerts"];
+            id::JSON endVerts = jsonDraw["endVerts"];
 
             lineDraw.endVerts.SetNum(endVerts.Size());
             for (int v = 0; v < lineDraw.endVerts.Num(); v++) {
@@ -1122,7 +1118,7 @@ bool idSWF::LoadJSON(const char* filename) {
             }
           }
 
-          Value& indices = jsonDraw["indices"];
+          id::JSON indices = jsonDraw["indices"];
           lineDraw.indices.SetNum(indices.Size());
 
 #if 1
@@ -1175,7 +1171,7 @@ bool idSWF::LoadJSON(const char* filename) {
       edittext->fontID = entry["fontID"].GetUint();
       edittext->fontHeight = entry["fontHeight"].GetUint();
 
-      Value& color = entry["color"];
+      id::JSON color = entry["color"];
       edittext->color.r = (uint8)(color[0].GetDouble() * 255) & 0xFF;
       edittext->color.g = (uint8)(color[1].GetDouble() * 255) & 0xFF;
       edittext->color.b = (uint8)(color[2].GetDouble() * 255) & 0xFF;

@@ -289,19 +289,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
-RapidJSON
----------------------------------------------------------------------------
-vendor/rapidjson/*
-
-Tencent is pleased to support the open source community by making RapidJSON available. 
- 
-Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.  All rights reserved.
-
-If you have downloaded a copy of the RapidJSON binary from Tencent, please note that the RapidJSON binary is licensed under the MIT License.
-If you have downloaded a copy of the RapidJSON source code from Tencent, please note that RapidJSON source code is licensed under the MIT License, except for the third-party components listed below which are subject to different license terms.  Your integration of RapidJSON into your own projects may require compliance with the MIT License, as well as the other licenses applicable to the third-party components included within RapidJSON.
-A copy of the MIT License is included in this file.
-
 Other dependencies and licenses:
 
 Open Source Software Licensed Under the BSD License:

@@ -37,9 +37,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #include "precompiled.h"
 
-#include "rapidjson/document.h"
-#include "rapidjson/pointer.h"
-
 #pragma hdrstop
 
 #include "Unzip.h"
@@ -57,10 +54,6 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #endif
 #include <unistd.h>
 #endif
-
-using rapidjson::Document;
-using rapidjson::Pointer;
-using rapidjson::Value;
 
 /*
 =============================================================================
@@ -147,6 +140,7 @@ struct searchpath_t {
 class idFileSystemLocal : public idFileSystem {
  public:
   idFileSystemLocal();
+  ~idFileSystemLocal();
 
   virtual void Init();
   virtual void Restart();
@@ -273,7 +267,7 @@ class idFileSystemLocal : public idFileSystem {
   virtual int GetGameInfoInt(const char* jsonPointer);
 
  private:
-  Document gameInfo;
+  id::JSON* gameInfo;
 
   idList<searchpath_t> searchPaths;
   int loadCount;     // total files read
@@ -412,12 +406,19 @@ idFileSystemLocal::idFileSystemLocal
 ================
 */
 idFileSystemLocal::idFileSystemLocal() {
+  gameInfo = NULL;
   loadCount = 0;
   loadStack = 0;
   resourceBufferPtr = NULL;
   resourceBufferSize = 0;
   resourceBufferAvailable = 0;
   numFilesOpenedAsCached = 0;
+}
+
+idFileSystemLocal::~idFileSystemLocal() {
+  if (gameInfo != NULL) {
+    delete gameInfo;
+  }
 }
 
 /*
@@ -3573,7 +3574,6 @@ Loads the gameinfo.json file for the current game.
 ===============
 */
 void idFileSystemLocal::LoadGameInfo() {
-  Document& d = this->gameInfo;
   const char* fbuffer = NULL;
   ID_TIME_T timestamp;
 
@@ -3582,7 +3582,9 @@ void idFileSystemLocal::LoadGameInfo() {
     return;
   }
 
-  d.Parse(fbuffer);
+  this->gameInfo = new id::JSON(fbuffer, fileSize);
+
+  auto& d = *this->gameInfo;
   idassert(d.IsObject());
 }
 
@@ -3592,19 +3594,19 @@ idFileSystemLocal::GetGameInfo
 ===============
 */
 idStr idFileSystemLocal::GetGameInfo(const char* jsonPointer) {
-  Document& d = this->gameInfo;
+  auto& d = *this->gameInfo;
   idassert(d.IsObject());
 
   // https://rapidjson.org/md_doc_pointer.html
-  const auto value = Pointer(jsonPointer).Get(d);
+  const auto value = d.Pointer(jsonPointer);
 
-  if (!value->IsString()) {
+  if (!value.IsString()) {
     common->Error("idFileSystemLocal::GetGameInfo: %s doesn't exist!",
                   jsonPointer);
     return idStr("");
   }
 
-  const char* stringVal = value->GetString();
+  const char* stringVal = value.GetString();
   return idStr(stringVal);
 }
 
@@ -3614,17 +3616,17 @@ idFileSystemLocal::GetGameInfoInt
 ===============
 */
 int idFileSystemLocal::GetGameInfoInt(const char* jsonPointer) {
-  Document& d = this->gameInfo;
+  auto& d = *this->gameInfo;
   idassert(d.IsObject());
 
   // https://rapidjson.org/md_doc_pointer.html
-  const auto value = Pointer(jsonPointer).Get(d);
+  const auto value = d.Pointer(jsonPointer);
 
-  if (!value->IsInt()) {
+  if (!value.IsInt()) {
     common->Error("idFileSystemLocal::GetGameInfo: %s doesn't exist!",
                   jsonPointer);
     return -1;
   }
 
-  return value->GetInt();
+  return value.GetInt();
 }

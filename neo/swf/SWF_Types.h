@@ -104,11 +104,6 @@ struct swfMatrix_t {
     return (xx == a.xx && yy == a.yy && xy == a.xy && yx == a.yx &&
             tx == a.tx && ty == a.ty);
   }
-
-  bool operator!=(const swfMatrix_t& a) {
-    return !(xx == a.xx && yy == a.yy && xy == a.xy && yx == a.yx &&
-             tx == a.tx && ty == a.ty);
-  }
   // RB end
 };
 struct swfColorRGB_t {

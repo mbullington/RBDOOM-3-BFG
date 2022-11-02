@@ -34,10 +34,9 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 ===========================================================================
 */
+
 #include "precompiled.h"
 #pragma hdrstop
-
-using namespace rapidjson;
 
 /*
 ========================
@@ -275,10 +274,10 @@ void idSWFSprite::Write(idFile* f) {
 }
 
 // RB begin
-void idSWFSprite::ReadJSON(rapidjson::Value& entry) {
+void idSWFSprite::ReadJSON(const id::JSON& entry) {
   frameCount = entry["frameCount"].GetUint();
 
-  Value& fo = entry["frameOffsets"];
+  id::JSON fo = entry["frameOffsets"];
   frameOffsets.SetNum(fo.Size());
 
   for (int i = 0; i < frameOffsets.Num(); i++) {
@@ -286,7 +285,7 @@ void idSWFSprite::ReadJSON(rapidjson::Value& entry) {
   }
 
   if (entry.HasMember("frameLabels")) {
-    Value& fl = entry["frameLabels"];
+    id::JSON fl = entry["frameLabels"];
     frameLabels.SetNum(fl.Size());
     for (int i = 0; i < frameLabels.Num(); i++) {
       frameLabels[i].frameNum = fl[i]["frameNum"].GetUint();
@@ -294,11 +293,11 @@ void idSWFSprite::ReadJSON(rapidjson::Value& entry) {
     }
   }
 
-  Value& c = entry["commands"];
+  id::JSON c = entry["commands"];
   commands.SetNum(c.Size());
   for (int i = 0; i < commands.Num(); i++) {
-    Value& command = c[i];
-    Value& type = command["type"];
+    id::JSON command = c[i];
+    id::JSON type = command["type"];
 
     if (type == "Tag_PlaceObject2" || type == "Tag_PlaceObject3") {
       if (type == "Tag_PlaceObject3") {
@@ -332,7 +331,7 @@ void idSWFSprite::ReadJSON(rapidjson::Value& entry) {
 
       if ((flags1 & PlaceFlagHasMatrix) != 0) {
         swfMatrix_t m;
-        Value& startMatrix = command["startMatrix"];
+        id::JSON startMatrix = command["startMatrix"];
         m.xx = startMatrix[0].GetDouble();
         m.yy = startMatrix[1].GetDouble();
         m.xy = startMatrix[2].GetDouble();
@@ -345,14 +344,14 @@ void idSWFSprite::ReadJSON(rapidjson::Value& entry) {
       if ((flags1 & PlaceFlagHasColorTransform) != 0) {
         swfColorXform_t cxf;
 
-        Value& mulColor = command["mulColor"];
+        id::JSON mulColor = command["mulColor"];
         cxf.mul.x = mulColor[0].GetDouble();
         cxf.mul.y = mulColor[1].GetDouble();
         cxf.mul.z = mulColor[2].GetDouble();
         cxf.mul.w = mulColor[3].GetDouble();
 
         if (command.HasMember("addColor")) {
-          Value& addColor = command["addColor"];
+          id::JSON addColor = command["addColor"];
           cxf.add.x = addColor[0].GetDouble();
           cxf.add.y = addColor[1].GetDouble();
           cxf.add.z = addColor[2].GetDouble();
@@ -368,7 +367,7 @@ void idSWFSprite::ReadJSON(rapidjson::Value& entry) {
       }
 
       if ((flags1 & PlaceFlagHasName) != 0) {
-        Value& name = command["name"];
+        id::JSON name = command["name"];
         idStr string = name.GetString();
         string.Append('\0');
         int len = string.Length();

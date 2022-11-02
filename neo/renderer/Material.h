@@ -229,18 +229,18 @@ typedef enum {
   STENCIL_OP_DECRWRAP
 } stencilOperation_t;
 
-typedef struct {
+struct stencilStage_t {
   // The value to be compared against (if Comp is anything else than always)
   // and/or the value to be written to the buffer (if either Pass, Fail or ZFail
   // is set to replace).
   byte ref = 0;
 
-  // An 8 bit mask as an 0–255 integer, used when comparing the reference value
+  // An 8 bit mask as an 0ï¿½255 integer, used when comparing the reference value
   // with the contents of the buffer (referenceValue & readMask)
   // comparisonFunction (stencilBufferValue & readMask).
   byte readMask = 255;
 
-  // An 8 bit mask as an 0–255 integer, used when writing to the buffer.Note
+  // An 8 bit mask as an 0ï¿½255 integer, used when writing to the buffer.Note
   // that, like other write masks, it specifies which bits of stencil buffer
   // will be affected by write (i.e.WriteMask 0 means that no bits are affected
   // and not that 0 will be written).
@@ -260,13 +260,13 @@ typedef struct {
   // What to do with the contents of the buffer if the stencil test passes, but
   // the depth test fails.
   stencilOperation_t zFail = STENCIL_OP_KEEP;
-} stencilStage_t;
+};
 // SP End
 
 static const int MAX_FRAGMENT_IMAGES = 8;
 static const int MAX_VERTEX_PARMS = 4;
 
-typedef struct {
+struct newShaderStage_t {
   int vertexProgram;
   int numVertexParms;
   int vertexParms[MAX_VERTEX_PARMS][4];  // evaluated register indexes
@@ -275,9 +275,9 @@ typedef struct {
   int glslProgram;
   int numFragmentProgramImages;
   idImage* fragmentProgramImages[MAX_FRAGMENT_IMAGES];
-} newShaderStage_t;
+};
 
-typedef struct {
+struct shaderStage_t {
   int conditionRegister;     // if registers[conditionRegister] == 0, skip stage
   stageLighting_t lighting;  // determines which passes interact with lights
   uint64 drawStateBits;
@@ -292,17 +292,17 @@ typedef struct {
 
   stencilStage_t* stencilStage;
   newShaderStage_t* newStage;  // vertex / fragment program based stage
-} shaderStage_t;
+};
 
-typedef enum {
+enum materialCoverage_t {
   MC_BAD,
   MC_OPAQUE,      // completely fills the triangle, will have black drawn on
                   // fillDepthBuffer
   MC_PERFORATED,  // may have alpha tested holes
   MC_TRANSLUCENT  // blended with background
-} materialCoverage_t;
+};
 
-typedef enum {
+enum materialSort_t {
   SS_SUBVIEW = -3,  // mirrors, viewscreens, etc
   SS_GUI = -2,      // guis
   SS_BAD = -1,
@@ -321,7 +321,7 @@ typedef enum {
   SS_NEAREST,  // screen blood blobs
 
   SS_POST_PROCESS = 100  // after a screen copy to texture
-} materialSort_t;
+};
 
 enum SubViewType : uint16_t {
   SUBVIEW_NONE,
@@ -329,7 +329,7 @@ enum SubViewType : uint16_t {
   SUBVIEW_DIRECT_PORTAL
 };
 
-typedef enum { CT_FRONT_SIDED, CT_BACK_SIDED, CT_TWO_SIDED } cullType_t;
+enum cullType_t { CT_FRONT_SIDED, CT_BACK_SIDED, CT_TWO_SIDED };
 
 // these don't effect per-material storage, so they can be very large
 const int MAX_SHADER_STAGES = 256;
@@ -439,7 +439,7 @@ typedef enum {
   SURF_DISCRETE = BIT(10),    // not clipped or merged by utilities
   SURF_NOFRAGMENT = BIT(11),  // dmap won't cut surface at each bsp boundary
   SURF_NULLNORMAL = BIT(12)   // renderbump will draw this surface as 0x80 0x80
-                             // 0x80, which won't collect light from any angle
+                              // 0x80, which won't collect light from any angle
 } surfaceFlags_t;
 
 class idSoundEmitter;
@@ -690,14 +690,14 @@ class idMaterial : public idDecl {
   const char* GetDescription() const { return desc; }
 
   // get sort order
-  const float GetSort() const { return sort; }
+  const int GetSort() const { return sort; }
 
   const int GetStereoEye() const { return stereoEye; }
 
   // this is only used by the gui system to force sorting order
   // on images referenced from tga's instead of materials.
   // this is done this way as there are 2000 tgas the guis use
-  void SetSort(float s) const { sort = s; };
+  void SetSort(int s) const { sort = s; };
 
   // DFRM_NONE, DFRM_SPRITE, etc
   deform_t Deform() const { return deform; }
@@ -871,7 +871,7 @@ class idMaterial : public idDecl {
 
   decalInfo_t decalInfo;
 
-  mutable float sort;  // lower numbered shaders draw before higher numbered
+  mutable int sort;  // lower numbered shaders draw before higher numbered
   int stereoEye;
   deform_t deform;
   int deformRegisters[4];    // numeric parameter for deforms

@@ -325,6 +325,7 @@ class idNetworkLoadException : public idException {
 #include "Callback.h"
 #include "ParallelJobList.h"
 #include "TaskScheduler.h"
+#include "JSON.h"
 
 #include "SoftwareCache.h"
 

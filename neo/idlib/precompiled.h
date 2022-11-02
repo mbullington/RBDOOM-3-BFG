@@ -127,9 +127,6 @@ const uint32 NUM_FRAME_DATA = 2;
 #include "../ui/ListGUI.h"
 #include "../ui/UserInterface.h"
 
-// RB: required for SWF extensions
-//#include "rapidjson/document.h"
-
 #include "../swf/SWF.h"
 
 // collision detection system
