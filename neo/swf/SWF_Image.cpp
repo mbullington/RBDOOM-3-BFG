@@ -178,9 +178,7 @@ and write it out.
 */
 void RectAllocator(const idList<idVec2i>& inputSizes,
                    idList<idVec2i>& outputPositions, idVec2i& totalSize,
-                   const int START_MAX = 16384, const int imageMax = 1024);
-float RectPackingFraction(const idList<idVec2i>& inputSizes,
-                          const idVec2i totalSize);
+                   float* packingFraction = NULL);
 
 void idSWF::WriteSwfImageAtlas(const char* filename) {
   idList<idVec2i> inputSizes;
@@ -193,9 +191,9 @@ void idSWF::WriteSwfImageAtlas(const char* filename) {
   idList<idVec2i> outputPositions;
   idVec2i totalSize;
   // smart allocator
-  RectAllocator(inputSizes, outputPositions, totalSize);
+  float frac;
+  RectAllocator(inputSizes, outputPositions, totalSize, &frac);
 
-  float frac = RectPackingFraction(inputSizes, totalSize);
   idLib::Printf("%5.2f packing fraction in %ix%i image\n", frac,
                 totalSize.x * 4, totalSize.y * 4);
 
@@ -243,8 +241,8 @@ void idSWF::WriteSwfImageAtlas(const char* filename) {
       }
     }
     //		idLib::Printf( "Color normalize: %3i:%3i  %3i:%3i  %3i:%3i
-    //%3i:%3i\n", 			minV[0], maxV[0], minV[1], maxV[1], minV[2], maxV[2], minV[3],
-    //maxV[3] );
+    //%3i:%3i\n", 			minV[0], maxV[0], minV[1], maxV[1],
+    //minV[2], maxV[2], minV[3], maxV[3] );
 
     // don't divide by zero
     for (int x = 0; x < 4; x++) {

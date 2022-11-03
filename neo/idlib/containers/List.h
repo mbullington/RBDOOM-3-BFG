@@ -159,7 +159,9 @@ class idList {
 
   // For use with for (auto &item : list) syntax;
   _type_* begin() { return Ptr(); }
+  const _type_* begin() const { return Ptr(); }
   _type_* end() { return (Ptr() + Num()); }
+  const _type_* end() const { return (Ptr() + Num()); }
 
   _type_* Ptr();              // returns a pointer to the list
   const _type_* Ptr() const;  // returns a pointer to the list
