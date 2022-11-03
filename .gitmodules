@@ -13,3 +13,6 @@
 [submodule "vendor/pdqsort"]
 	path = vendor/pdqsort
 	url = git@github.com:orlp/pdqsort.git
+[submodule "vendor/rpmalloc"]
+	path = vendor/rpmalloc
+	url = git@github.com:mjansson/rpmalloc.git
