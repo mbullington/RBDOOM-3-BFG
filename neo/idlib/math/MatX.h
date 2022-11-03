@@ -351,7 +351,7 @@ inline idMatX::~idMatX() {
   if (mat != NULL &&
       (mat < idMatX::tempPtr || mat > idMatX::tempPtr + MATX_MAX_TEMP) &&
       alloced != -1) {
-    Mem_Free16(mat);
+    Mem_Free(mat);
   }
 }
 
@@ -728,9 +728,9 @@ inline void idMatX::SetSize(int rows, int columns) {
     int alloc = (rows * columns + 3) & ~3;
     if (alloc > alloced && alloced != -1) {
       if (mat != NULL) {
-        Mem_Free16(mat);
+        Mem_Free(mat);
       }
-      mat = (float*)Mem_Alloc16(alloc * sizeof(float), TAG_MATH);
+      mat = (float*)Mem_Alloc(alloc * sizeof(float), TAG_MATH);
       alloced = alloc;
     }
     numRows = rows;
@@ -768,7 +768,7 @@ idMatX::SetData
 inline void idMatX::SetData(int rows, int columns, float* data) {
   assert(mat < idMatX::tempPtr || mat > idMatX::tempPtr + MATX_MAX_TEMP);
   if (mat != NULL && alloced != -1) {
-    Mem_Free16(mat);
+    Mem_Free(mat);
   }
   // RB: changed UINT_PTR to uintptr_t
   assert((((uintptr_t)data) & 15) == 0);  // data must be 16 byte aligned

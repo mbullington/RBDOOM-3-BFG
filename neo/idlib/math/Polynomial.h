@@ -56,7 +56,7 @@ class idPolynomial {
 
   ~idPolynomial()  // DG: don't leak coefficient's memory!
   {
-    Mem_Free16(coefficient);
+    Mem_Free(coefficient);
   }
 
   float operator[](int index) const;
@@ -624,14 +624,14 @@ inline float* idPolynomial::ToFloatPtr() { return coefficient; }
 inline void idPolynomial::Resize(int d, bool keep) {
   int alloc = (d + 1 + 3) & ~3;
   if (alloc > allocated) {
-    float* ptr = (float*)Mem_Alloc16(alloc * sizeof(float), TAG_MATH);
+    float* ptr = (float*)Mem_Alloc(alloc * sizeof(float), TAG_MATH);
     if (coefficient != NULL) {
       if (keep) {
         for (int i = 0; i <= degree; i++) {
           ptr[i] = coefficient[i];
         }
       }
-      Mem_Free16(coefficient);
+      Mem_Free(coefficient);
     }
     allocated = alloc;
     coefficient = ptr;

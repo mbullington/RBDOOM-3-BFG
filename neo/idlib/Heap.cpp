@@ -94,7 +94,7 @@ void Mem_EnableTagging(bool enable) { memTagging = enable; }
 
 size_t* Mem_GetThreadLocalTagStats() { return memTagDict; }
 
-void* Mem_Alloc16(const size_t size, const memTag_t tag) {
+void* Mem_Alloc(const size_t size, const memTag_t tag) {
   if (!size) {
     return NULL;
   }
@@ -127,7 +127,7 @@ void* Mem_Alloc16(const size_t size, const memTag_t tag) {
   }
 }
 
-void Mem_Free16(void* ptr) {
+void Mem_Free(void* ptr) {
   if (ptr == NULL) {
     return;
   }

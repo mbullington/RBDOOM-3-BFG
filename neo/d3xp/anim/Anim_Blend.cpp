@@ -2500,7 +2500,7 @@ void idDeclModelDef::SetupJoints(int* numJoints, idJointMat** jointList,
   idJointMat* list;
 
   if (!modelHandle || modelHandle->IsDefaultModel()) {
-    Mem_Free16((*jointList));
+    Mem_Free((*jointList));
     (*jointList) = NULL;
     frameBounds.Clear();
     return;
@@ -2514,8 +2514,8 @@ void idDeclModelDef::SetupJoints(int* numJoints, idJointMat** jointList,
   }
 
   // set up initial pose for model (with no pose, model is just a jumbled mess)
-  list = (idJointMat*)Mem_Alloc16(SIMD_ROUND_JOINTS(num) * sizeof(list[0]),
-                                  TAG_JOINTMAT);
+  list = (idJointMat*)Mem_Alloc(SIMD_ROUND_JOINTS(num) * sizeof(list[0]),
+                                TAG_JOINTMAT);
   pose = GetDefaultPose();
 
   // convert the joint quaternions to joint matrices
@@ -3323,7 +3323,7 @@ void idAnimator::Restore(idRestoreGame* savefile) {
   }
 
   savefile->ReadInt(numJoints);
-  joints = (idJointMat*)Mem_Alloc16(
+  joints = (idJointMat*)Mem_Alloc(
       SIMD_ROUND_JOINTS(numJoints) * sizeof(joints[0]), TAG_JOINTMAT);
   for (i = 0; i < numJoints; i++) {
     float* data = joints[i].ToFloatPtr();
@@ -3399,7 +3399,7 @@ void idAnimator::FreeData() {
 
   jointMods.DeleteContents(true);
 
-  Mem_Free16(joints);
+  Mem_Free(joints);
   joints = NULL;
   numJoints = 0;
 
@@ -5278,7 +5278,7 @@ idRenderModel* idGameEdit::ANIM_CreateMeshForAnim(idRenderModel* model,
   }
 
   ent.numJoints = model->NumJoints();
-  ent.joints = (idJointMat*)Mem_Alloc16(
+  ent.joints = (idJointMat*)Mem_Alloc(
       SIMD_ROUND_JOINTS(ent.numJoints) * sizeof(*ent.joints), TAG_JOINTMAT);
 
   ANIM_CreateAnimFrame(model, md5anim, ent.numJoints, ent.joints,
@@ -5288,7 +5288,7 @@ idRenderModel* idGameEdit::ANIM_CreateMeshForAnim(idRenderModel* model,
 
   newmodel = model->InstantiateDynamicModel(&ent, NULL, NULL);
 
-  Mem_Free16(ent.joints);
+  Mem_Free(ent.joints);
   ent.joints = NULL;
 
   return newmodel;

@@ -118,7 +118,7 @@ R_ShutdownFrameData
 void R_ShutdownFrameData() {
   frameData = NULL;
   for (int i = 0; i < NUM_FRAME_DATA; i++) {
-    Mem_Free16(smpFrameData[i].frameMemory);
+    Mem_Free(smpFrameData[i].frameMemory);
     smpFrameData[i].frameMemory = NULL;
   }
 }
@@ -133,7 +133,7 @@ void R_InitFrameData() {
 
   for (int i = 0; i < NUM_FRAME_DATA; i++) {
     smpFrameData[i].frameMemory =
-        (byte*)Mem_Alloc16(MAX_FRAME_MEMORY, TAG_RENDER);
+        (byte*)Mem_Alloc(MAX_FRAME_MEMORY, TAG_RENDER);
   }
 
   // must be set before calling R_ToggleSmpFrame()

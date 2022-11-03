@@ -87,7 +87,7 @@ void R_FreeEntityDefDerivedData(idRenderEntityLocal* def, bool keepDecals,
   // leaves them in the control of the game
   if (common->ReadDemo()) {
     if (def->parms.joints) {
-      Mem_Free16(def->parms.joints);
+      Mem_Free(def->parms.joints);
       def->parms.joints = NULL;
     }
     if (def->parms.callbackData) {

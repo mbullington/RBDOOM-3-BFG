@@ -353,7 +353,7 @@ R_AllocStaticTriSurfVerts
 void R_AllocStaticTriSurfVerts(srfTriangles_t* tri, int numVerts) {
   assert(tri->verts == NULL);
   tri->verts =
-      (idDrawVert*)Mem_Alloc16(numVerts * sizeof(idDrawVert), TAG_TRI_VERTS);
+      (idDrawVert*)Mem_Alloc(numVerts * sizeof(idDrawVert), TAG_TRI_VERTS);
 }
 
 /*
@@ -363,8 +363,8 @@ R_AllocStaticTriSurfIndexes
 */
 void R_AllocStaticTriSurfIndexes(srfTriangles_t* tri, int numIndexes) {
   assert(tri->indexes == NULL);
-  tri->indexes = (triIndex_t*)Mem_Alloc16(numIndexes * sizeof(triIndex_t),
-                                          TAG_TRI_INDEXES);
+  tri->indexes =
+      (triIndex_t*)Mem_Alloc(numIndexes * sizeof(triIndex_t), TAG_TRI_INDEXES);
 }
 
 /*
@@ -374,8 +374,8 @@ R_AllocStaticTriSurfSilIndexes
 */
 void R_AllocStaticTriSurfSilIndexes(srfTriangles_t* tri, int numIndexes) {
   assert(tri->silIndexes == NULL);
-  tri->silIndexes = (triIndex_t*)Mem_Alloc16(numIndexes * sizeof(triIndex_t),
-                                             TAG_TRI_SIL_INDEXES);
+  tri->silIndexes = (triIndex_t*)Mem_Alloc(numIndexes * sizeof(triIndex_t),
+                                           TAG_TRI_SIL_INDEXES);
 }
 
 /*
@@ -385,7 +385,7 @@ R_AllocStaticTriSurfDominantTris
 */
 void R_AllocStaticTriSurfDominantTris(srfTriangles_t* tri, int numVerts) {
   assert(tri->dominantTris == NULL);
-  tri->dominantTris = (dominantTri_t*)Mem_Alloc16(
+  tri->dominantTris = (dominantTri_t*)Mem_Alloc(
       numVerts * sizeof(dominantTri_t), TAG_TRI_DOMINANT_TRIS);
 }
 
@@ -397,7 +397,7 @@ R_AllocStaticTriSurfMirroredVerts
 void R_AllocStaticTriSurfMirroredVerts(srfTriangles_t* tri,
                                        int numMirroredVerts) {
   assert(tri->mirroredVerts == NULL);
-  tri->mirroredVerts = (int*)Mem_Alloc16(
+  tri->mirroredVerts = (int*)Mem_Alloc(
       numMirroredVerts * sizeof(*tri->mirroredVerts), TAG_TRI_MIR_VERT);
 }
 
@@ -408,8 +408,8 @@ R_AllocStaticTriSurfDupVerts
 */
 void R_AllocStaticTriSurfDupVerts(srfTriangles_t* tri, int numDupVerts) {
   assert(tri->dupVerts == NULL);
-  tri->dupVerts = (int*)Mem_Alloc16(numDupVerts * 2 * sizeof(*tri->dupVerts),
-                                    TAG_TRI_DUP_VERT);
+  tri->dupVerts = (int*)Mem_Alloc(numDupVerts * 2 * sizeof(*tri->dupVerts),
+                                  TAG_TRI_DUP_VERT);
 }
 
 /*
@@ -419,8 +419,8 @@ R_AllocStaticTriSurfSilEdges
 */
 void R_AllocStaticTriSurfSilEdges(srfTriangles_t* tri, int numSilEdges) {
   assert(tri->silEdges == NULL);
-  tri->silEdges = (silEdge_t*)Mem_Alloc16(numSilEdges * sizeof(silEdge_t),
-                                          TAG_TRI_SIL_EDGE);
+  tri->silEdges =
+      (silEdge_t*)Mem_Alloc(numSilEdges * sizeof(silEdge_t), TAG_TRI_SIL_EDGE);
 }
 
 /*
@@ -431,8 +431,8 @@ R_AllocStaticTriSurfPreLightShadowVerts
 void R_AllocStaticTriSurfPreLightShadowVerts(srfTriangles_t* tri,
                                              int numVerts) {
   assert(tri->preLightShadowVertexes == NULL);
-  tri->preLightShadowVertexes = (idShadowVert*)Mem_Alloc16(
-      numVerts * sizeof(idShadowVert), TAG_TRI_SHADOW);
+  tri->preLightShadowVertexes =
+      (idShadowVert*)Mem_Alloc(numVerts * sizeof(idShadowVert), TAG_TRI_SHADOW);
 }
 
 /*
@@ -442,7 +442,7 @@ R_ResizeStaticTriSurfVerts
 */
 void R_ResizeStaticTriSurfVerts(srfTriangles_t* tri, int numVerts) {
   idDrawVert* newVerts =
-      (idDrawVert*)Mem_Alloc16(numVerts * sizeof(idDrawVert), TAG_TRI_VERTS);
+      (idDrawVert*)Mem_Alloc(numVerts * sizeof(idDrawVert), TAG_TRI_VERTS);
   const int copy = std::min(numVerts, tri->numVerts);
   memcpy(newVerts, tri->verts, copy * sizeof(idDrawVert));
   Mem_Free(tri->verts);
@@ -455,8 +455,8 @@ R_ResizeStaticTriSurfIndexes
 =================
 */
 void R_ResizeStaticTriSurfIndexes(srfTriangles_t* tri, int numIndexes) {
-  triIndex_t* newIndexes = (triIndex_t*)Mem_Alloc16(
-      numIndexes * sizeof(triIndex_t), TAG_TRI_INDEXES);
+  triIndex_t* newIndexes =
+      (triIndex_t*)Mem_Alloc(numIndexes * sizeof(triIndex_t), TAG_TRI_INDEXES);
   const int copy = std::min(numIndexes, tri->numIndexes);
   memcpy(newIndexes, tri->indexes, copy * sizeof(triIndex_t));
   Mem_Free(tri->indexes);
@@ -831,7 +831,8 @@ void R_IdentifySilEdges(srfTriangles_t* tri, bool omitCoplanarEdges) {
     if (c_coplanarCulled) {
       c_coplanarSilEdges += c_coplanarCulled;
       //			common->Printf( "%i of %i sil edges coplanar
-      //culled\n", c_coplanarCulled, 				c_coplanarCulled + numSilEdges );
+      // culled\n", c_coplanarCulled,
+      // c_coplanarCulled + numSilEdges );
     }
   }
   c_totalSilEdges += silEdges.Num();
@@ -1702,8 +1703,8 @@ void R_TestDegenerateTextureSpace(srfTriangles_t* tri) {
   }
 
   if (c_degenerate) {
-    //		common->Printf( "%d triangles with a degenerate texture space\n",
-    //c_degenerate );
+    //		common->Printf( "%d triangles with a degenerate texture
+    //space\n", c_degenerate );
   }
 }
 
@@ -1880,7 +1881,7 @@ void R_CleanupTriangles(srfTriangles_t* tri, bool createNormals,
   R_CreateSilIndexes(tri);
 
   //	R_RemoveDuplicatedTriangles( tri );	// this may remove valid
-  //overlapped transparent triangles
+  // overlapped transparent triangles
 
   R_RemoveDegenerateTriangles(tri);
 
@@ -1979,7 +1980,7 @@ deformInfo_t* R_BuildDeformInfo(int numVerts, const idDrawVert* verts,
     tri.dominantTris = NULL;
   }
 
-  idShadowVertSkinned* shadowVerts = (idShadowVertSkinned*)Mem_Alloc16(
+  idShadowVertSkinned* shadowVerts = (idShadowVertSkinned*)Mem_Alloc(
       ALIGN(deform->numOutputVerts * 2 * sizeof(idShadowVertSkinned), 16),
       TAG_MODEL);
   idShadowVertSkinned::CreateShadowCache(shadowVerts, deform->verts,
@@ -2146,8 +2147,7 @@ void R_CreateStaticBuffersForTri(srfTriangles_t& tri) {
     const int shadowSize =
         ALIGN(tri.numVerts * 2 * sizeof(idShadowVert), VERTEX_CACHE_ALIGN);
     if (tri.staticShadowVertexes == NULL) {
-      tri.staticShadowVertexes =
-          (idShadowVert*)Mem_Alloc16(shadowSize, TAG_TEMP);
+      tri.staticShadowVertexes = (idShadowVert*)Mem_Alloc(shadowSize, TAG_TEMP);
       idShadowVert::CreateShadowCache(tri.staticShadowVertexes, tri.verts,
                                       tri.numVerts);
     }
@@ -2320,7 +2320,7 @@ idVec3 R_ClosestPointPointTriangle(const idVec3& point, const idVec3& vertex1,
   float v2 = vb * denom;
   float w2 = vc * denom;
   result = vertex1 + ab * v2 + ac * w2;  //= u*vertex1 + v*vertex2 + w*vertex3,
-                                         //u = va * denom = 1.0f - v - w
+                                         // u = va * denom = 1.0f - v - w
 
   return result;
 }

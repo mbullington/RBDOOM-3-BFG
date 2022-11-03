@@ -76,7 +76,7 @@ void idRenderWindow::BuildAnimation(int time) {
 
   if (animName.Length() && animClass.Length()) {
     worldEntity.numJoints = worldEntity.hModel->NumJoints();
-    worldEntity.joints = (idJointMat*)Mem_Alloc16(
+    worldEntity.joints = (idJointMat*)Mem_Alloc(
         SIMD_ROUND_JOINTS(worldEntity.numJoints) * sizeof(*worldEntity.joints),
         TAG_JOINTMAT);
     modelAnim = gameEdit->ANIM_GetAnimFromEntityDef(animClass, animName);

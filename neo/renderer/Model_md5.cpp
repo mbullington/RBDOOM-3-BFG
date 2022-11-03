@@ -232,10 +232,10 @@ void idMD5Mesh::ParseMesh(idLexer& parser, int numJoints,
   }
 
   // create pre-scaled weights and an index for the vertex/joint lookup
-  idVec4* scaledWeights = (idVec4*)Mem_Alloc16(
-      numWeights * sizeof(scaledWeights[0]), TAG_MD5_WEIGHT);
+  idVec4* scaledWeights =
+      (idVec4*)Mem_Alloc(numWeights * sizeof(scaledWeights[0]), TAG_MD5_WEIGHT);
   int* weightIndex =
-      (int*)Mem_Alloc16(numWeights * 2 * sizeof(weightIndex[0]), TAG_MD5_INDEX);
+      (int*)Mem_Alloc(numWeights * 2 * sizeof(weightIndex[0]), TAG_MD5_INDEX);
   memset(weightIndex, 0, numWeights * 2 * sizeof(weightIndex[0]));
 
   count = 0;
@@ -1532,7 +1532,7 @@ void idRenderModelMD5::ExportOBJ(idFile* objFile, idFile* mtlFile,
     idRenderModel* newmodel = InstantiateDynamicModel(&ent, NULL, NULL);
     newmodel->ExportOBJ(objFile, mtlFile, _timeStamp);
 
-    Mem_Free16(ent.joints);
+    Mem_Free(ent.joints);
     ent.joints = NULL;
 
     delete newmodel;

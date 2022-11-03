@@ -179,7 +179,7 @@ inline idVecX::~idVecX() {
   // if not temp memory
   if (p && (p < idVecX::tempPtr || p >= idVecX::tempPtr + VECX_MAX_TEMP) &&
       alloced != -1) {
-    Mem_Free16(p);
+    Mem_Free(p);
   }
 }
 
@@ -480,9 +480,9 @@ inline void idVecX::SetSize(int newSize) {
     int alloc = (newSize + 3) & ~3;
     if (alloc > alloced && alloced != -1) {
       if (p) {
-        Mem_Free16(p);
+        Mem_Free(p);
       }
-      p = (float*)Mem_Alloc16(alloc * sizeof(float), TAG_MATH);
+      p = (float*)Mem_Alloc(alloc * sizeof(float), TAG_MATH);
       alloced = alloc;
     }
     size = newSize;
@@ -500,13 +500,13 @@ inline void idVecX::ChangeSize(int newSize, bool makeZero) {
     int alloc = (newSize + 3) & ~3;
     if (alloc > alloced && alloced != -1) {
       float* oldVec = p;
-      p = (float*)Mem_Alloc16(alloc * sizeof(float), TAG_MATH);
+      p = (float*)Mem_Alloc(alloc * sizeof(float), TAG_MATH);
       alloced = alloc;
       if (oldVec) {
         for (int i = 0; i < size; i++) {
           p[i] = oldVec[i];
         }
-        Mem_Free16(oldVec);
+        Mem_Free(oldVec);
       }
       if (makeZero) {
         // zero any new elements
@@ -546,7 +546,7 @@ inline void idVecX::SetData(int length, float* data) {
   if (p != NULL &&
       (p < idVecX::tempPtr || p >= idVecX::tempPtr + VECX_MAX_TEMP) &&
       alloced != -1) {
-    Mem_Free16(p);
+    Mem_Free(p);
   }
   assert_16_byte_aligned(data);  // data must be 16 byte aligned
   p = data;

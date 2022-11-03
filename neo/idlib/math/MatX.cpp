@@ -59,7 +59,7 @@ void idMatX::ChangeSize(int rows, int columns, bool makeZero) {
   int alloc = (rows * columns + 3) & ~3;
   if (alloc > alloced && alloced != -1) {
     float* oldMat = mat;
-    mat = (float*)Mem_Alloc16(alloc * sizeof(float), TAG_MATH);
+    mat = (float*)Mem_Alloc(alloc * sizeof(float), TAG_MATH);
     if (makeZero) {
       memset(mat, 0, alloc * sizeof(float));
     }
@@ -72,7 +72,7 @@ void idMatX::ChangeSize(int rows, int columns, bool makeZero) {
           mat[i * columns + j] = oldMat[i * numColumns + j];
         }
       }
-      Mem_Free16(oldMat);
+      Mem_Free(oldMat);
     }
   } else {
     if (columns < numColumns) {
@@ -2947,8 +2947,8 @@ bool idMatX::Cholesky_UpdateDecrement(const idVecX& v, int r) {
 
   // NOTE:	msvc compiler bug: the this pointer stored in edi is expected to
   // stay
-  //			untouched when calling Cholesky_UpdateRowColumn in the if
-  //statement
+  //			untouched when calling Cholesky_UpdateRowColumn in the
+  // if statement
 #if 0
 	if( !Cholesky_UpdateRowColumn( v1, r ) )
 	{
@@ -3416,7 +3416,7 @@ bool idMatX::LDLT_UpdateDecrement(const idVecX& v, int r) {
   // NOTE:	msvc compiler bug: the this pointer stored in edi is expected to
   // stay
   //			untouched when calling LDLT_UpdateRowColumn in the if
-  //statement
+  // statement
 #if 0
 	if( !LDLT_UpdateRowColumn( v1, r ) )
 	{
