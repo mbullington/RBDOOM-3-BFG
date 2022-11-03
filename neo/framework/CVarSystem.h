@@ -144,6 +144,8 @@ class idCVar {
   const char** GetValueStrings() const { return valueStrings; }
   argCompletion_t GetValueCompletion() const { return valueCompletion; }
 
+  bool IsRegistered() const { return internalVar != NULL; }
+
   bool IsModified() const { return (internalVar->flags & CVAR_MODIFIED) != 0; }
   void SetModified() { internalVar->flags |= CVAR_MODIFIED; }
   void ClearModified() { internalVar->flags &= ~CVAR_MODIFIED; }

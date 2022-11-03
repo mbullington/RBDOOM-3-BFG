@@ -49,6 +49,7 @@ enum memTag_t {
 #define MEM_TAG(x) TAG_##x,
 #include "sys/sys_alloc_tags.h"
   TAG_NUM_TAGS,
+#undef MEM_TAG
 };
 
 static const int MAX_TAGS = 256;
@@ -63,13 +64,12 @@ void Mem_ThreadLocalShutdown();
 void* Mem_Alloc(const size_t size, const memTag_t tag);
 void Mem_Free(void* ptr);
 
-void Mem_EnableTagging(bool enable);
-
 // This is addressable by the memTag_t enum.
-// Example:
 //
-// Mem_GetThreadLocalTagStats()[TAG_RENDER] will return the bytes allocated
-// for the render tag (in this thread).
+// Example:
+// Mem_GetThreadLocalTagStats()[TAG_RENDER];
+
+// This will return the bytes allocated for the render tag (in this thread).
 size_t* Mem_GetThreadLocalTagStats();
 
 void* Mem_ClearedAlloc(const size_t size, const memTag_t tag);
