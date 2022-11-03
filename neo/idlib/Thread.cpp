@@ -196,6 +196,7 @@ idSysThread::ThreadProc
 */
 int idSysThread::ThreadProc(idSysThread* thread, void* garbage) {
   int retVal = 0;
+  Mem_ThreadLocalInit();
 
   try {
     if (thread->isWorker) {
@@ -232,6 +233,7 @@ int idSysThread::ThreadProc(idSysThread* thread, void* garbage) {
   }
 
   thread->isRunning = false;
+  Mem_ThreadLocalShutdown();
 
   return retVal;
 }

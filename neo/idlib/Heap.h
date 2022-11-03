@@ -55,11 +55,26 @@ enum memTag_t {
 
 static const int MAX_TAGS = 256;
 
+void Mem_Init();
+void Mem_Shutdown();
+
+void Mem_ThreadLocalInit();
+void Mem_ThreadLocalShutdown();
+
 // RB: 64 bit fixes, changed int to size_t
 void* Mem_Alloc16(const size_t size, const memTag_t tag);
 void Mem_Free16(void* ptr);
 
-inline void* Mem_Alloc(const size_t size, const memTag_t tag) {
+void Mem_EnableTagging(bool enable);
+
+// This is addressable by the memTag_t enum.
+// Example:
+//
+// Mem_GetThreadLocalTagStats()[TAG_RENDER] will return the bytes allocated
+// for the render tag (in this thread).
+size_t* Mem_GetThreadLocalTagStats();
+
+ID_FORCE_INLINE void* Mem_Alloc(const size_t size, const memTag_t tag) {
   return Mem_Alloc16(size, tag);
 }
 

@@ -5,6 +5,7 @@ Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
 Copyright (C) 2012 Robert Beckebans
 Copyright (C) 2012 Daniel Gibson
+Copyright (C) 2022 Michael Bullington
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
 Source Code").
@@ -44,70 +45,124 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 //	memory allocation all in one place
 //
 //===============================================================
-#include <stdlib.h>
+
 #undef new
 
-/*
-==================
-Mem_Alloc16
-==================
-*/
-// RB: 64 bit fixes, changed int to size_t
-void* Mem_Alloc16(const size_t size, const memTag_t tag)
-// RB end
-{
+#include "vendor/rpmalloc/rpmalloc/rpmalloc.h"
+
+// This is if you want to track memory tagging at runtime.
+//
+// It is not enabled by default because it is a performance hit.
+thread_local bool memTagging = false;
+
+// This is a mapping of memory tags to their total allocated size.
+thread_local size_t memTagDict[256];
+// This is a mapping of pointers to their memory tag.
+thread_local idHashTable<memTag_t> pointerToMemTagTable;
+
+//
+// START UP AND SHUT DOWN
+//
+
+thread_local bool rpmallocInitialized = false;
+
+void Mem_Init() {
+  if (rpmallocInitialized) {
+    return;
+  }
+
+  rpmallocInitialized = true;
+  rpmalloc_initialize();
+
+  // Reset the memory tagging.
+  for (short i = 0; i < MAX_TAGS; i++) {
+    memTagDict[i] = 0;
+  }
+  pointerToMemTagTable.Clear();
+}
+
+void Mem_Shutdown() { rpmalloc_finalize(); }
+
+void Mem_ThreadLocalInit() { Mem_Init(); }
+void Mem_ThreadLocalShutdown() { rpmalloc_thread_finalize(1); }
+
+//
+// TAGGING AND ALLOC/FREE
+//
+
+void Mem_EnableTagging(bool enable) { memTagging = enable; }
+
+size_t* Mem_GetThreadLocalTagStats() { return memTagDict; }
+
+void* Mem_Alloc16(const size_t size, const memTag_t tag) {
   if (!size) {
     return NULL;
   }
-  const size_t paddedSize = (size + 15) & ~15;
-#ifdef _WIN32
-  // this should work with MSVC and mingw, as long as __MSVCRT_VERSION__ >=
-  // 0x0700
-  return _aligned_malloc(paddedSize, 16);
-#else   // not _WIN32
-        // DG: the POSIX solution for linux etc
-  void* ret;
-  posix_memalign(&ret, 16, paddedSize);
-  return ret;
-  // DG end
-#endif  // _WIN32
+
+  // Care was taken to make sure this has many fast path returns.
+  // This is because malloc may be called **before** the game has started in
+  // some initializers.
+  Mem_Init();
+
+  if (memTagging) {
+    // Turn off tagging so we don't recurse.
+    memTagging = false;
+
+    void* ptr = rpmalloc(size);
+
+    // The key only accepts char*, so we're getting a little hacky here.
+    // Quick reminder: We can use NULL (\0) to terminate the string.
+    void* ptrKey[2] = {ptr, NULL};
+    memTag_t mutTag = tag;
+    pointerToMemTagTable.Set((char*)(ptrKey), mutTag);
+
+    // Add the actual size to the dict.
+    memTagDict[tag] += rpmalloc_usable_size(ptr);
+
+    // Turn tagging back on.
+    memTagging = true;
+    return ptr;
+  } else {
+    return rpmalloc(size);
+  }
 }
 
-/*
-==================
-Mem_Free16
-==================
-*/
 void Mem_Free16(void* ptr) {
   if (ptr == NULL) {
     return;
   }
-#ifdef _WIN32
-  _aligned_free(ptr);
-#else   // not _WIN32
-        // DG: Linux/POSIX compatibility
-        // can use normal free() for aligned memory
-  free(ptr);
-  // DG end
-#endif  // _WIN32
+
+  if (memTagging) {
+    // Turn off tagging so we don't recurse.
+    memTagging = false;
+
+    // The key only accepts char*, so we're getting a little hacky here.
+    // Quick reminder: We can use NULL (\0) to terminate the string.
+    void* ptrKey[2] = {ptr, NULL};
+
+    memTag_t* tag = NULL;
+    pointerToMemTagTable.Get((char*)(ptrKey), &tag);
+
+    if (tag != NULL) {
+      // Subtract the actual size from the dict.
+      memTagDict[*tag] -= rpmalloc_usable_size(ptr);
+      // Remove from the dictionary now that we've used the ptr address.
+      pointerToMemTagTable.Remove((char*)(ptrKey));
+    }
+
+    // Turn tagging back on.
+    memTagging = true;
+  }
+
+  rpfree(ptr);
 }
 
-/*
-==================
-Mem_ClearedAlloc
-==================
-*/
 void* Mem_ClearedAlloc(const size_t size, const memTag_t tag) {
   void* mem = Mem_Alloc(size, tag);
   SIMDProcessor->Memset(mem, 0, size);
   return mem;
 }
 
-/*
-==================
-Mem_CopyString
-==================
-*/
 char* Mem_CopyString(const char* in) {
   char* out = (char*)Mem_Alloc(strlen(in) + 1, TAG_STRING);
   strcpy(out, in);

@@ -69,6 +69,9 @@ void idLib::Init() {
   mainThreadInitialized =
       1;  // note that the thread-local isMainThread is now valid
 
+  // init heap memory allocator
+  Mem_Init();
+
   // initialize little/big endian conversion
   Swap_Init();
 
@@ -114,6 +117,9 @@ void idLib::ShutDown() {
 
   // shut down task scheduler.
   delete id::taskScheduler;
+
+  // shut down heap memory allocator
+  Mem_Shutdown();
 }
 
 /*

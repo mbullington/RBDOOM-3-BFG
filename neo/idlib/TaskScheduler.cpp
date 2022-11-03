@@ -49,6 +49,9 @@ TaskScheduler* taskScheduler = NULL;
 
 void SxThreadInit(sx_job_context* context, int thread_index,
                   unsigned int thread_id, void* user) {
+  // Intialize the thread's allocator.
+  Mem_ThreadLocalInit();
+
   int64 threads = (int64)user;
 
   bool combinedRenderTags = threads <= 4;
