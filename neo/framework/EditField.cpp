@@ -388,9 +388,9 @@ idEditField::KeyDownEvent
 void idEditField::KeyDownEvent(int key) {
   int len;
 
-  // shift-insert is paste
-  if (((key == K_INS) || (key == K_KP_0)) &&
-      (idKeyInput::IsDown(K_LSHIFT) || idKeyInput::IsDown(K_RSHIFT))) {
+  // Ctrl+V is paste
+  if ((key == K_V) &&
+      (idKeyInput::IsDown(K_LCTRL) || idKeyInput::IsDown(K_RCTRL))) {
     ClearAutoComplete();
     Paste();
     return;
