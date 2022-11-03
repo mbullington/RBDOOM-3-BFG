@@ -60,32 +60,46 @@ void Mem_Shutdown();
 void Mem_ThreadLocalInit();
 void Mem_ThreadLocalShutdown();
 
-// RB: 64 bit fixes, changed int to size_t
 void* Mem_Alloc(const size_t size, const memTag_t tag);
 void Mem_Free(void* ptr);
 
 void* Mem_ClearedAlloc(const size_t size, const memTag_t tag);
 char* Mem_CopyString(const char* in);
-// RB end
+
+// Override C++ new/delete operators.
 
 inline void* operator new(size_t s) { return Mem_Alloc(s, TAG_NEW); }
-
-// SRS - Added noexcept to silence build-time warning
 inline void operator delete(void* p) noexcept { Mem_Free(p); }
 inline void* operator new[](size_t s) { return Mem_Alloc(s, TAG_NEW); }
-
-// SRS - Added noexcept to silence build-time warning
 inline void operator delete[](void* p) noexcept { Mem_Free(p); }
-
 inline void* operator new(size_t s, memTag_t tag) { return Mem_Alloc(s, tag); }
-
 inline void operator delete(void* p, memTag_t tag) { Mem_Free(p); }
-
 inline void* operator new[](size_t s, memTag_t tag) {
   return Mem_Alloc(s, tag);
 }
-
 inline void operator delete[](void* p, memTag_t tag) { Mem_Free(p); }
+
+/*
+================================================
+idAutoMemTag is a way of automatically tagging memory allocations made with
+"new" within the current scope.
+
+As such, this only applies to allocations made with TAG_NEW.
+
+It's highly inspired by how Pixar does memory tagging in USD, which I found
+while researching prior art for this feature.
+
+Reference:
+https://graphics.pixar.com/usd/dev/api/page_tf__malloc_tag.html
+================================================
+*/
+class idAutoMemTag {
+ public:
+  idAutoMemTag(memTag_t tag);
+  ~idAutoMemTag();
+
+  static memTag_t GetTag();
+};
 
 /*
 ================================================

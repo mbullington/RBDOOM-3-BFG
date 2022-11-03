@@ -86,7 +86,10 @@ idHashTable<memTag_t> pointerToMemTag;
 // START UP AND SHUT DOWN
 //
 
-bool rpmallocInitialized = false;
+// See 'idAutoMemTag' below.
+thread_local idList<memTag_t> autoMemTagStack;
+
+thread_local bool rpmallocInitialized = false;
 void Mem_Init() {
   rpmalloc_initialize();
   if (rpmallocInitialized) {
@@ -95,13 +98,18 @@ void Mem_Init() {
 
   rpmallocInitialized = true;
 
-  sx_lock_enter(&memTagLock);
+  // Reset auto memtag tracking.
+  autoMemTagStack.Clear();
 
-  // Reset the memory tagging.
-  memTagToByteUsage.Zero();
-  pointerToMemTag.Clear();
+  if (idLib::IsMainThread()) {
+    sx_lock_enter(&memTagLock);
 
-  sx_lock_exit(&memTagLock);
+    // Reset the memory tagging.
+    memTagToByteUsage.Zero();
+    pointerToMemTag.Clear();
+
+    sx_lock_exit(&memTagLock);
+  }
 }
 
 void Mem_Shutdown() { rpmalloc_finalize(); }
@@ -122,6 +130,7 @@ CONSOLE_COMMAND(memTagStats, "print memory stats", 0) {
   sx_lock_enter(&memTagRecordingLock);
   sx_lock_enter(&memTagLock);
 
+  // TODO: This would be neat if it updated in real time via IMGUI.
   // Create a table of the memory tags.
   idStr table;
   table += "Memory Tag Stats\n";
@@ -153,16 +162,22 @@ void* Mem_Alloc(const size_t size, const memTag_t tag) {
     memTagRecursiveCheck = true;
     sx_lock_enter(&memTagLock);
 
+    // Check for TAG_NEW and if so, look for a idAutoMemTag.
+    memTag_t mutTag = tag;
+    // Look for a idAutoMemTag.
+    if (tag == TAG_NEW) {
+      mutTag = idAutoMemTag::GetTag();
+    }
+
     void* ptr = rpmalloc(size);
 
     // The key only accepts char*, so we're getting a little hacky here.
     // Quick reminder: We can use NULL (\0) to terminate the string.
     void* ptrKey[2] = {ptr, NULL};
-    memTag_t mutTag = tag;
     pointerToMemTag.Set((char*)(ptrKey), mutTag);
 
     // Add the actual size to the dict.
-    memTagToByteUsage[tag] += rpmalloc_usable_size(ptr);
+    memTagToByteUsage[mutTag] += rpmalloc_usable_size(ptr);
 
     memTagRecursiveCheck = false;
     sx_lock_exit(&memTagLock);
@@ -213,4 +228,17 @@ char* Mem_CopyString(const char* in) {
   char* out = (char*)Mem_Alloc(strlen(in) + 1, TAG_STRING);
   strcpy(out, in);
   return out;
+}
+
+idAutoMemTag::idAutoMemTag(memTag_t tag) { autoMemTagStack.Append(tag); }
+
+idAutoMemTag::~idAutoMemTag() {
+  autoMemTagStack.RemoveIndex(autoMemTagStack.Num() - 1);
+}
+
+memTag_t idAutoMemTag::GetTag() {
+  if (autoMemTagStack.Num() == 0) {
+    return TAG_NEW;
+  }
+  return autoMemTagStack[autoMemTagStack.Num() - 1];
 }
