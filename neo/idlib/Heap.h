@@ -64,14 +64,6 @@ void Mem_ThreadLocalShutdown();
 void* Mem_Alloc(const size_t size, const memTag_t tag);
 void Mem_Free(void* ptr);
 
-// This is addressable by the memTag_t enum.
-//
-// Example:
-// Mem_GetThreadLocalTagStats()[TAG_RENDER];
-
-// This will return the bytes allocated for the render tag (in this thread).
-size_t* Mem_GetThreadLocalTagStats();
-
 void* Mem_ClearedAlloc(const size_t size, const memTag_t tag);
 char* Mem_CopyString(const char* in);
 // RB end

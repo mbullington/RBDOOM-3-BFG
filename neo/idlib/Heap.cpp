@@ -48,11 +48,11 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #undef new
 
+#include <sx/lockless.h>
 #include "vendor/rpmalloc/rpmalloc/rpmalloc.h"
 
 // This is if you want to track memory tagging at runtime.
 // It is not enabled by default because it is a performance hit.
-thread_local bool memTaggingRecursiveCheck = false;
 idCVar com_memTag("com_memTag", "0", CVAR_BOOL,
                   "Enables memory tagging for debugging memory leaks. "
                   "This will slow down the game.");
@@ -63,30 +63,45 @@ char* memTagNames[TAG_NUM_TAGS] = {
 #undef MEM_TAG
 };
 
+// Make sure the tag array/table are thread safe (and fiber safe) by using
+// spinlocks.
+//
+// We need two so we can disable idStr allocation while we are in the
+// middle of recording.
+sx_lock_t memTagLock = 0;
+sx_lock_t memTagRecordingLock = 0;
+// This is used to disable allocation while we are in the middle of adding
+// memory tags to the mappings.
+//
+// Similar in theory to 'memTagRecordingLock', but only affects the current
+// thread.
+thread_local bool memTagRecursiveCheck = false;
+
 // This is a mapping of memory tags to their total allocated size.
-thread_local size_t memTagDict[256];
+idTempArray<size_t> memTagToByteUsage(MAX_TAGS);
 // This is a mapping of pointers to their memory tag.
-thread_local idHashTable<memTag_t> pointerToMemTagTable;
+idHashTable<memTag_t> pointerToMemTag;
 
 //
 // START UP AND SHUT DOWN
 //
 
-thread_local bool rpmallocInitialized = false;
-
+bool rpmallocInitialized = false;
 void Mem_Init() {
+  rpmalloc_initialize();
   if (rpmallocInitialized) {
     return;
   }
 
   rpmallocInitialized = true;
-  rpmalloc_initialize();
+
+  sx_lock_enter(&memTagLock);
 
   // Reset the memory tagging.
-  for (short i = 0; i < MAX_TAGS; i++) {
-    memTagDict[i] = 0;
-  }
-  pointerToMemTagTable.Clear();
+  memTagToByteUsage.Zero();
+  pointerToMemTag.Clear();
+
+  sx_lock_exit(&memTagLock);
 }
 
 void Mem_Shutdown() { rpmalloc_finalize(); }
@@ -98,22 +113,26 @@ void Mem_ThreadLocalShutdown() { rpmalloc_thread_finalize(1); }
 // TAGGING AND ALLOC/FREE
 //
 
-size_t* Mem_GetThreadLocalTagStats() { return memTagDict; }
-
 CONSOLE_COMMAND(memTagStats, "print memory stats", 0) {
   if (!(com_memTag.IsRegistered() && com_memTag.GetBool())) {
     idLib::Printf("com_memTag is not enabled.");
     return;
   }
 
+  sx_lock_enter(&memTagRecordingLock);
+  sx_lock_enter(&memTagLock);
+
   // Create a table of the memory tags.
   idStr table;
   table += "Memory Tag Stats\n";
   for (short i = 0; i < MAX_TAGS; i++) {
-    if (memTagDict[i] > 0) {
-      table += va("%s\t\t\t: %zu\n", memTagNames[i], memTagDict[i]);
+    if (memTagToByteUsage[i] > 0) {
+      table += va("%s\t\t\t: %zu\n", memTagNames[i], memTagToByteUsage[i]);
     }
   }
+
+  sx_lock_exit(&memTagLock);
+  sx_lock_exit(&memTagRecordingLock);
 
   // Print the table.
   idLib::Printf("%s", table.c_str());
@@ -129,10 +148,10 @@ void* Mem_Alloc(const size_t size, const memTag_t tag) {
   // some initializers.
   Mem_Init();
 
-  if (!memTaggingRecursiveCheck &&
+  if (!memTagRecursiveCheck && !memTagRecordingLock &&
       (com_memTag.IsRegistered() && com_memTag.GetBool())) {
-    // Turn off tagging so we don't recurse.
-    memTaggingRecursiveCheck = true;
+    memTagRecursiveCheck = true;
+    sx_lock_enter(&memTagLock);
 
     void* ptr = rpmalloc(size);
 
@@ -140,13 +159,13 @@ void* Mem_Alloc(const size_t size, const memTag_t tag) {
     // Quick reminder: We can use NULL (\0) to terminate the string.
     void* ptrKey[2] = {ptr, NULL};
     memTag_t mutTag = tag;
-    pointerToMemTagTable.Set((char*)(ptrKey), mutTag);
+    pointerToMemTag.Set((char*)(ptrKey), mutTag);
 
     // Add the actual size to the dict.
-    memTagDict[tag] += rpmalloc_usable_size(ptr);
+    memTagToByteUsage[tag] += rpmalloc_usable_size(ptr);
 
-    // Turn tagging back on.
-    memTaggingRecursiveCheck = false;
+    memTagRecursiveCheck = false;
+    sx_lock_exit(&memTagLock);
     return ptr;
   } else {
     return rpmalloc(size);
@@ -158,27 +177,27 @@ void Mem_Free(void* ptr) {
     return;
   }
 
-  if (!memTaggingRecursiveCheck &&
+  if (!memTagRecursiveCheck && !memTagRecordingLock &&
       (com_memTag.IsRegistered() && com_memTag.GetBool())) {
-    // Turn off tagging so we don't recurse.
-    memTaggingRecursiveCheck = true;
+    memTagRecursiveCheck = true;
+    sx_lock_enter(&memTagLock);
 
     // The key only accepts char*, so we're getting a little hacky here.
     // Quick reminder: We can use NULL (\0) to terminate the string.
     void* ptrKey[2] = {ptr, NULL};
 
     memTag_t* tag = NULL;
-    pointerToMemTagTable.Get((char*)(ptrKey), &tag);
+    pointerToMemTag.Get((char*)(ptrKey), &tag);
 
     if (tag != NULL) {
       // Subtract the actual size from the dict.
-      memTagDict[*tag] -= rpmalloc_usable_size(ptr);
+      memTagToByteUsage[*tag] -= rpmalloc_usable_size(ptr);
       // Remove from the dictionary now that we've used the ptr address.
-      pointerToMemTagTable.Remove((char*)(ptrKey));
+      pointerToMemTag.Remove((char*)(ptrKey));
     }
 
-    // Turn tagging back on.
-    memTaggingRecursiveCheck = false;
+    memTagRecursiveCheck = false;
+    sx_lock_exit(&memTagLock);
   }
 
   rpfree(ptr);
