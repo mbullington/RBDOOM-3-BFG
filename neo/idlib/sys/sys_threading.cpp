@@ -42,6 +42,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #include <sx/allocator.h>
 #include <sx/threads.h>
+#include <sx/atomic.h>
 
 const sx_alloc* alloc;
 
@@ -81,9 +82,7 @@ Sys_Yield
 */
 void Sys_Yield() {
   if (id::taskScheduler->InTask()) {
-    common->FatalError(
-        "Cannot use operating system thread sync within task; use locks "
-        "instead.");
+    sx_relax_cpu();
   }
 
   sx_thread_yield();
