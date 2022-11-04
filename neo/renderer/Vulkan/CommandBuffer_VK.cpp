@@ -45,13 +45,10 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 namespace id {
 
-CommandBuffer::CommandBuffer(CommandBuffer **dependencies,
-                             size_t numDependencies, uint8_t opts) {
+CommandBuffer::CommandBuffer(uint8_t opts) {
   isRecording = false;
   isBound = false;
   isHeapAllocated = opts & CMD_BUF_OPT_HEAP_ALLOCATED;
-
-  SetDependencies(dependencies, numDependencies);
 
   frameParity = -1;
   waitOnSwapAcquire = false;
@@ -133,7 +130,7 @@ CommandBuffer::~CommandBuffer() {
   if (fence) deletionQueue.fences.Append(fence);
 }
 
-void CommandBuffer::Bind(id::Framebuffer *frameBuffer) {
+void CommandBuffer::Bind(Framebuffer *frameBuffer) {
   if (!isRecording) {
     common->Warning("CommandBuffer::Unbind: Command buffer is not recording");
     return;
@@ -167,6 +164,17 @@ void CommandBuffer::Bind(id::Framebuffer *frameBuffer) {
 
     vkCmdSetScissor(handle, 0, 1, &scissor);
   }
+}
+
+void CommandBuffer::Bind(BufferedFramebuffer *frameBuffer) {
+  if (!tr.backend.inRenderPass) {
+    common->Error(
+        "CommandBuffer::Bind: Called with buffered frame but not in a render "
+        "pass");
+    return;
+  }
+
+  Bind(frameBuffer->Get(vkcontext.frameParity));
 }
 
 void CommandBuffer::Unbind() {
@@ -260,7 +268,7 @@ void CommandBuffer::Submit() {
     // TODO(mbullington): Once we have compute shaders, we'll want to be able to
     // specify if dependents of compute should wait for vertex shading.
     dstStageMask |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT |
-                    VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                    VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
   }
   if (waitOnSwapAcquire) {
     dstStageMask |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;

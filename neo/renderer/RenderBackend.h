@@ -40,8 +40,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #define __RENDERER_BACKEND_H__
 
 #include <vulkan/vulkan_core.h>
-#include "renderer/CommandBuffer.h"
-#include "renderer/Framebuffer.h"
+
 #if defined(USE_VULKAN)
 #include <vulkan/vulkan.h>
 #endif
@@ -213,9 +212,6 @@ struct vulkanContext_t {
   idArray<VkImageView, NUM_FRAME_DATA> swapchainViews;
 
   idArray<VkSemaphore, NUM_FRAME_DATA> acquireSemaphores;
-
-  int currentImageParm;
-  idArray<idImage*, MAX_IMAGE_PARMS> imageParms;
 
   // typedef uint32 QueryTuple[2];
 
@@ -520,11 +516,16 @@ class idRenderBackend {
 #if defined(USE_VULKAN)
   bool inRenderPass;
 
-  idArray<id::Framebuffer*, NUM_FRAME_DATA> swapFrameBuffers;
+  RefPtr<idBufferedImage> swapDepthImage;
+  RefPtr<id::BufferedFramebuffer> swapFrameBuffer;
+
   idArray<id::CommandBuffer*, NUM_FRAME_DATA> swapSubmitCommandBuffers;
   idArray<id::CommandBuffer*, NUM_FRAME_DATA> resetQueryCommandBuffers;
 
   bool swapRecorded[3];
+
+  void CreateRenderTargets();
+  void DestroyRenderTargets();
 
   void CreateFrameBuffers();
   void DestroyFrameBuffers();

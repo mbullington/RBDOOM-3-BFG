@@ -2,9 +2,8 @@
 ===========================================================================
 
 Doom 3 BFG Edition GPL Source Code
-Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
-Copyright (C) 2016-2017 Dustin Land
-Copyright (C) 2017-2020 Robert Beckebans
+Copyright (C) 2014-2018 Robert Beckebans
+Copyright (C) 2022 Michael Bullington
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
 Source Code").
@@ -36,13 +35,44 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 ===========================================================================
 */
 
-#pragma once
+#include "precompiled.h"
+#pragma hdrstop
+
+#include "RenderCommon.h"
+#include "Framebuffer.h"
 
 namespace id {
 
-class Framebuffer;
-class BufferedFramebuffer;
+globalFramebuffers_t globalFramebuffers;
 
-class CommandBuffer;
+void Framebuffer::Init() {
+  int screenWidth = renderSystem->GetWidth();
+  int screenHeight = renderSystem->GetHeight();
+
+  globalFramebuffers.hdrFBO = RefPtr<BufferedFramebuffer>(
+      new BufferedFramebuffer(screenWidth, screenHeight));
+
+  globalFramebuffers.hdrFBO->Update(FMT_RGBA16F, globalImages->hdrImage,
+                                    globalImages->hdrDepthImage);
+}
+
+void Framebuffer::Shutdown() { globalFramebuffers.hdrFBO = NULL; }
+
+void Framebuffer::CheckFramebuffers() {
+  int screenWidth = renderSystem->GetWidth();
+  int screenHeight = renderSystem->GetHeight();
+
+  // Check for HDR framebuffer.
+  auto &hdrFBO = globalFramebuffers.hdrFBO;
+  if (hdrFBO->GetWidth() != screenWidth ||
+      hdrFBO->GetHeight() != screenHeight) {
+    globalImages->hdrImage->Resize(screenWidth, screenHeight);
+    globalImages->hdrDepthImage->Resize(screenWidth, screenHeight);
+
+    globalFramebuffers.hdrFBO->Resize(screenWidth, screenHeight);
+    globalFramebuffers.hdrFBO->Update(FMT_RGBA16F, globalImages->hdrImage,
+                                      globalImages->hdrDepthImage);
+  }
+}
 
 }  // namespace id

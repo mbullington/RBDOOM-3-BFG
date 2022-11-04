@@ -71,15 +71,19 @@ enum commandBufferOptions_t {
 
 class CommandBuffer {
  public:
-  CommandBuffer(CommandBuffer **dependencies, size_t numDependencies,
-                uint8_t opts = CMD_BUF_OPT_NONE);
+  CommandBuffer(uint8_t opts = CMD_BUF_OPT_NONE);
 
-  CommandBuffer(uint8_t opts = CMD_BUF_OPT_NONE)
-      : CommandBuffer(NULL, 0, opts) {}
+  CommandBuffer(CommandBuffer &buf) = delete;
+  CommandBuffer(CommandBuffer &&buf) = delete;
 
-  virtual ~CommandBuffer();
+  ~CommandBuffer();
 
   void Bind(Framebuffer *frameBuffer);
+  void Bind(BufferedFramebuffer *frameBuffer);
+  ID_FORCE_INLINE void Bind(RefPtr<BufferedFramebuffer> &frameBuffer) {
+    Bind(&*frameBuffer);
+  }
+
   void Unbind();
 
   void Begin();

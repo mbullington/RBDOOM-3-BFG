@@ -861,3 +861,5 @@ void idImage::SetImageLayout(VkImage image,
                        1, &barrier);
 }
 // SRS End
+
+void idBufferedImage::Bind() { _images[vkcontext.frameParity]->Bind(); }

@@ -204,29 +204,6 @@ static void R_DepthImage(idImage* image) {
                        TD_DEPTH);
 }
 
-// RB begin
-static void R_HDR_RGBA16FImage_ResNative(idImage* image) {
-  image->GenerateImage(NULL, renderSystem->GetWidth(),
-                       renderSystem->GetHeight(), TF_NEAREST, TR_CLAMP,
-                       TD_RGBA16F, SAMPLE_1, CF_2D, true);
-}
-
-static void R_HDR_RGBA16FImage_ResQuarter(idImage* image) {
-  image->GenerateImage(NULL, renderSystem->GetWidth() / 4,
-                       renderSystem->GetHeight() / 4, TF_NEAREST, TR_CLAMP,
-                       TD_RGBA16F);
-}
-
-static void R_HDR_RGBA16FImage_ResQuarter_Linear(idImage* image) {
-  image->GenerateImage(NULL, renderSystem->GetWidth() / 4,
-                       renderSystem->GetHeight() / 4, TF_LINEAR, TR_CLAMP,
-                       TD_LOOKUP_TABLE_RGBA);
-}
-
-static void R_HDR_RGBA16FImage_Res64(idImage* image) {
-  image->GenerateImage(NULL, 64, 64, TF_NEAREST, TR_CLAMP, TD_RGBA16F);
-}
-
 static void R_EnvprobeImage_HDR(idImage* image) {
   image->GenerateImage(NULL, ENVPROBE_CAPTURE_SIZE, ENVPROBE_CAPTURE_SIZE,
                        TF_NEAREST, TR_CLAMP, TD_RGBA16F);
@@ -909,22 +886,32 @@ void idImageManager::CreateIntrinsicImages() {
   blueNoiseImage256 = globalImages->ImageFromFunction(
       "_blueNoise256", R_CreateBlueNoise256Image);
 
-  currentRenderHDRImage = globalImages->ImageFromFunction(
-      "_currentRenderHDR", R_HDR_RGBA16FImage_ResNative);
-  currentRenderHDRImageQuarter = globalImages->ImageFromFunction(
-      "_currentRenderHDRQuarter", R_HDR_RGBA16FImage_ResQuarter);
-  currentRenderHDRImage64 = globalImages->ImageFromFunction(
-      "_currentRenderHDR64", R_HDR_RGBA16FImage_Res64);
+  // Images for the internal game world, which is rendered in 16-bit HDR.
+  {
+    idImageOpts opts;
+    opts.format = FMT_RGBA16F;
+    opts.width = renderSystem->GetWidth();
+    opts.height = renderSystem->GetHeight();
+    opts.numLevels = 1;
+    opts.samples = SAMPLE_1;
+
+    hdrImage = globalImages->ScratchImageBuffered("_hdrImage", opts);
+  }
+  {
+    idImageOpts opts;
+    opts.format = FMT_DEPTH;
+    opts.width = renderSystem->GetWidth();
+    opts.height = renderSystem->GetHeight();
+    opts.numLevels = 1;
+    opts.samples = SAMPLE_1;
+
+    hdrDepthImage = globalImages->ScratchImageBuffered("_hdrDepthImage", opts);
+  }
 
   envprobeHDRImage =
       globalImages->ImageFromFunction("_envprobeHDR", R_EnvprobeImage_HDR);
   envprobeDepthImage =
       ImageFromFunction("_envprobeDepth", R_EnvprobeImage_Depth);
-
-  bloomRenderImage[0] = globalImages->ImageFromFunction(
-      "_bloomRender0", R_HDR_RGBA16FImage_ResQuarter_Linear);
-  bloomRenderImage[1] = globalImages->ImageFromFunction(
-      "_bloomRender1", R_HDR_RGBA16FImage_ResQuarter_Linear);
 
   heatmap5Image = ImageFromFunction("_heatmap5", R_CreateHeatmap5ColorsImage);
   heatmap7Image = ImageFromFunction("_heatmap7", R_CreateHeatmap7ColorsImage);

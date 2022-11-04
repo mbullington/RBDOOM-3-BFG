@@ -88,8 +88,37 @@ class Framebuffer {
   bool isSwapImage;
 };
 
+// This is a wrapper around Framebuffer that is buffered for NUM_FRAME_DATA
+// frames.
+//
+// This should be used for any framebuffer that written to in a render pass.
+class BufferedFramebuffer {
+ public:
+  BufferedFramebuffer(int width, int height);
+  ~BufferedFramebuffer();
+
+  void Update(textureFormat_t format, RefPtr<idBufferedImage> image,
+              RefPtr<idBufferedImage> depthImage = 0);
+
+  int GetWidth() const { return width; }
+  int GetHeight() const { return height; }
+
+  void Resize(int width_, int height_);
+
+  Framebuffer* Get(int index) const { return _frames[index]; }
+
+ private:
+  BufferedFramebuffer(const BufferedFramebuffer&) = delete;
+  BufferedFramebuffer(const BufferedFramebuffer&&) = delete;
+
+  int width;
+  int height;
+
+  Framebuffer* _frames[NUM_FRAME_DATA];
+};
+
 struct globalFramebuffers_t {
-  Framebuffer* hdrFBO;
+  RefPtr<BufferedFramebuffer> hdrFBO;
 };
 
 extern globalFramebuffers_t globalFramebuffers;

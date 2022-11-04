@@ -418,72 +418,6 @@ idImage* idImageManager::ImageFromFile(const char* _name,
 }
 
 /*
-========================
-idImageManager::ScratchImage
-========================
-*/
-idImage* idImageManager::ScratchImage(const char* _name, idImageOpts* imgOpts,
-                                      textureFilter_t filter,
-                                      textureRepeat_t repeat,
-                                      textureUsage_t usage) {
-  if (!_name || !_name[0]) {
-    idLib::FatalError("idImageManager::ScratchImage called with empty name");
-  }
-
-  if (imgOpts == NULL) {
-    idLib::FatalError("idImageManager::ScratchImage called with NULL imgOpts");
-  }
-
-  idStr name = _name;
-
-  //
-  // see if the image is already loaded, unless we
-  // are in a reloadImages call
-  //
-  int hash = name.FileNameHash();
-  for (int i = imageHash.First(hash); i != -1; i = imageHash.Next(i)) {
-    idImage* image = images[i];
-    if (name.Icmp(image->GetName()) == 0) {
-      // the built in's, like _white and _flat always match the other options
-      if (name[0] == '_') {
-        return image;
-      }
-
-      if (image->filter != filter || image->repeat != repeat) {
-        // we might want to have the system reset these parameters on every bind
-        // and share the image data
-        continue;
-      }
-      if (image->usage != usage) {
-        // If an image is used differently then we need 2 copies of it because
-        // usage affects the way it's compressed and swizzled
-        continue;
-      }
-
-      image->usage = usage;
-      image->levelLoadReferenced = true;
-      image->referencedOutsideLevelLoad = true;
-      return image;
-    }
-  }
-
-  // clamp is the only repeat mode that makes sense for cube maps, but
-  // some platforms let them stay in repeat mode and get border seam issues
-  if (imgOpts->textureType == TT_CUBIC && repeat != TR_CLAMP) {
-    repeat = TR_CLAMP;
-  }
-
-  //
-  // create a new image
-  //
-  idImage* newImage = AllocImage(name);
-  if (newImage != NULL) {
-    newImage->AllocImage(*imgOpts, filter, repeat);
-  }
-  return newImage;
-}
-
-/*
 ===============
 idImageManager::ScratchImage
 ===============
@@ -506,6 +440,23 @@ idImage* idImageManager::ScratchImage(const char* name,
   image->referencedOutsideLevelLoad = true;
 
   return image;
+}
+
+/*
+===============
+idImageManager::ScratchImageBuffered
+===============
+*/
+RefPtr<idBufferedImage> idImageManager::ScratchImageBuffered(
+    const char* name, const idImageOpts& opts) {
+  idImage** images =
+      (idImage**)Mem_Alloc(sizeof(void*) * NUM_FRAME_DATA, TAG_IMAGE);
+
+  for (int i = 0; i < NUM_FRAME_DATA; i++) {
+    images[i] = ScratchImage(va("%s_frame%d", name, i), opts);
+  }
+
+  return RefPtr<idBufferedImage>(new idBufferedImage(images));
 }
 
 /*

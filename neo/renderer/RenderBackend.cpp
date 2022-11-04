@@ -46,6 +46,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 #include "imgui/ImGui_Hooks.h"
 
+using id::globalFramebuffers;
+
 idCVar r_drawEyeColor(
     "r_drawEyeColor", "0", CVAR_RENDERER | CVAR_BOOL,
     "Draw a colored box, red = left eye, blue = right eye, grey = non-stereo");
@@ -4328,7 +4330,7 @@ void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
   GL_Scissor(0, 0, screenWidth, screenHeight);
 
   GL_SelectTexture(0);
-  globalImages->currentRenderHDRImage->Bind();
+  globalImages->hdrImage->Bind();
 
   if (r_hdrDebug.GetBool()) {
     renderProgManager.BindShader_HDRDebug();
@@ -4915,45 +4917,43 @@ smp extensions, or asyncronously by another thread.
 ====================
 */
 void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
+  if (renderSystem->GetStereo3DMode() != STEREO3D_OFF) {
+    // We currently don't support VR rendering, although DOOM 3 BFG
+    // has it.
+    common->FatalError("VR rendering is not supported");
+    return;
+  }
+
+  // Early return if we're just a no-op.
   if (cmds->commandId == RC_NOP && !cmds->next) {
     return;
   }
 
-  resolutionScale.SetCurrentGPUFrameTime(
-      commonLocal.GetRendererGPUMicroseconds());
-
+  // This makes sure we can respond to window size changes.
   ResizeImages();
 
+  resolutionScale.SetCurrentGPUFrameTime(
+      commonLocal.GetRendererGPUMicroseconds());
   renderLog.StartFrame();
 
+  // Wait for VSync and acquire framebuffer.
   Framebuffer* swapChain = GL_StartFrame();
-
-  CommandBuffer hdrCommandBuffer;
-  CommandBuffer commandBuffer(
-      (CommandBuffer*[]){
-          &hdrCommandBuffer,
-      },
-      1);
-
-  if (renderSystem->GetStereo3DMode() != STEREO3D_OFF) {
-    StereoRenderExecuteBackEndCommands(cmds);
-    renderLog.EndFrame();
-    return;
-  }
-
   uint64 backEndStartTime = Sys_Microseconds();
 
   // needed for editor rendering
   GL_SetDefaultState();
 
-  // SRS - Save glConfig.timerQueryAvailable state so it can be disabled for
-  // RC_DRAW_VIEW_GUI then restored after it is finished
-  const bool timerQueryAvailable = glConfig.timerQueryAvailable;
-  bool drawView3D_timestamps = false;
+  //
+  // This is where we'll create all our CommandBuffers, such as for the
+  // HDR and final composition pass.
+  //
 
+  CommandBuffer hdrCommandBuffer;
   hdrCommandBuffer.Begin();
-  hdrCommandBuffer.Bind(id::globalFramebuffers.hdrFBO);
+  hdrCommandBuffer.Bind(globalFramebuffers.hdrFBO);
 
+  CommandBuffer commandBuffer;
+  commandBuffer.SetDependencies((CommandBuffer*[]){&hdrCommandBuffer}, 1);
   commandBuffer.Begin();
   commandBuffer.Bind(swapChain);
 
@@ -4962,14 +4962,11 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
       case RC_NOP:
         break;
 
-      case RC_DRAW_VIEW_3D:
+      case RC_DRAW_VIEW_3D: {
         hdrCommandBuffer.MakeActive();
-
-        drawView3D_timestamps = true;
         DrawView(cmds, 0);
 
         commandBuffer.MakeActive();
-
         // Do tonemapping.
         {
           hdrKey = r_hdrKey.GetFloat();
@@ -4980,28 +4977,26 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
         }
 
         break;
+      }
 
-      case RC_DRAW_VIEW_GUI:
+      case RC_DRAW_VIEW_GUI: {
+        renderLog.OpenMainBlock(MRB_DRAW_GUI);
+        renderLog.OpenBlock("Render_DrawViewGUI", colorBlue);
+        // Disable detailed timestamps during overlay GUI rendering so
+        // they do not overwrite timestamps from 3D rendering
+        const bool timerQueryAvailable = glConfig.timerQueryAvailable;
+        glConfig.timerQueryAvailable = false;
+
         commandBuffer.MakeActive();
-        if (drawView3D_timestamps) {
-          // SRS - Capture separate timestamps for overlay GUI rendering when
-          // RC_DRAW_VIEW_3D timestamps are active
-          renderLog.OpenMainBlock(MRB_DRAW_GUI);
-          renderLog.OpenBlock("Render_DrawViewGUI", colorBlue);
-          // SRS - Disable detailed timestamps during overlay GUI rendering so
-          // they do not overwrite timestamps from 3D rendering
-          glConfig.timerQueryAvailable = false;
+        DrawView(cmds, 0);
 
-          DrawView(cmds, 0);
-
-          // SRS - Restore timestamp capture state after overlay GUI rendering
-          // is finished
-          glConfig.timerQueryAvailable = timerQueryAvailable;
-          renderLog.CloseBlock();
-          renderLog.CloseMainBlock();
-        } else {
-          DrawView(cmds, 0);
-        }
+        // SRS - Restore timestamp capture state after overlay GUI rendering
+        // is finished
+        glConfig.timerQueryAvailable = timerQueryAvailable;
+        renderLog.CloseBlock();
+        renderLog.CloseMainBlock();
+        break;
+      }
 
       case RC_SET_BUFFER:
         SetBuffer(cmds);
@@ -5011,15 +5006,12 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
         CopyRender(cmds);
         break;
 
-      case RC_POST_PROCESS:
+      // TODO(mbullington)
+      case RC_POST_PROCESS: {
+        // apply optional post processing
+        // PostProcess(cmds);
         break;
-
-        // TODO(mbullington)
-        // case RC_POST_PROCESS: {
-        //   // apply optional post processing
-        //   PostProcess(cmds);
-        //   break;
-        // }
+      }
 
       default:
         common->Error("RB_ExecuteBackEndCommands: bad commandId");
@@ -5027,10 +5019,12 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
     }
   }
 
+  // This is a visual test for frames that are dropped.
   DrawFlickerBox();
 
   hdrCommandBuffer.Submit();
   commandBuffer.Submit();
+
   GL_EndFrame(&commandBuffer);
 
   // stop rendering on this thread

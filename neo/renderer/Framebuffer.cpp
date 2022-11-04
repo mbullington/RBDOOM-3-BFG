@@ -3,7 +3,7 @@
 
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 2014-2018 Robert Beckebans
-Copyright (C) 2022 Stephen Pridham
+Copyright (C) 2022 Michael Bullington
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition
 Source Code").
@@ -43,35 +43,36 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 
 namespace id {
 
-globalFramebuffers_t globalFramebuffers;
+BufferedFramebuffer::BufferedFramebuffer(int width, int height) {
+  this->width = width;
+  this->height = height;
 
-void Framebuffer::Init() {
-  int screenWidth = renderSystem->GetWidth();
-  int screenHeight = renderSystem->GetHeight();
-
-  globalFramebuffers.hdrFBO = new Framebuffer(screenWidth, screenHeight);
-  globalFramebuffers.hdrFBO->Update(FMT_RGBA16F,
-                                    globalImages->currentRenderHDRImage,
-                                    globalImages->currentDepthImage);
+  for (int i = 0; i < NUM_FRAME_DATA; i++) {
+    _frames[i] = new Framebuffer(width, height);
+  }
 }
 
-void Framebuffer::Shutdown() { globalFramebuffers.hdrFBO = NULL; }
+BufferedFramebuffer::~BufferedFramebuffer() {
+  for (int i = 0; i < NUM_FRAME_DATA; i++) {
+    delete _frames[i];
+  }
+}
 
-void Framebuffer::CheckFramebuffers() {
-  int screenWidth = renderSystem->GetWidth();
-  int screenHeight = renderSystem->GetHeight();
+void BufferedFramebuffer::Resize(int width, int height) {
+  this->width = width;
+  this->height = height;
 
-  // Check for HDR framebuffer.
-  Framebuffer *hdrFBO = globalFramebuffers.hdrFBO;
-  if (hdrFBO->GetWidth() != screenWidth ||
-      hdrFBO->GetHeight() != screenHeight) {
-    globalImages->currentRenderHDRImage->Resize(screenWidth, screenHeight);
-    globalImages->currentDepthImage->Resize(screenWidth, screenHeight);
+  for (int i = 0; i < NUM_FRAME_DATA; i++) {
+    _frames[i]->Resize(width, height);
+  }
+}
 
-    globalFramebuffers.hdrFBO->Resize(screenWidth, screenHeight);
-    globalFramebuffers.hdrFBO->Update(FMT_RGBA16F,
-                                      globalImages->currentRenderHDRImage,
-                                      globalImages->currentDepthImage);
+void BufferedFramebuffer::Update(textureFormat_t format,
+                                 RefPtr<idBufferedImage> image,
+                                 RefPtr<idBufferedImage> depthImage) {
+  for (int i = 0; i < NUM_FRAME_DATA; i++) {
+    _frames[i]->Update(format, image->Get(i),
+                       depthImage == NULL ? NULL : depthImage->Get(i));
   }
 }
 

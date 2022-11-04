@@ -35,6 +35,19 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 */
 #pragma once
 
+#include <memory>
+
+/*
+===============================================================================
+
+        Shortcuts for things in the STL
+
+===============================================================================
+*/
+
+template <class T>
+using RefPtr = std::shared_ptr<T>;
+
 /*
 ===============================================================================
 

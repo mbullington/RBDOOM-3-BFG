@@ -1263,7 +1263,7 @@ static VkFormat ChooseSupportedFormat(VkFormat* formats, int numFormats,
 CreateRenderTargets
 =============
 */
-static void CreateRenderTargets() {
+void idRenderBackend::CreateRenderTargets() {
   // Determine samples before creating depth
   VkImageFormatProperties fmtProps = {};
   vkGetPhysicalDeviceImageFormatProperties(
@@ -1283,26 +1283,20 @@ static void CreateRenderTargets() {
         ChooseSupportedFormat(formats, 3, VK_IMAGE_TILING_OPTIMAL,
                               VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
   }
-  idImageOpts depthOptions;
-  depthOptions.format = FMT_DEPTH;
 
-  // Eric: See if this fixes resizing
-// SRS - Generalized Vulkan SDL platform
-#if defined(VULKAN_USE_PLATFORM_SDL)
   gpuInfo_t& gpu = *vkcontext.gpu;
   VkExtent2D extent = ChooseSurfaceExtent(gpu.surfaceCaps);
 
-  depthOptions.width = extent.width;
-  depthOptions.height = extent.height;
-#else
-  depthOptions.width = renderSystem->GetWidth();
-  depthOptions.height = renderSystem->GetHeight();
-#endif
+  idImageOpts depthOpts;
+  depthOpts.format = FMT_DEPTH;
+  depthOpts.width = extent.width;
+  depthOpts.height = extent.height;
+  depthOpts.numLevels = 1;
+  depthOpts.samples = static_cast<textureSamples_t>(vkcontext.sampleCount);
 
-  depthOptions.numLevels = 1;
-  depthOptions.samples = static_cast<textureSamples_t>(vkcontext.sampleCount);
-
-  globalImages->ScratchImage("_viewDepth", depthOptions);
+  // Recreate it instead of just resizing it--we could have moved to a different
+  // monitor or changed the display mode.
+  swapDepthImage = globalImages->ScratchImageBuffered("_viewDepth", depthOpts);
 }
 
 /*
@@ -1310,7 +1304,10 @@ static void CreateRenderTargets() {
 DestroyRenderTargets
 =============
 */
-static void DestroyRenderTargets() {}
+void idRenderBackend::DestroyRenderTargets() {
+  // Make sure this gets freed in order.
+  swapDepthImage = NULL;
+}
 
 /*
 =============
@@ -1330,24 +1327,20 @@ CreateFrameBuffers
 =============
 */
 void idRenderBackend::CreateFrameBuffers() {
-  // depth attachment is the same
-  idImage* depthImg = globalImages->GetImage("_viewDepth");
-  if (depthImg == NULL) {
-    idLib::FatalError("CreateFrameBuffers: No _viewDepth image.");
+  if (swapDepthImage == NULL) {
+    idLib::FatalError("CreateFrameBuffers: No swap depth image.");
   }
+
+  swapFrameBuffer = RefPtr<id::BufferedFramebuffer>(new id::BufferedFramebuffer(
+      renderSystem->GetWidth(), renderSystem->GetHeight()));
 
   for (int i = 0; i < NUM_FRAME_DATA; ++i) {
     VkImageView attachment = vkcontext.swapchainViews[i];
 
-    swapFrameBuffers[i] =
-        new Framebuffer(renderSystem->GetWidth(), renderSystem->GetHeight());
-
     // Populate framebuffer.
-    {
-      Framebuffer* fb = swapFrameBuffers[i];
-      fb->VkUpdate(vkcontext.swapchainFormat, attachment, depthImg->GetView(),
-                   true);
-    }
+    Framebuffer* frame = swapFrameBuffer->Get(i);
+    frame->VkUpdate(vkcontext.swapchainFormat, attachment,
+                    swapDepthImage->Get(i)->GetView(), true);
   }
 }
 
@@ -1356,7 +1349,10 @@ void idRenderBackend::CreateFrameBuffers() {
 DestroyFrameBuffers
 =============
 */
-void idRenderBackend::DestroyFrameBuffers() { swapFrameBuffers.Zero(); }
+void idRenderBackend::DestroyFrameBuffers() {
+  // Make sure this gets freed in order.
+  swapFrameBuffer = NULL;
+}
 
 /*
 =============
@@ -1430,7 +1426,6 @@ idRenderBackend::idRenderBackend() {
   swapRecorded[1] = 0;
   swapRecorded[2] = 0;
 
-  swapFrameBuffers.Zero();
   swapSubmitCommandBuffers.Zero();
   resetQueryCommandBuffers.Zero();
 }
@@ -2031,7 +2026,7 @@ id::Framebuffer* idRenderBackend::GL_StartFrame() {
   cmd->Submit();
 
   // Return the swap framebuffer.
-  return swapFrameBuffers[vkcontext.currentSwapIndex];
+  return swapFrameBuffer->Get(vkcontext.currentSwapIndex);
 }
 
 /*

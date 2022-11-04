@@ -480,6 +480,36 @@ class idImage {
 #endif
 };
 
+// This is a wrapper around Image that is buffered for NUM_FRAME_DATA frames.
+//
+// Create an instance of idBufferedImage with
+// idImageManager::ScratchImageBuffered().
+class idBufferedImage {
+ public:
+  idBufferedImage(idImage** images) : _images(images) {}
+  ~idBufferedImage() {
+    if (_images != NULL) {
+      delete _images;
+    }
+  }
+
+  idImage* Get(int index) const { return _images[index]; }
+
+  void Resize(int width, int height) {
+    for (int i = 0; i < NUM_FRAME_DATA; i++) {
+      _images[i]->Resize(width, height);
+    }
+  }
+
+  void Bind();
+
+ private:
+  idBufferedImage(const idBufferedImage&) = delete;
+  idBufferedImage(const idBufferedImage&&) = delete;
+
+  idImage** _images;
+};
+
 // data is RGBA
 void LoadSTBImage(const char* filename, unsigned char** pic, int* width,
                   int* height, ID_TIME_T* timestamp);
@@ -527,14 +557,15 @@ class idImageManager {
   idImage* ImageFromFunction(const char* name,
                              void (*generatorFunction)(idImage* image));
 
-  // scratch images are for internal renderer use.  ScratchImage names should
-  // always begin with an underscore
-  idImage* ScratchImage(const char* name, idImageOpts* imgOpts,
-                        textureFilter_t filter, textureRepeat_t repeat,
-                        textureUsage_t usage);
-
   // These images are for internal renderer use.  Names should start with "_".
   idImage* ScratchImage(const char* name, const idImageOpts& opts);
+
+  // These images are for internal renderer use.  Names should start with "_".
+  //
+  // The image is buffered for NUM_FRAME_DATA frames. The name of each frame is
+  // name + "_frame" + frameData.
+  RefPtr<idBufferedImage> ScratchImageBuffered(const char* name,
+                                               const idImageOpts& opts);
 
   // purges all the images before a vid_restart
   void PurgeAllImages();
@@ -567,6 +598,10 @@ class idImageManager {
   idImage* noFalloffImage;   // all 255, but zero clamped
   idImage* fogImage;         // increasing alpha is denser fog
   idImage* fogEnterImage;    // adjust fogImage alpha based on terminator plane
+
+  RefPtr<idBufferedImage> hdrImage;
+  RefPtr<idBufferedImage> hdrDepthImage;
+
   // RB begin
   idImage* shadowImage[5];
   idImage* jitterImage1;  // shadow jitter
@@ -575,9 +610,6 @@ class idImageManager {
   idImage* grainImage1;
   idImage* randomImage256;
   idImage* blueNoiseImage256;
-  idImage* currentRenderHDRImage;
-  idImage* currentRenderHDRImageQuarter;
-  idImage* currentRenderHDRImage64;
   idImage* bloomRenderImage[2];
   idImage* envprobeHDRImage;
   idImage* envprobeDepthImage;
