@@ -1073,7 +1073,7 @@ void idRenderBackend::FillDepthBufferFast(drawSurf_t** drawSurfs,
   }
 
   const drawSurf_t** perforatedSurfaces =
-      (const drawSurf_t**)_alloca(numDrawSurfs * sizeof(drawSurf_t*));
+      (const drawSurf_t**)_alloca(numDrawSurfs * sizeof(void*));
   int numPerforatedSurfaces = 0;
 
   // draw all the opaque surfaces and build up a list of perforated surfaces

@@ -105,8 +105,8 @@ struct jobBackEndCommandsHelper_t {
   idRenderBackend* backend;
 };
 
-void Job_ExecuteBackEndCommands(int workItemIdx, int workItemLen, void* user) {
-  auto helper = (jobBackEndCommandsHelper_t*)user;
+void Job_ExecuteBackEndCommands(int workItemIdx, int workItemLen,
+                                jobBackEndCommandsHelper_t* helper) {
   helper->backend->ExecuteBackEndCommands(helper->cmdHead);
 }
 
@@ -135,17 +135,14 @@ void idRenderSystemLocal::RenderCommandBuffers(
   // r_skipRender is usually more useful, because it will still
   // draw 2D graphics
   if (!r_skipBackEnd.GetBool()) {
-    // This is okay since we're waiting within this block anyway.
-    jobBackEndCommandsHelper_t helper = {
-        .cmdHead = cmdHead,
-        .backend = &backend,
-    };
-
     // Dispatch the job and wait for it to finish.
-    const auto job =
-        scheduler->Submit(id::TAG_RENDERER_BACKEND, &Job_ExecuteBackEndCommands,
-                          1, (void*)&helper);
-    scheduler->Wait(job);
+    auto job = scheduler->Submit(
+        id::TAG_RENDERER_BACKEND,
+        [&](int workItemIdx, int workItemLen, void* userData) {
+          backend.ExecuteBackEndCommands(cmdHead);
+        });
+
+    scheduler->Await(job);
   }
 
   // pass in null for now - we may need to do some map specific hackery in the

@@ -37,13 +37,18 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #pragma once
 
 #include <sx/jobs.h>
+#include <functional>
 
 namespace id {
 
 const int MAX_FIBERS = 2048;
 const int STACK_SIZE_BYTES = 1048576;  // 1MB stack size
 
-typedef void(jobFn_t)(int work_idx, int work_len, void* user_data);
+template <typename T>
+using jobFnGeneric_t =
+    std::function<void(int work_idx, int work_len, T* user_data)>;
+using jobFn_t = jobFnGeneric_t<void>;
+
 typedef sx_job_context* jobContextHandle_t;
 
 struct jobListHandle_t {
@@ -81,16 +86,30 @@ struct Scheduler {
   ~Scheduler();
 
   // Submit the jobs in this list.
-  jobListHandle_t Submit(taskTags_t tag, jobFn_t fn, int workLen, void* data);
-  inline jobListHandle_t Submit(jobFn_t fn, int workLen, void* data) {
+  jobListHandle_t Submit(taskTags_t tag, jobFn_t fn, int workLen = 1,
+                         void* data = NULL);
+
+  inline jobListHandle_t Submit(jobFn_t fn, int workLen = 1,
+                                void* data = NULL) {
     return Submit(TAG_NONE, fn, workLen, data);
   }
 
-  // Wait for the jobs in this list to finish.
-  void Wait(jobListHandle_t handle);
-  // Try to wait for the jobs in this list to finish but either way return
-  // immediately. Returns true if all jobs are done.
-  bool TryWait(jobListHandle_t handle);
+  template <typename T>
+  inline jobListHandle_t Submit(taskTags_t tag, jobFnGeneric_t<T> fn,
+                                int workLen = 1, T* data = NULL) {
+    return Submit(tag, (jobFn_t)fn, workLen, (void*)data);
+  }
+
+  template <typename T>
+  inline jobListHandle_t Submit(jobFnGeneric_t<T> fn, int workLen = 1,
+                                T* data = NULL) {
+    return Submit(TAG_NONE, (jobFn_t)fn, workLen, (void*)data);
+  }
+
+  // Await for the current job to finish.
+  void Await(jobListHandle_t handle);
+  // Returns true if the job is done, false otherwise.
+  bool IsCompleted(jobListHandle_t handle);
 
   bool InTask();
 

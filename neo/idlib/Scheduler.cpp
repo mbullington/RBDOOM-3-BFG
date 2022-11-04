@@ -72,12 +72,12 @@ void SxThreadInit(sx_job_context* context, int thread_index,
 }
 
 struct sxTaskData_t {
-  jobFn_t* fn;
   int workLen;
+  jobFn_t fn;
   void* data;
 };
 
-sxTaskData_t* CreateSxTaskData(jobFn_t* fn, int workLen, void* data) {
+sxTaskData_t* CreateSxTaskData(jobFn_t fn, int workLen, void* data) {
   auto taskData = new sxTaskData_t;
   taskData->fn = fn;
   taskData->workLen = workLen;
@@ -135,7 +135,7 @@ jobListHandle_t Scheduler::Submit(taskTags_t tag, jobFn_t fn, int workLen,
   };
 }
 
-void Scheduler::Wait(jobListHandle_t handle) {
+void Scheduler::Await(jobListHandle_t handle) {
   if (handle.deleted) {
     return;
   }
@@ -144,7 +144,7 @@ void Scheduler::Wait(jobListHandle_t handle) {
   handle.deleted = true;
 }
 
-bool Scheduler::TryWait(jobListHandle_t handle) {
+bool Scheduler::IsCompleted(jobListHandle_t handle) {
   if (handle.deleted) {
     return true;
   }
