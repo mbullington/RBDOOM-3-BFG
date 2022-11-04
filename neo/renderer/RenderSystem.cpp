@@ -143,9 +143,9 @@ void idRenderSystemLocal::RenderCommandBuffers(
 
     // Dispatch the job and wait for it to finish.
     const auto job =
-        taskScheduler->Submit(id::TAG_RENDERER_BACKEND,
-                              &Job_ExecuteBackEndCommands, 1, (void*)&helper);
-    taskScheduler->Wait(job);
+        scheduler->Submit(id::TAG_RENDERER_BACKEND, &Job_ExecuteBackEndCommands,
+                          1, (void*)&helper);
+    scheduler->Wait(job);
   }
 
   // pass in null for now - we may need to do some map specific hackery in the

@@ -59,7 +59,7 @@ enum taskTags_t {
 };
 
 // ================================================
-// TaskScheduler is largely a wrapper around the "sx" library,
+// Scheduler is largely a wrapper around the "sx" library,
 // which has a nested job system based on a 2015 GDC talk from Christian Gyrling
 // (at Naughty Dog):
 //
@@ -75,10 +75,10 @@ enum taskTags_t {
 // Given hyperthreading & 4+ cores now on most CPUs (even mobile), this should
 // be a reasonable default.
 // ================================================
-struct TaskScheduler {
+struct Scheduler {
  public:
-  TaskScheduler(int stackSizeBytes = STACK_SIZE_BYTES);  // 2MB
-  ~TaskScheduler();
+  Scheduler(int stackSizeBytes = STACK_SIZE_BYTES);  // 2MB
+  ~Scheduler();
 
   // Submit the jobs in this list.
   jobListHandle_t Submit(taskTags_t tag, jobFn_t fn, int workLen, void* data);
@@ -98,6 +98,6 @@ struct TaskScheduler {
   jobContextHandle_t context;
 };
 
-extern TaskScheduler* taskScheduler;
+extern Scheduler* scheduler;
 
 }  // namespace id

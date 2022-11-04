@@ -41,11 +41,11 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include <sx/jobs.h>
 #include <sx/os.h>  // sx_os_numcores
 
-#include "TaskScheduler.h"
+#include "Scheduler.h"
 
 namespace id {
 
-TaskScheduler* taskScheduler = NULL;
+Scheduler* scheduler = NULL;
 
 void SxThreadInit(sx_job_context* context, int thread_index,
                   unsigned int thread_id, void* user) {
@@ -96,7 +96,7 @@ void SxJobFunc(int range_start, int range_end, int thread_index, void* user) {
   delete taskData;
 }
 
-TaskScheduler::TaskScheduler(int stackSizeBytes) {
+Scheduler::Scheduler(int stackSizeBytes) {
   // Per https://fabiensanglard.net/doom3_bfg/threading.php, there are three
   // "serialized" threads:
   //
@@ -122,10 +122,10 @@ TaskScheduler::TaskScheduler(int stackSizeBytes) {
   this->context = sx_job_create_context(alloc, &desc);
 }
 
-TaskScheduler::~TaskScheduler() { sx_job_destroy_context(context, alloc); }
+Scheduler::~Scheduler() { sx_job_destroy_context(context, alloc); }
 
-jobListHandle_t TaskScheduler::Submit(taskTags_t tag, jobFn_t fn, int workLen,
-                                      void* data) {
+jobListHandle_t Scheduler::Submit(taskTags_t tag, jobFn_t fn, int workLen,
+                                  void* data) {
   auto taskData = CreateSxTaskData(fn, workLen, data);
   auto job = sx_job_dispatch(context, workLen, SxJobFunc, taskData,
                              SX_JOB_PRIORITY_NORMAL, tag);
@@ -135,7 +135,7 @@ jobListHandle_t TaskScheduler::Submit(taskTags_t tag, jobFn_t fn, int workLen,
   };
 }
 
-void TaskScheduler::Wait(jobListHandle_t handle) {
+void Scheduler::Wait(jobListHandle_t handle) {
   if (handle.deleted) {
     return;
   }
@@ -144,7 +144,7 @@ void TaskScheduler::Wait(jobListHandle_t handle) {
   handle.deleted = true;
 }
 
-bool TaskScheduler::TryWait(jobListHandle_t handle) {
+bool Scheduler::TryWait(jobListHandle_t handle) {
   if (handle.deleted) {
     return true;
   }
@@ -157,6 +157,6 @@ bool TaskScheduler::TryWait(jobListHandle_t handle) {
   return ret;
 }
 
-bool TaskScheduler::InTask() { return sx_job_in_job(context); }
+bool Scheduler::InTask() { return sx_job_in_job(context); }
 
 }  // namespace id

@@ -97,7 +97,7 @@ void idLib::Init() {
 
   // initialize task scheduler.
   alloc = sx_alloc_malloc();
-  id::taskScheduler = new id::TaskScheduler();
+  id::scheduler = new id::Scheduler();
 }
 
 /*
@@ -116,7 +116,7 @@ void idLib::ShutDown() {
   idSIMD::Shutdown();
 
   // shut down task scheduler.
-  delete id::taskScheduler;
+  delete id::scheduler;
 
   // shut down heap memory allocator
   Mem_Shutdown();

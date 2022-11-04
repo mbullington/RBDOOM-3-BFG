@@ -38,7 +38,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
-#include "../TaskScheduler.h"
+#include "../Scheduler.h"
 
 #include <sx/allocator.h>
 #include <sx/threads.h>
@@ -81,7 +81,7 @@ Sys_Yield
 ========================
 */
 void Sys_Yield() {
-  if (id::taskScheduler->InTask()) {
+  if (id::scheduler->InTask()) {
     sx_relax_cpu();
   }
 
@@ -135,7 +135,7 @@ Sys_SignalWait
 ========================
 */
 bool Sys_SignalWait(signalHandle_t& handle, int timeout) {
-  if (id::taskScheduler->InTask()) {
+  if (id::scheduler->InTask()) {
     common->FatalError(
         "Cannot use operating system thread sync within task; use locks "
         "instead.");
@@ -175,7 +175,7 @@ Sys_MutexLock
 ========================
 */
 bool Sys_MutexLock(mutexHandle_t& handle, bool blocking) {
-  if (id::taskScheduler->InTask()) {
+  if (id::scheduler->InTask()) {
     common->FatalError(
         "Cannot use operating system thread sync within task; use locks "
         "instead.");
@@ -196,7 +196,7 @@ Sys_MutexUnlock
 ========================
 */
 void Sys_MutexUnlock(mutexHandle_t& handle) {
-  if (id::taskScheduler->InTask()) {
+  if (id::scheduler->InTask()) {
     common->FatalError(
         "Cannot use operating system thread sync within task; use locks "
         "instead.");
