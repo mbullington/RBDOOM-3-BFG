@@ -4919,12 +4919,6 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
     return;
   }
 
-  // r_debugRenderToTexture
-  int c_draw3d = 0;
-  int c_draw2d = 0;
-  int c_setBuffers = 0;
-  int c_copyRenders = 0;
-
   resolutionScale.SetCurrentGPUFrameTime(
       commonLocal.GetRendererGPUMicroseconds());
 
@@ -4973,7 +4967,6 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
 
         drawView3D_timestamps = true;
         DrawView(cmds, 0);
-        c_draw3d++;
 
         commandBuffer.MakeActive();
 
@@ -5009,16 +5002,13 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
         } else {
           DrawView(cmds, 0);
         }
-        c_draw2d++;
 
       case RC_SET_BUFFER:
         SetBuffer(cmds);
-        c_setBuffers++;
         break;
 
       case RC_COPY_RENDER:
         CopyRender(cmds);
-        c_copyRenders++;
         break;
 
       case RC_POST_PROCESS:
@@ -5046,13 +5036,6 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
   // stop rendering on this thread
   uint64 backEndFinishTime = Sys_Microseconds();
   pc.cpuTotalMicroSec = backEndFinishTime - backEndStartTime;
-
-  if (r_debugRenderToTexture.GetInteger() == 1) {
-    common->Printf(
-        "3d: %i, 2d: %i, SetBuf: %i, CpyRenders: %i, CpyFrameBuf: %i\n",
-        c_draw3d, c_draw2d, c_setBuffers, c_copyRenders, pc.c_copyFrameBuffer);
-    pc.c_copyFrameBuffer = 0;
-  }
 
   renderLog.EndFrame();
 }

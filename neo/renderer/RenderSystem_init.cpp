@@ -477,10 +477,6 @@ idCVar r_debugPolygonFilled("r_debugPolygonFilled", "1",
 idCVar r_materialOverride("r_materialOverride", "", CVAR_RENDERER,
                           "overrides all materials",
                           idCmdSystem::ArgCompletion_Decl<DECL_MATERIAL>);
-
-idCVar r_debugRenderToTexture("r_debugRenderToTexture", "0",
-                              CVAR_RENDERER | CVAR_INTEGER, "");
-
 idCVar stereoRender_enable("stereoRender_enable", "0",
                            CVAR_INTEGER | CVAR_ARCHIVE,
                            "1 = side-by-side compressed, 2 = top and bottom "

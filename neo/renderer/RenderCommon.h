@@ -1278,8 +1278,6 @@ extern idCVar r_debugPolygonFilled;
 
 extern idCVar r_materialOverride;  // override all materials
 
-extern idCVar r_debugRenderToTexture;
-
 extern idCVar stereoRender_enable;
 extern idCVar
     stereoRender_deGhost;  // subtract from opposite eye to reduce ghosting
