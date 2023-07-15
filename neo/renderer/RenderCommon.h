@@ -754,7 +754,6 @@ enum renderCommand_t {
   RC_DRAW_VIEW_3D,   // may be at a reduced resolution, will be upsampled before
                      // 2D GUIs
   RC_DRAW_VIEW_GUI,  // not resolution scaled
-  RC_SET_BUFFER,
   RC_COPY_RENDER,
   RC_POST_PROCESS,
 };
@@ -762,12 +761,6 @@ enum renderCommand_t {
 struct emptyCommand_t {
   renderCommand_t commandId;
   renderCommand_t* next;
-};
-
-struct setBufferCommand_t {
-  renderCommand_t commandId;
-  renderCommand_t* next;
-  int buffer;
 };
 
 struct drawSurfsCommand_t {

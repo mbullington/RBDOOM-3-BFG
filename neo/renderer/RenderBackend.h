@@ -357,7 +357,7 @@ class idRenderBackend {
 
   // RB: HDR stuff
 
-  void Tonemap(const viewDef_t* viewDef);
+  void Tonemap();
   void Bloom(const viewDef_t* viewDef);
 
   void DrawScreenSpaceAmbientOcclusion(const viewDef_t* _viewDef,
@@ -430,8 +430,6 @@ class idRenderBackend {
   }
 
   //	void				GL_Color( float* color );
-
-  void SetBuffer(const void* data);
 
  private:
   void DBG_SimpleSurfaceSetup(const drawSurf_t* drawSurf);

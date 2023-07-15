@@ -2554,21 +2554,6 @@ void idRenderBackend::DrawFlickerBox() {
 }
 
 /*
-=============
-idRenderBackend::SetBuffer
-=============
-*/
-void idRenderBackend::SetBuffer(const void* data) {
-  // see which draw buffer we want to render the frame to
-  // TODO(mbullington): Currently does nothing ?
-
-  const setBufferCommand_t* cmd = (const setBufferCommand_t*)data;
-
-  RENDERLOG_PRINTF("---------- RB_SetBuffer ---------- to buffer # %d\n",
-                   cmd->buffer);
-}
-
-/*
 ====================
 idRenderBackend::StereoRenderExecuteBackEndCommands
 

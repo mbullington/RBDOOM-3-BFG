@@ -40,6 +40,7 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "precompiled.h"
 #pragma hdrstop
 
+#include <sx/lockless.h>
 #include "framework/Common_local.h"
 #include "RenderCommon.h"
 #include "Framebuffer.h"
@@ -47,6 +48,8 @@ terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite
 #include "imgui/ImGui_Hooks.h"
 
 using id::globalFramebuffers;
+using id::jobFn_t;
+using id::scheduler;
 
 idCVar r_drawEyeColor(
     "r_drawEyeColor", "0", CVAR_RENDERER | CVAR_BOOL,
@@ -4308,7 +4311,7 @@ void idRenderBackend::FogAllLights() {
   renderLog.CloseMainBlock();
 }
 
-void idRenderBackend::Tonemap(const viewDef_t* _viewDef) {
+void idRenderBackend::Tonemap() {
   RENDERLOG_PRINTF(
       "---------- RB_Tonemap( avg = %f, max = %f, key = %f, is2Dgui = %i ) "
       "----------\n",
@@ -4938,86 +4941,118 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
 
   // Wait for VSync and acquire framebuffer.
   Framebuffer* swapChain = GL_StartFrame();
-  uint64 backEndStartTime = Sys_Microseconds();
+  uint64 startTime = Sys_Microseconds();
 
-  // needed for editor rendering
   GL_SetDefaultState();
 
   //
   // This is where we'll create all our CommandBuffers, such as for the
   // HDR and final composition pass.
   //
+  // BIG TODO: We shouldn't be using sx_lock directly here, but rather
+  // an abstraction like idSpinLock or something.
 
+  sx_lock_t hdrLock;
   CommandBuffer hdrCommandBuffer;
   hdrCommandBuffer.Begin();
   hdrCommandBuffer.Bind(globalFramebuffers.hdrFBO);
 
+  sx_lock_t lock;
   CommandBuffer commandBuffer;
   commandBuffer.SetDependencies((CommandBuffer*[]){&hdrCommandBuffer}, 1);
   commandBuffer.Begin();
   commandBuffer.Bind(swapChain);
 
-  for (; cmds != NULL; cmds = (const emptyCommand_t*)cmds->next) {
-    switch (cmds->commandId) {
-      case RC_NOP:
-        break;
+  // Do a pre-pass of the commands so we can make a single Mem_Alloc call.
+  int numCommands = 0;
+  bool has3DView = false;
+  for (const emptyCommand_t* temp = cmds; temp != NULL;
+       temp = (const emptyCommand_t*)temp->next) {
+    numCommands++;
 
-      case RC_DRAW_VIEW_3D: {
-        hdrCommandBuffer.MakeActive();
-        DrawView(cmds, 0);
-
-        commandBuffer.MakeActive();
-        // Do tonemapping.
-        {
-          hdrKey = r_hdrKey.GetFloat();
-          hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
-          hdrMaxLuminance = 1;
-
-          Tonemap(((const drawSurfsCommand_t*)cmds)->viewDef);
-        }
-
-        break;
-      }
-
-      case RC_DRAW_VIEW_GUI: {
-        renderLog.OpenMainBlock(MRB_DRAW_GUI);
-        renderLog.OpenBlock("Render_DrawViewGUI", colorBlue);
-        // Disable detailed timestamps during overlay GUI rendering so
-        // they do not overwrite timestamps from 3D rendering
-        const bool timerQueryAvailable = glConfig.timerQueryAvailable;
-        glConfig.timerQueryAvailable = false;
-
-        commandBuffer.MakeActive();
-        DrawView(cmds, 0);
-
-        // SRS - Restore timestamp capture state after overlay GUI rendering
-        // is finished
-        glConfig.timerQueryAvailable = timerQueryAvailable;
-        renderLog.CloseBlock();
-        renderLog.CloseMainBlock();
-        break;
-      }
-
-      case RC_SET_BUFFER:
-        SetBuffer(cmds);
-        break;
-
-      case RC_COPY_RENDER:
-        CopyRender(cmds);
-        break;
-
-      // TODO(mbullington)
-      case RC_POST_PROCESS: {
-        // apply optional post processing
-        // PostProcess(cmds);
-        break;
-      }
-
-      default:
-        common->Error("RB_ExecuteBackEndCommands: bad commandId");
-        break;
+    // This is used for the HDR -> LDR tonemapping.
+    if (temp->commandId == RC_DRAW_VIEW_3D) {
+      has3DView = true;
     }
   }
+
+  // Allocate a single block of memory for all the commands.
+  idTempArray<const emptyCommand_t*> commandList(numCommands);
+  int commandIndex = 0;
+  for (const emptyCommand_t* temp = cmds; temp != NULL;
+       temp = (const emptyCommand_t*)temp->next) {
+    commandList[commandIndex++] = temp;
+  }
+
+  // Tonemapping will "bring" it all together at the end, by converting
+  // the HDR framebuffer to LDR and drawing it **before**
+  // the commands for UI.
+  if (has3DView) {
+    commandBuffer.MakeActive();
+
+    hdrKey = r_hdrKey.GetFloat();
+    hdrAverageLuminance = r_hdrMinLuminance.GetFloat();
+    hdrMaxLuminance = 1;
+    Tonemap();
+  }
+
+  jobFn_t task = [&](int workStart, int workEnd, void* userData) {
+    for (int i = workStart; i < workEnd; i++) {
+      auto cmd = commandList[i];
+      switch (cmd->commandId) {
+        case RC_NOP:
+          break;
+
+        case RC_DRAW_VIEW_3D: {
+          sx_lock_enter(&hdrLock);
+          hdrCommandBuffer.MakeActive();
+          DrawView(cmd, 0);
+          sx_lock_exit(&hdrLock);
+          break;
+        }
+
+        case RC_DRAW_VIEW_GUI: {
+          sx_lock_enter(&lock);
+          renderLog.OpenMainBlock(MRB_DRAW_GUI);
+          renderLog.OpenBlock("Render_DrawViewGUI", colorBlue);
+          // Disable detailed timestamps during overlay GUI rendering so
+          // they do not overwrite timestamps from 3D rendering
+          const bool timerQueryAvailable = glConfig.timerQueryAvailable;
+          glConfig.timerQueryAvailable = false;
+
+          {
+            commandBuffer.MakeActive();
+            DrawView(cmd, 0);
+          }
+
+          // SRS - Restore timestamp capture state after overlay GUI rendering
+          // is finished
+          glConfig.timerQueryAvailable = timerQueryAvailable;
+          renderLog.CloseBlock();
+          renderLog.CloseMainBlock();
+          sx_lock_exit(&lock);
+          break;
+        }
+
+        case RC_COPY_RENDER:
+          CopyRender(cmd);
+          break;
+
+        case RC_POST_PROCESS: {
+          // apply optional post processing
+          // PostProcess(cmds);
+          break;
+        }
+
+        default:
+          common->Error("RB_ExecuteBackEndCommands: bad commandId");
+          break;
+      }
+    }
+  };
+
+  auto job = scheduler->Submit(id::TAG_RENDERER_BACKEND, task, numCommands);
+  scheduler->Await(job);
 
   // This is a visual test for frames that are dropped.
   DrawFlickerBox();
@@ -5025,12 +5060,10 @@ void idRenderBackend::ExecuteBackEndCommands(const emptyCommand_t* cmds) {
   hdrCommandBuffer.Submit();
   commandBuffer.Submit();
 
+  // Tell the GPU after our commands are done, we can present the framebuffer.
   GL_EndFrame(&commandBuffer);
 
-  // stop rendering on this thread
-  uint64 backEndFinishTime = Sys_Microseconds();
-  pc.cpuTotalMicroSec = backEndFinishTime - backEndStartTime;
-
+  pc.cpuTotalMicroSec = Sys_Microseconds() - startTime;
   renderLog.EndFrame();
 }
 

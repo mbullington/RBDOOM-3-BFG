@@ -71,29 +71,16 @@ void SxThreadInit(sx_job_context* context, int thread_index,
   }
 }
 
-struct sxTaskData_t {
-  int workLen;
-  jobFn_t fn;
-  void* data;
-};
-
 sxTaskData_t* CreateSxTaskData(jobFn_t fn, int workLen, void* data) {
   auto taskData = new sxTaskData_t;
   taskData->fn = fn;
-  taskData->workLen = workLen;
   taskData->data = data;
   return taskData;
 }
 
 void SxJobFunc(int range_start, int range_end, int thread_index, void* user) {
   sxTaskData_t* taskData = (sxTaskData_t*)user;
-
-  for (int i = range_start; i < range_end; i++) {
-    taskData->fn(i, taskData->workLen, taskData->data);
-  }
-
-  // Free task data
-  delete taskData;
+  taskData->fn(range_start, range_end, taskData->data);
 }
 
 Scheduler::Scheduler(int stackSizeBytes) {
@@ -132,6 +119,7 @@ jobListHandle_t Scheduler::Submit(taskTags_t tag, jobFn_t fn, int workLen,
   return {
       .job = job,
       .deleted = false,
+      .taskData = taskData,
   };
 }
 
@@ -142,6 +130,7 @@ void Scheduler::Await(jobListHandle_t handle) {
 
   sx_job_wait_and_del(context, handle.job);
   handle.deleted = true;
+  delete handle.taskData;
 }
 
 bool Scheduler::IsCompleted(jobListHandle_t handle) {
@@ -152,6 +141,7 @@ bool Scheduler::IsCompleted(jobListHandle_t handle) {
   bool ret = sx_job_test_and_del(context, handle.job);
   if (ret) {
     handle.deleted = true;
+    delete handle.taskData;
   }
 
   return ret;

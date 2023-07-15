@@ -51,9 +51,15 @@ using jobFn_t = jobFnGeneric_t<void>;
 
 typedef sx_job_context* jobContextHandle_t;
 
+struct sxTaskData_t {
+  jobFn_t fn;
+  void* data;
+};
+
 struct jobListHandle_t {
   sx_job_t job;
   bool deleted;
+  sxTaskData_t* taskData;
 };
 
 enum taskTags_t {
